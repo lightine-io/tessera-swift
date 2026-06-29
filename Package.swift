@@ -16,8 +16,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "Tessera",
-            url: "https://github.com/lightine-io/tessera/releases/download/v0.2.1/Tessera.xcframework.zip",
-            checksum: "de91d7bcb51756e924f34b468396c9e8fc8eac941ca4bca0f33983458bdebf2d"
+            url: "https://github.com/lightine-io/tessera/releases/download/v0.3.0/Tessera.xcframework.zip",
+            checksum: "5b2e894dcd164e21ea168001b1d9bd8aa1c2a6fed9b3f247533f20052934f936"
         ),
     ]
 )
