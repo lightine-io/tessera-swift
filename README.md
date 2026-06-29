@@ -2,7 +2,7 @@
 
 Swift Package Manager (SPM) distribution of **Tessera** — a vendor-neutral SDK for reading and validating identity-document data (Machine Readable Zones) — for iOS / Swift consumers.
 
-> **Current release: `0.2.1`.** Headless live-camera MRZ reading (AVFoundation + Apple Vision) plus the ICAO Doc 9303 parsing / validation / generation core, vended as the `Tessera` XCFramework.
+> **Current release: `0.3.0`.** Headless live-camera and saved-image (pre-captured) MRZ reading (AVFoundation + Apple Vision) plus the ICAO Doc 9303 parsing / validation / generation core, vended as the `Tessera` XCFramework.
 
 ## What this repository is
 
@@ -10,7 +10,7 @@ Tessera is built from a single Kotlin Multiplatform codebase. JVM and Android co
 
 ## Using it
 
-In Xcode: **File → Add Package Dependencies…**, enter this repository's URL and choose version **`0.2.1`** (or "Up to Next Major"). Then:
+In Xcode: **File → Add Package Dependencies…**, enter this repository's URL and choose version **`0.3.0`** (or "Up to Next Major"). Then:
 
 ```swift
 import Tessera
@@ -20,7 +20,7 @@ Or in a `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/lightine-io/tessera-swift", from: "0.2.1"),
+    .package(url: "https://github.com/lightine-io/tessera-swift", from: "0.3.0"),
 ]
 ```
 
@@ -31,5 +31,5 @@ Minimum deployment target: **iOS 18**.
 ## Links
 
 - **Main project & source:** https://github.com/lightine-io/tessera
-- **Release & XCFramework:** https://github.com/lightine-io/tessera/releases/tag/v0.2.1
+- **Release & XCFramework:** https://github.com/lightine-io/tessera/releases/tag/v0.3.0
 - **License:** [Apache-2.0](LICENSE)
