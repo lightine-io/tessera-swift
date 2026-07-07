@@ -1,0 +1,9 @@
+# SwiftPM / Xcode build products
+.build/
+.build-apiguard/
+.swiftpm/
+DerivedData/
+*.xcresult
+
+# macOS
+.DS_Store

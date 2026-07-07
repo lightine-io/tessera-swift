@@ -6,7 +6,18 @@ Swift Package Manager (SPM) distribution of **Tessera** — a vendor-neutral SDK
 
 ## What this repository is
 
-Tessera is built from a single Kotlin Multiplatform codebase. JVM and Android consumers get it from Maven Central; **iOS / Swift consumers get it here**, through Swift Package Manager. This repository hosts the `Package.swift` that vends the `Tessera` XCFramework — the iOS binary, attached as an asset to a release of the [main project](https://github.com/lightine-io/tessera).
+Tessera is built from a single Kotlin Multiplatform codebase. JVM and Android consumers get it from Maven Central; **iOS / Swift consumers get it here**, through Swift Package Manager. This repository hosts the `Package.swift` that vends the iOS products, and — from `0.5.0` — the hand-written SwiftUI default UI.
+
+## Products
+
+This package vends two library products:
+
+| Product | What it is |
+|---|---|
+| **`Tessera`** | The headless SDK: MRZ parsing / validation / generation plus the AVFoundation + Apple Vision live-camera scanner, vended as the `Tessera` XCFramework (built from the [main project](https://github.com/lightine-io/tessera) and attached to its GitHub release). |
+| **`TesseraUI`** | *(new in `0.5.0`, in development)* The optional default MRZ scanner UI — hand-written SwiftUI layered over the headless `Tessera` APIs. A single entry view (`MrzScannerView`) plus `MrzScannerConfig` and a result callback. Its public surface freezes at the `0.5.0` tag, lockstep-versioned with `Tessera`. |
+
+Import only what you need — `import Tessera` for the headless SDK, `import TesseraUI` for the default UI (which re-exports the headless types it hands back).
 
 ## Using it
 
