@@ -34,15 +34,9 @@ public struct MrzScannerView: View {
     }
 
     public var body: some View {
-        // Placeholder scaffold body — replaced by the real state-machine-driven UI in later slices.
-        VStack(spacing: 16) {
-            Image(systemName: "doc.viewfinder")
-                .font(.system(size: 48))
-            Text("Tessera scanner")
-                .font(.headline)
-            Button("Cancel") { onResult(.cancelled(.userDismissed)) }
-        }
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        // The state-machine-driven UI: RootScannerView owns the ScannerModel, dispatches the matching screen
+        // under the shared ScannerScaffold chrome, and applies the theme. The leaf screen bodies land in
+        // later slices; the foundation (state model, decisions, live preview, scaffold, theme) is here.
+        RootScannerView(config: config, onResult: onResult)
     }
 }

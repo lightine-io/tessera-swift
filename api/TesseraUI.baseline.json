@@ -6,6 +6,48 @@
     "children": [
       {
         "kind": "Import",
+        "name": "AVFoundation",
+        "printedName": "AVFoundation",
+        "declKind": "Import",
+        "moduleName": "TesseraUI"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "TesseraUI"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "TesseraUI"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "TesseraUI"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "TesseraUI"
+      },
+      {
+        "kind": "Import",
+        "name": "Observation",
+        "printedName": "Observation",
+        "declKind": "Import",
+        "moduleName": "TesseraUI"
+      },
+      {
+        "kind": "Import",
         "name": "SwiftOnoneSupport",
         "printedName": "SwiftOnoneSupport",
         "declKind": "Import",
@@ -27,8 +69,22 @@
       },
       {
         "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "TesseraUI"
+      },
+      {
+        "kind": "Import",
         "name": "_Concurrency",
         "printedName": "_Concurrency",
+        "declKind": "Import",
+        "moduleName": "TesseraUI"
+      },
+      {
+        "kind": "Import",
+        "name": "_PhotosUI_SwiftUI",
+        "printedName": "_PhotosUI_SwiftUI",
         "declKind": "Import",
         "moduleName": "TesseraUI"
       },

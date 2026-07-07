@@ -31,6 +31,7 @@ let tesseraBinary: Target = {
 
 let package = Package(
     name: "Tessera",
+    defaultLocalization: "en",
     platforms: [
         .iOS(.v18),
     ],
@@ -43,7 +44,8 @@ let package = Package(
         .target(
             name: "TesseraUI",
             dependencies: ["Tessera"],
-            path: "Sources/TesseraUI"
+            path: "Sources/TesseraUI",
+            resources: [.process("Resources")]
         ),
         .testTarget(
             name: "TesseraUITests",
