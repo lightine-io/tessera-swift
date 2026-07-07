@@ -28,8 +28,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select Xcode ${{ env.XCODE_VERSION }}
-        run: sudo xcode-select -s "/Applications/Xcode_${XCODE_VERSION}.app"
+      - name: Select Xcode (latest ${{ env.XCODE_VERSION }}.x on the runner)
+        run: |
+          # The runner's Xcode may be Xcode_26.6.app or Xcode_26.6.0.app etc.; pick the newest matching the
+          # pinned major.minor rather than hard-coding a full path (which broke: no /Applications/Xcode_26.6.app).
+          XC=$(ls -d /Applications/Xcode_${XCODE_VERSION}*.app 2>/dev/null | sort -V | tail -1)
+          if [ -z "$XC" ]; then XC=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -1); fi
+          echo "Selecting $XC"
+          sudo xcode-select -s "$XC"
+          xcodebuild -version
 
       - name: Resolve package dependencies
         run: xcodebuild -resolvePackageDependencies -scheme TesseraUI
