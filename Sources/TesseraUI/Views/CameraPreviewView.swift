@@ -23,9 +23,41 @@ struct CameraPreviewView: View {
                 PreviewLayerView(session: session)
                     .ignoresSafeArea()
                     .accessibilityIdentifier("tessera-mrz-viewfinder")
+                // The MRZ guide (mockup 01): a dashed frame + hint telling the user to line up the document's
+                // bottom lines (the MRZ band). Apple Vision reads all text in frame and the reader isolates the
+                // MRZ downstream; framing just the band gives a cleaner, faster read — this guides that.
+                MrzGuideOverlay()
             } else {
                 InitializingContent()
             }
+        }
+    }
+}
+
+/// The MRZ framing guide overlaid on the live preview (mockup 01): a dashed rounded frame sitting low in the
+/// view, where the machine-readable zone lands on a document held upright, plus a hint. Purely advisory — it
+/// never gates capture, and the reader still isolates the MRZ from wherever it appears. The frame is
+/// decorative (hidden from assistive tech); the hint carries the meaning as a spoken label.
+private struct MrzGuideOverlay: View {
+    var body: some View {
+        VStack(spacing: 12) {
+            Spacer()
+            RoundedRectangle(cornerRadius: 10)
+                .strokeBorder(
+                    Color.white.opacity(0.9),
+                    style: StrokeStyle(lineWidth: 2, dash: [8, 6])
+                )
+                .frame(height: 96)
+                .padding(.horizontal, 24)
+                .accessibilityHidden(true)
+            Text(String(localized: "tessera_scanner_camera_guide", bundle: .module))
+                .font(.callout.weight(.medium))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+                .shadow(color: .black.opacity(0.6), radius: 3)
+                .padding(.horizontal, 24)
+                .padding(.bottom, 48)
+                .accessibilityIdentifier("tessera-mrz-guide-hint")
         }
     }
 }

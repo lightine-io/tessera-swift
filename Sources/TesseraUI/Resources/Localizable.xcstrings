@@ -1010,6 +1010,16 @@
           }
         }
       }
+    },
+    "tessera_scanner_camera_guide": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fit the bottom lines of the document in the frame"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
