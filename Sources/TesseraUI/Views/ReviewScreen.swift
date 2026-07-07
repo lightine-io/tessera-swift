@@ -89,7 +89,7 @@ internal struct ReviewScreen: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(spacing: 8) {
-                        ForEach(reviewSummaryRows(reviewDocument)) { SummaryRow($0) }
+                        ForEach(Array(reviewSummaryRows(reviewDocument).enumerated()), id: \.offset) { SummaryRow($0.element) }
                     }
 
                     Divider()
@@ -97,7 +97,7 @@ internal struct ReviewScreen: View {
                     Text(String(localized: "tessera_scanner_review_observations_header", bundle: .module))
                         .font(.subheadline.weight(.semibold))
                     VStack(alignment: .leading, spacing: 6) {
-                        ForEach(reviewObservations) { ReviewObservationRow($0) }
+                        ForEach(Array(reviewObservations.enumerated()), id: \.offset) { ReviewObservationRow($0.element) }
                     }
 
                     Button(action: onToggleExpanded) {
@@ -138,7 +138,7 @@ internal struct ReviewScreen: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 8) {
-                    ForEach(reviewAllFieldRows(document)) { SummaryRow($0) }
+                    ForEach(Array(reviewAllFieldRows(document).enumerated()), id: \.offset) { SummaryRow($0.element) }
 
                     Divider()
 

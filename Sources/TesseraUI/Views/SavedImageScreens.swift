@@ -158,7 +158,7 @@ private struct CandidateCard: View {
             // The candidate's own per-candidate verdict — the same honest check-digit reporting the review
             // screen uses, over this candidate's parse. Not a decision; just what its check digits say.
             VStack(alignment: .leading, spacing: 4) {
-                ForEach(candidateObservations(candidate.parse)) { observation in
+                ForEach(Array(candidateObservations(candidate.parse).enumerated()), id: \.offset) { _, observation in
                     CandidateObservationRow(observation)
                 }
             }
