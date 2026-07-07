@@ -49,6 +49,21 @@ struct RootScannerView: View {
         switch state {
         case let .scanning(struggling):
             CameraPreviewView(session: model.previewSession)
+                .overlay(alignment: .topTrailing) {
+                    if config.showTorchButton {
+                        Button { model.toggleTorch() } label: {
+                            Image(systemName: model.torchOn ? "flashlight.on.fill" : "flashlight.off.fill")
+                                .font(.title2)
+                                .foregroundStyle(.white)
+                                .padding(12)
+                                .background(.black.opacity(0.45), in: Circle())
+                        }
+                        .padding(16)
+                        .accessibilityLabel(String(localized: "tessera_scanner_torch", bundle: .module))
+                        .accessibilityAddTraits(model.torchOn ? .isSelected : [])
+                        .accessibilityIdentifier("tessera-mrz-torch")
+                    }
+                }
                 .overlay(alignment: .top) {
                     if struggling {
                         StrugglingHint(onManualEntry: { model.enterManualEntry() })

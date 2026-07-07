@@ -1020,6 +1020,16 @@
           }
         }
       }
+    },
+    "tessera_scanner_torch": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Torch"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

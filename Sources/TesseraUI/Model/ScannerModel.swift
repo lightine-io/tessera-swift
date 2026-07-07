@@ -35,6 +35,12 @@ final class ScannerModel {
     /// been asked, so the permanent-denial face is reached without a separate rationale signal.
     private var hasAskedPermission = false
 
+    /// Whether the torch is currently on (reflected by the torch button). K/N does not expose the AVFoundation
+    /// torch API, so the torch is driven here in Swift via the capture device published on the session.
+    private(set) var torchOn = false
+    // Applies `torchOnByDefault` once per session, so it is not re-forced on every preview-session update.
+    private var torchDefaultApplied = false
+
     private let config: MrzScannerConfig
     private let onResult: (TesseraUIResult) -> Void
 
@@ -374,6 +380,9 @@ final class ScannerModel {
     }
 
     private func teardownScanner() {
+        // The torch turns off when the session stops; reset the flags so a re-start reapplies torchOnByDefault.
+        torchOn = false
+        torchDefaultApplied = false
         struggleTask?.cancel(); struggleTask = nil
         resultsTask?.cancel(); resultsTask = nil
         previewTask?.cancel(); previewTask = nil
@@ -393,6 +402,41 @@ final class ScannerModel {
     /// Main-actor delivery of the latest published `AVCaptureSession` (or `nil`), for the preview view.
     private func deliverPreviewSession(_ session: UnsafeTransfer<AVCaptureSession?>) {
         previewSession = session.value
+        // Honour torchOnByDefault the first time the camera opens (the device is now reachable via the session).
+        if session.value != nil, config.torchOnByDefault, !torchDefaultApplied {
+            torchDefaultApplied = true
+            setTorch(true)
+        }
+    }
+
+    // MARK: - Torch
+
+    /// Toggle the torch (the torch button's action).
+    func toggleTorch() {
+        setTorch(!torchOn)
+    }
+
+    /// Sets the active camera's torch on/off via the device published on the session. A no-op if the camera
+    /// isn't open yet or has no torch. Kotlin/Native doesn't bind the AVFoundation torch category, so this
+    /// lives in Swift; it's safe because torch is a device-level property orthogonal to the session config.
+    private func setTorch(_ on: Bool) {
+        guard let device = currentCaptureDevice(), device.hasTorch, device.isTorchAvailable else { return }
+        do {
+            try device.lockForConfiguration()
+            device.torchMode = on ? .on : .off
+            device.unlockForConfiguration()
+            torchOn = on
+        } catch {
+            // Torch config can fail transiently (device busy); leave the state unchanged.
+        }
+    }
+
+    /// The active video capture device, reached from the running session the scanner publishes.
+    private func currentCaptureDevice() -> AVCaptureDevice? {
+        previewSession?.inputs
+            .compactMap { $0 as? AVCaptureDeviceInput }
+            .first { $0.device.hasMediaType(.video) }?
+            .device
     }
 
     /// The continuous state reducer over the scanner's result stream — the iOS mirror of the Android
