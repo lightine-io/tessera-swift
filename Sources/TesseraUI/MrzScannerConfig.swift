@@ -90,7 +90,9 @@ public struct MrzScannerConfig: Sendable {
     public var torchOnByDefault: Bool
 
     /// How long with no decode before the "still looking / type it instead" hint appears (default 10s).
-    public var struggleTimeout: Duration
+    /// `nil` never shows the hint — the "never struggle" option, mirroring ``scanTimeout``'s `nil` convention
+    /// (Swift's `Duration` has no infinity sentinel, so absence is expressed as `nil`, not a magic value).
+    public var struggleTimeout: Duration?
 
     /// Total time before the scanner gives up and reports ``TesseraUIResult/cancelled(_:)`` with
     /// ``DismissReason/timedOut``. `nil` (the default) never times out.
@@ -108,7 +110,7 @@ public struct MrzScannerConfig: Sendable {
         reviewMode: ReviewMode = .review,
         showTorchButton: Bool = true,
         torchOnByDefault: Bool = false,
-        struggleTimeout: Duration = .seconds(10),
+        struggleTimeout: Duration? = .seconds(10),
         scanTimeout: Duration? = nil,
         theme: MrzScannerTheme = MrzScannerTheme(),
         onRequestPermission: (@Sendable () -> Void)? = nil

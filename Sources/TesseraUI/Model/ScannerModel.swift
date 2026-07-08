@@ -50,6 +50,7 @@ final class ScannerModel {
     private var resultsTask: Task<Void, Never>?
     private var previewTask: Task<Void, Never>?
     private var struggleTask: Task<Void, Never>?
+    private var scanTimeoutTask: Task<Void, Never>?
 
     /// A one-shot latch: once a decode has routed on (to review / read-failed / straight back), later decoded
     /// frames from the still-running stream must not re-fire. Kept as model state (not inside the collector)
@@ -356,6 +357,7 @@ final class ScannerModel {
         }
 
         armStruggleTimeout()
+        armScanTimeout()
         scanner.start()
     }
 
@@ -364,11 +366,9 @@ final class ScannerModel {
     /// struggle", so the timer does not arm. Mirrors the Android struggle `LaunchedEffect`.
     private func armStruggleTimeout() {
         struggleTask?.cancel()
-        let timeout = config.struggleTimeout
-        // A non-finite Duration means "never struggle".
-        guard timeout < .seconds(Int.max) else { return }
-        let nanos = UInt64(max(0, timeout.components.seconds)) * 1_000_000_000
-            + UInt64(max(0, timeout.components.attoseconds / 1_000_000_000))
+        // A nil struggleTimeout means "never struggle".
+        guard let timeout = config.struggleTimeout else { return }
+        let nanos = nanoseconds(for: timeout)
         struggleTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: nanos)
             guard !Task.isCancelled else { return }
@@ -379,11 +379,38 @@ final class ScannerModel {
         }
     }
 
+    /// After the configured scan timeout with no confirmed reading, give up and end the flow as
+    /// `Cancelled(timedOut)` — the whole-scan *deadline* (TES-85), distinct from the struggle timer, which only
+    /// nudges. A `nil` scanTimeout (the default) never arms. Runs once per scanning session — a rescan
+    /// re-creates the scanner and re-arms it — mirroring the Android scan-timeout `LaunchedEffect`.
+    private func armScanTimeout() {
+        scanTimeoutTask?.cancel()
+        guard let timeout = config.scanTimeout else { return }
+        let nanos = nanoseconds(for: timeout)
+        scanTimeoutTask = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: nanos)
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                // Only give up if still scanning — a decode that already routed to review/read-failed, or a
+                // teardown, leaves this a no-op (the task is cancelled on teardown regardless).
+                guard let self, case .scanning = self.state else { return }
+                self.onResult(.cancelled(.timedOut))
+            }
+        }
+    }
+
+    /// Nanoseconds for `Task.sleep`, clamped at ≥0. Shared by both timeout timers so they convert identically.
+    private func nanoseconds(for duration: Duration) -> UInt64 {
+        UInt64(max(0, duration.components.seconds)) * 1_000_000_000
+            + UInt64(max(0, duration.components.attoseconds / 1_000_000_000))
+    }
+
     private func teardownScanner() {
         // The torch turns off when the session stops; reset the flags so a re-start reapplies torchOnByDefault.
         torchOn = false
         torchDefaultApplied = false
         struggleTask?.cancel(); struggleTask = nil
+        scanTimeoutTask?.cancel(); scanTimeoutTask = nil
         resultsTask?.cancel(); resultsTask = nil
         previewTask?.cancel(); previewTask = nil
         previewSession = nil

@@ -1440,16 +1440,25 @@
             "children": [
               {
                 "kind": "TypeNominal",
-                "name": "Duration",
-                "printedName": "Swift.Duration",
-                "usr": "s:s8DurationV"
+                "name": "Optional",
+                "printedName": "Swift.Duration?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Duration",
+                    "printedName": "Swift.Duration",
+                    "usr": "s:s8DurationV"
+                  }
+                ],
+                "usr": "s:Sq"
               }
             ],
             "declKind": "Var",
-            "usr": "s:9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVvp",
-            "mangledName": "$s9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVvp",
+            "usr": "s:9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVSgvp",
+            "mangledName": "$s9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVSgvp",
             "moduleName": "TesseraUI",
             "declAttributes": [
+              "HasInitialValue",
               "HasStorage"
             ],
             "hasStorage": true,
@@ -1461,14 +1470,22 @@
                 "children": [
                   {
                     "kind": "TypeNominal",
-                    "name": "Duration",
-                    "printedName": "Swift.Duration",
-                    "usr": "s:s8DurationV"
+                    "name": "Optional",
+                    "printedName": "Swift.Duration?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Duration",
+                        "printedName": "Swift.Duration",
+                        "usr": "s:s8DurationV"
+                      }
+                    ],
+                    "usr": "s:Sq"
                   }
                 ],
                 "declKind": "Accessor",
-                "usr": "s:9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVvg",
-                "mangledName": "$s9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVvg",
+                "usr": "s:9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVSgvg",
+                "mangledName": "$s9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVSgvg",
                 "moduleName": "TesseraUI",
                 "implicit": true,
                 "declAttributes": [
@@ -1488,14 +1505,22 @@
                   },
                   {
                     "kind": "TypeNominal",
-                    "name": "Duration",
-                    "printedName": "Swift.Duration",
-                    "usr": "s:s8DurationV"
+                    "name": "Optional",
+                    "printedName": "Swift.Duration?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Duration",
+                        "printedName": "Swift.Duration",
+                        "usr": "s:s8DurationV"
+                      }
+                    ],
+                    "usr": "s:Sq"
                   }
                 ],
                 "declKind": "Accessor",
-                "usr": "s:9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVvs",
-                "mangledName": "$s9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVvs",
+                "usr": "s:9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVSgvs",
+                "mangledName": "$s9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVSgvs",
                 "moduleName": "TesseraUI",
                 "implicit": true,
                 "declAttributes": [
@@ -1874,10 +1899,18 @@
               },
               {
                 "kind": "TypeNominal",
-                "name": "Duration",
-                "printedName": "Swift.Duration",
+                "name": "Optional",
+                "printedName": "Swift.Duration?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Duration",
+                    "printedName": "Swift.Duration",
+                    "usr": "s:s8DurationV"
+                  }
+                ],
                 "hasDefaultArg": true,
-                "usr": "s:s8DurationV"
+                "usr": "s:Sq"
               },
               {
                 "kind": "TypeNominal",
@@ -1936,8 +1969,8 @@
               }
             ],
             "declKind": "Constructor",
-            "usr": "s:9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR05theme19onRequestPermissionACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVARSgAA0cD5ThemeVyyYbcSgtcfc",
-            "mangledName": "$s9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR05theme19onRequestPermissionACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVARSgAA0cD5ThemeVyyYbcSgtcfc",
+            "usr": "s:9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR05theme19onRequestPermissionACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgAsA0cD5ThemeVyyYbcSgtcfc",
+            "mangledName": "$s9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR05theme19onRequestPermissionACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgAsA0cD5ThemeVyyYbcSgtcfc",
             "moduleName": "TesseraUI",
             "init_kind": "Designated"
           }

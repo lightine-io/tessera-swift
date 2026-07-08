@@ -40,4 +40,12 @@ struct PublicSurfaceTests {
         let all: Set<DismissReason> = [.userDismissed, .timedOut, .cameraUnavailable, .permissionDenied]
         #expect(all.count == 4)
     }
+
+    /// Both timeouts express "never" as `nil` (Swift `Duration` has no infinity sentinel) — a config that
+    /// disables both the struggle hint and the scan deadline is accepted verbatim (TES-85).
+    @Test func timeoutsCanBeDisabledWithNil() {
+        let config = MrzScannerConfig(struggleTimeout: nil, scanTimeout: nil)
+        #expect(config.struggleTimeout == nil) // never struggle
+        #expect(config.scanTimeout == nil) // never time out
+    }
 }
