@@ -552,8 +552,13 @@ final class ScannerModel {
         // authorization signals + config.onRequestPermission) lands with the permission-screen slice. The
         // scanner surfaces CaptureError(PermissionDenied) on the stream in the meantime; reduceCameraResult
         // keeps it scanning (the gate governs the permission path once wired).
+        // Restrict OCR to the MRZ band the guide marks (TES-86 mirror): Vision reads only the centred
+        // guide-box band, not the whole frame — noise above the MRZ (name, address lines) otherwise breaks
+        // detection. Opt-in, so headless consumers' default reading is unchanged.
+        let recognizer = VisionMrzTextRecognizer()
+        recognizer.restrictToMrzBand()
         let scanner = AVCaptureMrzScanner(
-            recognizer: VisionMrzTextRecognizer(),
+            recognizer: recognizer,
             // LENIENT strips whitespace before shape-matching, exactly as the Android live camera does
             // (TES-86): Vision routinely injects spaces into MRZ lines, and under STRICT those lines fail
             // their fixed width so the MRZ band is never detected. Whitespace is never meaningful in an MRZ,
