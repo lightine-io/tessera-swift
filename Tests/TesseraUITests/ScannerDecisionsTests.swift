@@ -208,4 +208,79 @@ struct ScannerDecisionsTests {
         let decoded = assembleManualDecoded(text: "not an mrz at all")
         #expect(decoded.parse is ParseResult.Failure)
     }
+
+    // MARK: formatCountdown — TES-125 countdown-chip formatting
+
+    /// Seconds round UP (never down) and are zero-padded; minutes are never capped at two digits.
+    @Test func formatCountdownRoundsSecondsUpAndPadsToTwoDigits() {
+        #expect(formatCountdown(.seconds(90)) == "1:30")
+        // 4.5s must ceil to 5s (0:05), not floor to 0:04 — the chip reads "0:05" through the whole last second.
+        #expect(formatCountdown(.milliseconds(4500)) == "0:05")
+        #expect(formatCountdown(.zero) == "0:00")
+        // A multi-minute scanTimeout is not capped at two digits.
+        #expect(formatCountdown(.seconds(600)) == "10:00")
+    }
+
+    /// A negative input (should not occur — the caller clamps via `DeadlineClock.remaining`) still clamps to
+    /// `0:00` defensively, mirroring the Android `coerceAtLeast(0L)`.
+    @Test func formatCountdownClampsNegativeToZero() {
+        #expect(formatCountdown(.seconds(-5)) == "0:00")
+    }
+
+    // MARK: DeadlineClock — TES-124/126 session-deadline accumulation
+
+    /// Accumulates active elapsed time across ticks and fires exactly once — on the tick that first reaches
+    /// the total — never again on a later tick.
+    @Test func deadlineClockAccumulatesAndFiresExactlyOnceAtTheTotal() {
+        var clock = DeadlineClock(total: .seconds(2))
+        #expect(clock.remaining == .seconds(2))
+        let first = clock.advance(by: .seconds(1))
+        #expect(!first)
+        #expect(clock.remaining == .seconds(1))
+        #expect(!clock.fired)
+
+        let second = clock.advance(by: .seconds(1)) // this tick reaches the total — fires
+        #expect(second)
+        #expect(clock.fired)
+        #expect(clock.remaining == .zero)
+
+        // A further advance after firing is a no-op — the one-shot latch never fires twice.
+        let third = clock.advance(by: .seconds(5))
+        #expect(!third)
+        #expect(clock.fired)
+        #expect(clock.remaining == .zero)
+    }
+
+    /// A single tick that overshoots the total (e.g. a scheduler hiccup) still clamps the accumulator at the
+    /// total and fires exactly once, rather than accumulating past it.
+    @Test func deadlineClockClampsAccumulatedAtTheTotalOnAnOvershootingTick() {
+        var clock = DeadlineClock(total: .seconds(2))
+        let fired = clock.advance(by: .seconds(10))
+        #expect(fired)
+        #expect(clock.remaining == .zero)
+        #expect(clock.fired)
+    }
+
+    // MARK: announcementKey — TES-58 VoiceOver announce-on-arrival mapping
+
+    /// Exactly the six outcome states carry an announcement (mirroring the Android live-region set); every
+    /// other state — the scanning overlays included, which are announced separately by `ScannerModel` on
+    /// their own rising edge — maps to `nil`.
+    @Test func announcementKeyMapsTheSixOutcomeStatesAndNothingElse() {
+        let decoded = assembleManualDecoded(text: Self.icaoTD3)
+        #expect(announcementKey(for: .review(decoded: decoded, expanded: false, source: .camera)) == "tessera_scanner_review_title")
+        #expect(announcementKey(for: .readFailed(capturedText: RecognizedText(lines: []))) == "tessera_scanner_read_failed_title")
+        #expect(announcementKey(for: .cameraUnavailable) == "tessera_scanner_camera_unavailable_title")
+        #expect(announcementKey(for: .savedImageEmpty) == "tessera_scanner_saved_image_empty_title")
+        #expect(announcementKey(for: .cameraInUse) == "tessera_scanner_camera_in_use_title")
+        #expect(announcementKey(for: .savedImageAnalyzing) == "tessera_scanner_saved_image_analyzing_title")
+
+        // Every other state carries no announcement of its own.
+        #expect(announcementKey(for: .scanning(struggling: false, gathering: false)) == nil)
+        #expect(announcementKey(for: .scanning(struggling: true, gathering: true)) == nil)
+        #expect(announcementKey(for: .manualRaw(text: "", parseFailed: false)) == nil)
+        #expect(announcementKey(for: .awaitingSavedImagePick) == nil)
+        #expect(announcementKey(for: .permissionNeeded) == nil)
+        #expect(announcementKey(for: .permissionPermanentlyDenied) == nil)
+    }
 }

@@ -12,6 +12,11 @@ struct ScannerScaffold<Content: View>: View {
     let currentState: ScannerState
     let onClose: () -> Void
     let onSelectMethod: (ScanMethod) -> Void
+    /// The scan-timeout time left, shown as a countdown chip in the top bar on every screen; `nil` when the
+    /// host left `scanTimeout` at `nil` (no deadline → no chip). Defaults to `nil` so screen-focused call
+    /// sites don't need to thread a deadline. Mirrors the Android `ScannerScaffold`'s `timeRemaining`
+    /// parameter / ``ScanCountdownChip``.
+    var timeRemaining: Duration? = nil
     @ViewBuilder let content: () -> Content
 
     var body: some View {
@@ -38,8 +43,42 @@ struct ScannerScaffold<Content: View>: View {
                     .accessibilityLabel(String(localized: "tessera_scanner_close", bundle: .module))
                     .accessibilityIdentifier("tessera-mrz-close")
                 }
+                // The scan-timeout countdown (TES-125), shown on EVERY screen while a finite `scanTimeout`
+                // runs (the host set a session deadline) — so the user always knows there is a limit and how
+                // long is left. Nothing shows when `scanTimeout` is `nil` (`timeRemaining == nil`). Mirrors
+                // the Android top bar's `ScanCountdownChip` placement next to its privacy action; iOS has no
+                // privacy action yet, so this sits alone in the trailing toolbar slot.
+                if let timeRemaining {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        ScanCountdownChip(remaining: timeRemaining)
+                    }
+                }
             }
         }
+    }
+}
+
+/// The scan-timeout countdown chip (TES-125): a small pill in the top bar showing the time left as `M:SS`
+/// while a finite `scanTimeout` runs, present on every screen — the iOS mirror of the Android
+/// `ScanCountdownChip`. The visible `M:SS` uses monospaced digits so it doesn't jitter as it counts down; a
+/// spoken accessibility label gives VoiceOver the meaning. Deliberately NOT `.updatesFrequently` — a
+/// per-second VoiceOver announcement would spam VoiceOver, so it is read on focus only, matching the Android
+/// chip's non-live-region semantics (`liveRegion` is intentionally absent there too).
+private struct ScanCountdownChip: View {
+    let remaining: Duration
+
+    var body: some View {
+        let text = formatCountdown(remaining)
+        Text(text)
+            .font(.callout.monospacedDigit())
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(.secondary.opacity(0.15), in: Capsule())
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(
+                substituting(String(localized: "tessera_scanner_time_remaining", bundle: .module), text)
+            )
+            .accessibilityIdentifier("tessera-mrz-countdown")
     }
 }
 

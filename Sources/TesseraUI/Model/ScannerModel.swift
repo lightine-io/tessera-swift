@@ -10,7 +10,7 @@ import UIKit
 /// ``reduceCameraResult(_:)`` → ``routeDecode(_:reviewMode:)`` decisions to ``state``, and exposes the
 /// scanner's published `AVCaptureSession` for ``CameraPreviewView``. The root view (``RootScannerView``)
 /// dispatches on ``state``; the model holds the one-shot decode latch, the camera-in-use self-resume, the
-/// struggle timeout, and the method / rescan / manual-read hooks.
+/// struggle timeout, the session-level scan deadline, and the method / rescan / manual-read hooks.
 ///
 /// Everything is on the main actor: SwiftUI observation and the `AVCaptureMrzScanner` results are marshalled
 /// here, matching how the Android flow runs on the composition thread. Reports back exactly once through
@@ -50,7 +50,6 @@ final class ScannerModel {
     private var resultsTask: Task<Void, Never>?
     private var previewTask: Task<Void, Never>?
     private var struggleTask: Task<Void, Never>?
-    private var scanTimeoutTask: Task<Void, Never>?
 
     /// A one-shot latch: once a decode has routed on (to review / read-failed / straight back), later decoded
     /// frames from the still-running stream must not re-fire. Kept as model state (not inside the collector)
@@ -101,6 +100,33 @@ final class ScannerModel {
     /// Manual→other→Manual round trip.
     private var manualDraft = ""
 
+    // MARK: - Session scan deadline (TES-124/125/126)
+
+    /// The time left for the countdown chip, or `nil` when `config.scanTimeout` is `nil` (no deadline → no
+    /// chip). Refreshed on each ~500ms tick while the app is foreground. Mirrors the Android
+    /// `rememberScanDeadline`'s returned `Duration?`.
+    private(set) var timeRemaining: Duration?
+
+    /// The pure accumulator behind the deadline (see ``DeadlineClock``); `nil` when `config.scanTimeout` is
+    /// `nil` — the deadline never arms.
+    private var deadlineClock: DeadlineClock?
+
+    /// The monotonic clock the deadline measures active elapsed time against — never wall-clock `Date` (a
+    /// clock change, DST, or NTP correction must never perturb the deadline). Mirrors the Android
+    /// `SystemClock.elapsedRealtime()`.
+    private let deadlineTickClock = ContinuousClock()
+
+    /// The instant of the deadline's last tick while foreground, so each tick advances by the REAL elapsed
+    /// time since then (drift-corrected), not the nominal 500ms interval. Mirrors the Android `lastTick`.
+    private var deadlineLastTick: ContinuousClock.Instant?
+
+    private var deadlineTask: Task<Void, Never>?
+
+    /// Whether the app is currently foreground — the deadline advances only while this is `true`. Defaults to
+    /// `true` (the scanner only ever appears while the app is already active); ``setForeground(_:)`` keeps it
+    /// current as the scene phase changes.
+    private var deadlineForeground = true
+
     init(config: MrzScannerConfig, onResult: @escaping (TesseraUIResult) -> Void) {
         self.config = config
         self.onResult = onResult
@@ -113,11 +139,106 @@ final class ScannerModel {
     /// on appear.
     func onAppear() {
         applyStateEntry(state)
+        beginSession()
     }
 
-    /// Tears the flow down — stops and closes the scanner and cancels the collectors. Called on disappear.
+    /// Tears the flow down — stops and closes the scanner and cancels the collectors, including the
+    /// session-level deadline tick loop. Called on disappear.
     func onDisappear() {
         teardownScanner()
+        deadlineTask?.cancel()
+        deadlineTask = nil
+    }
+
+    /// Starts the session-level scan-timeout deadline (TES-124) exactly once, independent of which screen or
+    /// reading method is showing — called from ``onAppear()``, so it starts the moment the scanner UI appears
+    /// and survives every later method switch, review, or manual-entry detour. A `nil` `config.scanTimeout`
+    /// never arms (``timeRemaining`` stays `nil`, so the countdown chip never shows — Swift's `Duration` has
+    /// no infinity sentinel, so `nil` plays the role the Android `Duration.INFINITE` does). Idempotent: a
+    /// second call (e.g. a re-fired `.onAppear`) is a no-op once a deadline is already running.
+    private func beginSession() {
+        guard deadlineClock == nil, let timeout = config.scanTimeout else { return }
+        deadlineClock = DeadlineClock(total: timeout)
+        timeRemaining = timeout
+        armDeadlineTickIfNeeded()
+    }
+
+    /// Forwards a scene-phase change from the root view's `@Environment(\.scenePhase)`. The deadline advances
+    /// only while foreground — the iOS mirror of the Android session deadline's `Lifecycle.State.RESUMED`
+    /// gate (`repeatOnLifecycle`): time spent backgrounded or on the lock screen does not count, and the
+    /// deadline resumes from the accumulated elapsed time rather than restarting (TES-126). Camera-interrupted
+    /// ("in use") time still counts — that is a foreground state; only backgrounding pauses the clock, since
+    /// the pause is lifecycle-driven only, exactly like Android, never camera-driven.
+    func setForeground(_ foreground: Bool) {
+        guard deadlineForeground != foreground else { return }
+        deadlineForeground = foreground
+        guard deadlineClock != nil else { return }
+        if foreground {
+            armDeadlineTickIfNeeded()
+        } else {
+            deadlineTask?.cancel()
+            deadlineTask = nil
+        }
+    }
+
+    /// Arms the ~500ms deadline tick loop if a deadline is running, the app is foreground, and no loop is
+    /// already active. Re-reads the tick clock's `now` as the new `deadlineLastTick` so the paused gap (while
+    /// backgrounded) is never counted as elapsed active time.
+    private func armDeadlineTickIfNeeded() {
+        guard deadlineClock != nil, deadlineForeground, deadlineTask == nil else { return }
+        deadlineLastTick = deadlineTickClock.now
+        deadlineTask = Task { [weak self] in
+            while true {
+                try? await Task.sleep(for: .milliseconds(500))
+                if Task.isCancelled { return }
+                // Exits the loop for good once the model itself is gone, rather than spinning forever on a
+                // weak reference that will never resolve again.
+                guard let self else { return }
+                await MainActor.run { self.tickDeadline() }
+            }
+        }
+    }
+
+    /// One deadline tick: advances the accumulator by the REAL elapsed time since the last tick
+    /// (drift-corrected by the monotonic clock, mirroring the Android tick's `now - lastTick`), refreshes
+    /// ``timeRemaining`` for the countdown chip, and — the first time the accumulator reaches the total —
+    /// ends the flow as `Cancelled(timedOut)` on whatever screen the user is currently on, exactly like the
+    /// Android `onElapsed`.
+    private func tickDeadline() {
+        guard var clock = deadlineClock, let lastTick = deadlineLastTick else { return }
+        let now = deadlineTickClock.now
+        deadlineLastTick = now
+        let justFired = clock.advance(by: lastTick.duration(to: now))
+        deadlineClock = clock
+        timeRemaining = clock.remaining
+        if justFired {
+            deadlineTask?.cancel()
+            deadlineTask = nil
+            onResult(.cancelled(.timedOut))
+        }
+    }
+
+    // MARK: - VoiceOver announce-on-arrival (TES-58)
+
+    /// Posts a VoiceOver announcement for `state`'s arrival, if it carries one (``announcementKey(for:)`` in
+    /// ScannerDecisions.swift) — the iOS mirror of the Android live regions (`liveRegion =
+    /// Assertive`/`Polite`). `UIAccessibility.announcement` has no polite/assertive tier, so both groups are
+    /// posted identically here, immediately on arrival.
+    private func postAnnouncement(for state: ScannerState) {
+        guard let key = announcementKey(for: state) else { return }
+        postAnnouncement(key: key)
+    }
+
+    /// Posts a plain-text VoiceOver announcement for a localization `key` directly — used for the
+    /// struggling/gathering overlays, a rising-edge flag on `.scanning` rather than a distinct
+    /// ``ScannerState`` case, so they can't go through ``postAnnouncement(for:)``'s state-keyed mapping. Every
+    /// call site guards this to fire once, on the transition into the overlay — never on every recompute of
+    /// an already-showing one, mirroring the Android `StrugglingHint`/`GatheringHint` polite live regions.
+    private func postAnnouncement(key: String) {
+        UIAccessibility.post(
+            notification: .announcement,
+            argument: String(localized: String.LocalizationValue(key), bundle: .module)
+        )
     }
 
     // MARK: - Global chrome hooks
@@ -237,6 +358,7 @@ final class ScannerModel {
     func handlePickedItem(_ item: PhotosPickerItem) {
         pickedItem = nil
         state = .savedImageAnalyzing
+        postAnnouncement(for: .savedImageAnalyzing)
         Task { await readPickedPhoto(item) }
     }
 
@@ -254,6 +376,7 @@ final class ScannerModel {
             let url = writeTempImage(data)
         else {
             state = .savedImageEmpty
+            postAnnouncement(for: .savedImageEmpty)
             return
         }
         defer { try? FileManager.default.removeItem(at: url) }
@@ -290,6 +413,7 @@ final class ScannerModel {
         decodeRouted = false
         guard let result else {
             state = .savedImageEmpty
+            postAnnouncement(for: .savedImageEmpty)
             return
         }
         switch mapSavedImageResult(result) {
@@ -297,6 +421,7 @@ final class ScannerModel {
             routeThroughDecode(decoded, source: .savedImage)
         case .empty:
             state = .savedImageEmpty
+            postAnnouncement(for: .savedImageEmpty)
         }
     }
 
@@ -330,6 +455,7 @@ final class ScannerModel {
     /// same entry wiring, mirroring how the Android flow reacts to `uiState` changes.
     private func transition(to newState: ScannerState) {
         state = newState
+        postAnnouncement(for: newState)
         applyStateEntry(newState)
     }
 
@@ -413,9 +539,11 @@ final class ScannerModel {
     // MARK: - Camera wiring
 
     /// Starts (or keeps running) the live scanner for the scanning state. Constructs the scanner with preview
-    /// armed on first use, begins collecting `results` and `previewSession`, and arms the scan-timeout
-    /// deadline. The struggle timeout is armed separately, once the preview actually goes live (see
-    /// ``deliverPreviewSession(_:)`` — TES-97 item 6), not here at scan-intent.
+    /// armed on first use and begins collecting `results` and `previewSession`. The struggle timeout is armed
+    /// separately, once the preview actually goes live (see ``deliverPreviewSession(_:)`` — TES-97 item 6),
+    /// not here at scan-intent. The session-level scan deadline is NOT armed here either — unlike the old
+    /// camera-scoped timer this replaced, it lives at the whole-flow level (``beginSession()``, called once
+    /// from ``onAppear()``) and runs independently of whether the camera is even the active method.
     private func startScanningIfNeeded() {
         if scanner != nil { return }
         struggleTimeoutArmed = false
@@ -463,7 +591,6 @@ final class ScannerModel {
             try? await previewBox.flow.collect(collector: collector)
         }
 
-        armScanTimeout()
         scanner.start()
     }
 
@@ -488,31 +615,13 @@ final class ScannerModel {
                 self.struggleTimeoutElapsed = true
                 guard case let .scanning(struggling, gathering) = self.state, !struggling, self.sawTextEver else { return }
                 self.state = .scanning(struggling: true, gathering: gathering)
+                self.postAnnouncement(key: "tessera_scanner_struggling_hint")
             }
         }
     }
 
-    /// After the configured scan timeout with no confirmed reading, give up and end the flow as
-    /// `Cancelled(timedOut)` — the whole-scan *deadline* (TES-85), distinct from the struggle timer, which only
-    /// nudges. A `nil` scanTimeout (the default) never arms. Runs once per scanning session — a rescan
-    /// re-creates the scanner and re-arms it — mirroring the Android scan-timeout `LaunchedEffect`.
-    private func armScanTimeout() {
-        scanTimeoutTask?.cancel()
-        guard let timeout = config.scanTimeout else { return }
-        let nanos = nanoseconds(for: timeout)
-        scanTimeoutTask = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: nanos)
-            guard !Task.isCancelled else { return }
-            await MainActor.run {
-                // Only give up if still scanning — a decode that already routed to review/read-failed, or a
-                // teardown, leaves this a no-op (the task is cancelled on teardown regardless).
-                guard let self, case .scanning = self.state else { return }
-                self.onResult(.cancelled(.timedOut))
-            }
-        }
-    }
-
-    /// Nanoseconds for `Task.sleep`, clamped at ≥0. Shared by both timeout timers so they convert identically.
+    /// Nanoseconds for `Task.sleep`, clamped at ≥0. Used by the struggle timer's `Task.sleep(nanoseconds:)`
+    /// call (the session deadline below uses `Task.sleep(for:)` directly on a fixed 500ms tick instead).
     private func nanoseconds(for duration: Duration) -> UInt64 {
         UInt64(max(0, duration.components.seconds)) * 1_000_000_000
             + UInt64(max(0, duration.components.attoseconds / 1_000_000_000))
@@ -525,7 +634,6 @@ final class ScannerModel {
         struggleTask?.cancel(); struggleTask = nil
         struggleTimeoutArmed = false
         lastGatheringAt = nil
-        scanTimeoutTask?.cancel(); scanTimeoutTask = nil
         resultsTask?.cancel(); resultsTask = nil
         previewTask?.cancel(); previewTask = nil
         previewSession = nil
@@ -613,14 +721,17 @@ final class ScannerModel {
                 lastGatheringAt = Date()
                 if case let .scanning(struggling, gathering) = state, !gathering {
                     state = .scanning(struggling: struggling, gathering: true)
+                    postAnnouncement(key: "tessera_scanner_gathering_hint")
                 }
             default:
                 break
             }
         case .goCameraInUse:
             state = .cameraInUse
+            postAnnouncement(for: .cameraInUse)
         case .goCameraUnavailable:
             state = .cameraUnavailable
+            postAnnouncement(for: .cameraUnavailable)
         case let .stayScanning(sawText):
             // TES-97: fold whether OCR has returned text at least once this session — the gate for whether the
             // struggle timeout is allowed to show struggling at all (see armStruggleTimeout()).
@@ -648,6 +759,10 @@ final class ScannerModel {
             }
             if newStruggling != struggling || newGathering != gathering {
                 state = .scanning(struggling: newStruggling, gathering: newGathering)
+                // Announce only the rising edge (false → true), never the falling edge or an unrelated change.
+                if newStruggling, !struggling {
+                    postAnnouncement(key: "tessera_scanner_struggling_hint")
+                }
             }
         }
     }

@@ -921,6 +921,16 @@
         }
       }
     },
+    "tessera_scanner_time_remaining": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan time left: %1$@"
+          }
+        }
+      }
+    },
     "tessera_scanner_title": {
       "localizations": {
         "en": {

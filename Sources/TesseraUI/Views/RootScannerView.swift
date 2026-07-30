@@ -23,7 +23,8 @@ struct RootScannerView: View {
             enabledMethods: config.enabledMethods,
             currentState: model.state,
             onClose: { model.cancel() },
-            onSelectMethod: { model.selectMethod($0) }
+            onSelectMethod: { model.selectMethod($0) },
+            timeRemaining: model.timeRemaining
         ) {
             body(for: model.state)
         }
@@ -37,9 +38,15 @@ struct RootScannerView: View {
             if let item { model.handlePickedItem(item) }
         }
         .onChange(of: scenePhase) { _, phase in
+            // Forwards to the session-level scan deadline (TES-124/126) — it advances only while `.active`,
+            // pausing on background/inactive and resuming from the accumulated elapsed time, never restarting.
+            model.setForeground(phase == .active)
             if phase == .active { model.recheckPermissionOnForeground() }
         }
-        .onAppear { model.onAppear() }
+        .onAppear {
+            model.setForeground(scenePhase == .active)
+            model.onAppear()
+        }
         .onDisappear { model.onDisappear() }
         .accessibilityIdentifier("tessera-mrz-scanner-root")
     }

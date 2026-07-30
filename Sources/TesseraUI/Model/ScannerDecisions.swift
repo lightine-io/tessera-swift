@@ -268,6 +268,102 @@ func assembleManualDecoded(
     )
 }
 
+// MARK: - Session scan deadline (TES-124/125/126)
+
+/// The session-level scan-timeout deadline's pure accumulator — the iOS mirror of the Android
+/// `rememberScanDeadline`'s accumulation math, extracted as a value type so the drift-corrected
+/// advance-and-fire logic is host-testable without a real clock, timer, or scene-phase observer.
+/// ``ScannerModel`` owns one instance and feeds it the REAL elapsed *active* time between ticks (measured
+/// against a monotonic `ContinuousClock`, never wall-clock `Date` — a clock change, DST, or NTP correction
+/// must never perturb the deadline). Pausing/resuming while backgrounded needs no special-case here: the
+/// caller simply stops calling ``advance(by:)`` while backgrounded, and the accumulated total already carries
+/// the pause forward, exactly like the Android `repeatOnLifecycle(RESUMED)` gate resuming from the saved
+/// `accumulatedMs` rather than restarting.
+struct DeadlineClock {
+    /// The total session budget.
+    let total: Duration
+
+    /// The active time accumulated so far, clamped to `[0, total]`.
+    private(set) var accumulated: Duration = .zero
+
+    /// One-shot latch: once `true`, further ``advance(by:)`` calls are no-ops. Mirrors the Android `fired`.
+    private(set) var fired = false
+
+    init(total: Duration) {
+        self.total = total
+    }
+
+    /// The time left, clamped to `[0, total]` — what the countdown chip shows (via ``formatCountdown(_:)``).
+    var remaining: Duration {
+        max(.zero, total - accumulated)
+    }
+
+    /// Advances the accumulator by `elapsed` (clamped so it never exceeds `total`). Returns `true` exactly
+    /// once — on the call that first reaches the total — so the caller fires its one-shot "give up" effect
+    /// only once, never on a later tick. A no-op (always returns `false`) once already fired.
+    @discardableResult
+    mutating func advance(by elapsed: Duration) -> Bool {
+        guard !fired else { return false }
+        accumulated = min(total, accumulated + elapsed)
+        guard accumulated >= total else { return false }
+        fired = true
+        return true
+    }
+}
+
+/// Formats a countdown `Duration` as `M:SS` (minutes:seconds, seconds zero-padded) — the shape the
+/// scan-countdown chip shows. Seconds are rounded **up** so the chip reads `0:01` through the final second
+/// and only shows `0:00` at true expiry; a negative input (should not occur — the caller clamps at zero, via
+/// ``DeadlineClock/remaining``) also clamps to `0:00`. Minutes are not capped at two digits (a multi-minute
+/// host `scanTimeout` renders e.g. `10:00`). Digits only — no `String(format:)`, matching the module's
+/// established positional-substitution style (see `Localization.swift`) rather than a locale-sensitive
+/// formatter. Pure, so it is host-tested. Mirrors the Android `formatCountdown`.
+func formatCountdown(_ remaining: Duration) -> String {
+    let seconds = remaining.components.seconds
+    let attoseconds = remaining.components.attoseconds
+    guard seconds > 0 || (seconds == 0 && attoseconds > 0) else { return "0:00" }
+    let totalSeconds = attoseconds > 0 ? seconds + 1 : seconds
+    let minutes = totalSeconds / 60
+    let secs = totalSeconds % 60
+    let secsString = secs < 10 ? "0\(secs)" : "\(secs)"
+    return "\(minutes):\(secsString)"
+}
+
+// MARK: - VoiceOver announce-on-arrival (TES-58)
+
+/// The VoiceOver announcement key to post when the flow transitions INTO `state`, or `nil` when the state
+/// carries none — the iOS mirror of the Android live-region placements across `ReviewScreen.kt`
+/// (`ReviewContent`/`ReadFailedContent`), `CameraStatusScreen.kt` (`CameraInUseContent`/
+/// `CameraUnavailableContent`), and `SavedImageScreen.kt` (`SavedImageAnalyzingContent`/
+/// `SavedImageEmptyContent`). Android splits these into ASSERTIVE (review, read-failed, camera-unavailable,
+/// saved-image-empty — decode/terminal landings the user must hear right away) and POLITE (camera-in-use,
+/// saved-image-analyzing — auto-transitions with no urgency). `UIAccessibility`'s `.announcement` notification
+/// has no polite/assertive tier, so both groups are posted identically by the caller — a plain announcement,
+/// immediately on arrival.
+///
+/// Every other state carries no announcement of its own here: the struggling/gathering scanning overlays are
+/// a rising-edge flag on `.scanning`, not a distinct case, so ``ScannerModel`` announces those directly at
+/// the point they flip on, rather than through this state-keyed mapping. Pure and UIKit-free, so the mapping
+/// is host-testable without posting a real accessibility notification.
+func announcementKey(for state: ScannerState) -> String? {
+    switch state {
+    case .review:
+        return "tessera_scanner_review_title"
+    case .readFailed:
+        return "tessera_scanner_read_failed_title"
+    case .cameraUnavailable:
+        return "tessera_scanner_camera_unavailable_title"
+    case .savedImageEmpty:
+        return "tessera_scanner_saved_image_empty_title"
+    case .cameraInUse:
+        return "tessera_scanner_camera_in_use_title"
+    case .savedImageAnalyzing:
+        return "tessera_scanner_saved_image_analyzing_title"
+    default:
+        return nil
+    }
+}
+
 // MARK: - Time bridge
 
 /// The current instant as a Kotlin `Instant`, for the date-window inference the manual reader does. The K/N
