@@ -150,6 +150,13 @@ final class ScannerModel {
         deadlineTask = nil
     }
 
+    // DECIDED (TES-129, 2026-07-30): flow state is deliberately NOT persisted across scene/process death —
+    // no SceneStorage/Codable snapshot, unlike Android's saved-instance restoration (TES-102). iOS has no
+    // config-change recreation (rotation loses nothing; this @Observable model is the in-memory layer that
+    // survives view churn), so the only loss trigger is backgrounding plus memory eviction inside a
+    // seconds-long flow — a re-scan costs seconds, and not persisting means the SDK never writes document
+    // data of its own. Revisit only on real field reports of lost long manual entries, privacy-first.
+
     /// Starts the session-level scan-timeout deadline (TES-124) exactly once, independent of which screen or
     /// reading method is showing — called from ``onAppear()``, so it starts the moment the scanner UI appears
     /// and survives every later method switch, review, or manual-entry detour. A `nil` `config.scanTimeout`
