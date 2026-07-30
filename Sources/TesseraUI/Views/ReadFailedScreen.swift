@@ -40,9 +40,13 @@ internal struct ReadFailedScreen: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(String(localized: "tessera_scanner_read_failed_captured_header", bundle: .module))
                         .font(.subheadline.weight(.semibold))
+                    // Forced left-to-right regardless of the ambient locale — an MRZ is always printed
+                    // left-to-right per ICAO 9303, and RTL would otherwise mirror the visual order of a
+                    // string that must stay verbatim (Principle 5). Mirrors `ReviewScreen`'s own raw-MRZ use.
                     ForEach(Array(capturedText.lines.enumerated()), id: \.offset) { _, line in
                         MonoLine(line.text)
                     }
+                    .environment(\.layoutDirection, .leftToRight)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }

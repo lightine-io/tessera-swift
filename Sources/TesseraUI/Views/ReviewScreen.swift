@@ -237,7 +237,7 @@ internal struct ReviewScreen: View {
             FieldRow(label: String(localized: "tessera_scanner_field_name", bundle: .module),
                      value: nameDisplay(fields)),
             FieldRow(label: String(localized: "tessera_scanner_field_number", bundle: .module),
-                     value: fields.documentNumber),
+                     value: withoutTrailingFiller(fields.documentNumber)),
             FieldRow(label: String(localized: "tessera_scanner_field_expiry", bundle: .module),
                      value: dateDisplay(fields.dateOfExpiry)),
         ]
@@ -262,14 +262,22 @@ internal struct ReviewScreen: View {
             FieldRow(label: String(localized: "tessera_scanner_field_sex", bundle: .module),
                      value: charDisplay(fields.rawSex)),
             FieldRow(label: String(localized: "tessera_scanner_field_number", bundle: .module),
-                     value: fields.documentNumber),
+                     value: withoutTrailingFiller(fields.documentNumber)),
             FieldRow(label: String(localized: "tessera_scanner_field_expiry", bundle: .module),
                      value: dateDisplay(fields.dateOfExpiry)),
         ]
-        // Format-specific optional / personal field, only when the format has one and it is not blank.
-        let optional = optionalField(document)
+        // Format-specific optional / personal field, only when the format has one and it is not blank AFTER
+        // stripping trailing filler (an all-filler optional field, e.g. "<<<<<", must show no row at all
+        // rather than an empty one — mirrors the Android `reviewAllFieldRows` filler-then-blank-check order).
+        // TD3's field is specifically ICAO's "personal number" concept; every other format's optional data has
+        // no such meaning, so it gets the neutral label (Principle 1) — mirrors the Android
+        // `if (document is TD3) tessera_scanner_field_optional else tessera_scanner_field_optional_data`.
+        let optional = optionalField(document).map(withoutTrailingFiller)
         if let optional, !optional.isEmpty {
-            rows.append(FieldRow(label: String(localized: "tessera_scanner_field_optional", bundle: .module), value: optional))
+            let labelKey: String.LocalizationValue = String.LocalizationValue(
+                optionalFieldLabelKey(isTD3: document is TD3, forCheckDigit: false)
+            )
+            rows.append(FieldRow(label: String(localized: labelKey, bundle: .module), value: optional))
         }
         return rows
     }
@@ -336,7 +344,12 @@ internal struct ReviewScreen: View {
             (.dateOfExpiry, String(localized: "tessera_scanner_check_label_date_of_expiry", bundle: .module)),
         ]
         if fields.checkDigits.optionalData != nil {
-            checkedFields.append((.optionalData, String(localized: "tessera_scanner_check_label_optional_data", bundle: .module)))
+            // TD3 reuses the "personal number" field label for this observation too, mirroring the field-row
+            // choice above; every other format gets its own neutral check-digit label (Principle 1).
+            let labelKey: String.LocalizationValue = String.LocalizationValue(
+                optionalFieldLabelKey(isTD3: document is TD3, forCheckDigit: true)
+            )
+            checkedFields.append((.optionalData, String(localized: labelKey, bundle: .module)))
         }
         if fields.checkDigits.composite != nil {
             checkedFields.append((.composite, String(localized: "tessera_scanner_check_label_composite", bundle: .module)))
@@ -433,10 +446,24 @@ internal struct ReviewScreen: View {
 // MARK: - Free display helpers (shared)
 
 /// The computed calendar date when the SDK inferred one (ISO `YYYY-MM-DD` via `LocalDate.description`), else
-/// the raw YYMMDD components exactly as recorded. Mirrors the Android `MrzDate.computedDateOrRaw`.
+/// the raw YYMMDD components labeled explicitly as unresolved (`94-06-23 (year not resolved)`) — TES-94. The
+/// UI never re-derives a century itself; it only renders what the SDK already resolved, and labels the
+/// fallback honestly rather than showing bare two-digit components that could pass for a confident date
+/// (Principle 4). Mirrors the Android `dateDisplay` (`ReviewScreen.kt:748-751`).
 func dateDisplay(_ date: MrzDate) -> String {
     if let computed = date.computedDate { return computed.description() }
-    return "\(date.rawYear)\(date.rawMonth)\(date.rawDay)"
+    let raw = "\(date.rawYear)-\(date.rawMonth)-\(date.rawDay)"
+    return substituting(String(localized: "tessera_scanner_date_unresolved_format", bundle: .module), raw)
+}
+
+/// Strips trailing MRZ filler (`<`) from a parsed field VALUE for display — the fillers are fixed-width
+/// padding, not data, so `L898902C<` reads as `L898902C`. Display-only: the raw MRZ section still renders
+/// every character verbatim, so transparency is preserved (Principle 5). Mirrors the Android
+/// `String.withoutTrailingFiller`.
+func withoutTrailingFiller(_ value: String) -> String {
+    var trimmed = Substring(value)
+    while trimmed.hasSuffix("<") { trimmed = trimmed.dropLast() }
+    return String(trimmed)
 }
 
 /// Renders a `unichar` (K/N's bridging of a Kotlin `Char`) as a one-character Swift string. Used for check

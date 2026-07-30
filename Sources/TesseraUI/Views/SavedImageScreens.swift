@@ -46,10 +46,11 @@ internal struct AwaitingSavedImagePickScreen: View {
 // MARK: - Analyzing
 
 /// The "analyzing photo" screen (mockup 07c) — shown while the picked photo is being read on-device. A
-/// loading indicator over a title and neutral sub-text, stating the on-device privacy fact plainly rather
-/// than implying anything about the image. The title is announced to VoiceOver on arrival (this screen is
-/// reached via an auto-transition, not a user tap), mirroring the Android polite live region; the spinner is
-/// decorative and hidden from the accessibility tree. Mirrors the Android `SavedImageAnalyzingContent`.
+/// loading indicator over a title and neutral sub-text. The on-device privacy fact is stated once, globally,
+/// via the shared chrome's ``PrivacyNoticeAction`` — not repeated per screen. The title is announced to
+/// VoiceOver on arrival (this screen is reached via an auto-transition, not a user tap), mirroring the
+/// Android polite live region; the spinner is decorative and hidden from the accessibility tree. Mirrors the
+/// Android `SavedImageAnalyzingContent`.
 internal struct SavedImageAnalyzingScreen: View {
     var body: some View {
         VStack(spacing: 16) {
@@ -63,10 +64,6 @@ internal struct SavedImageAnalyzingScreen: View {
 
             Text(String(localized: "tessera_scanner_saved_image_analyzing_reading", bundle: .module))
                 .font(.body)
-
-            Text(String(localized: "tessera_scanner_saved_image_analyzing_on_device", bundle: .module))
-                .font(.caption)
-                .foregroundStyle(.secondary)
         }
         .multilineTextAlignment(.center)
         .padding(24)
@@ -79,9 +76,10 @@ internal struct SavedImageAnalyzingScreen: View {
 // MARK: - Empty
 
 /// The "no MRZ found in this photo" screen (mockup 07b). Stated honestly — the MRZ *couldn't be located*, not
-/// that the document is "invalid" — with a neutral hint about why, a privacy note that the photo stays
-/// on-device, and two escapes: pick a different photo (primary) or type the details by hand (secondary).
-/// Mirrors the Android `SavedImageEmptyContent`.
+/// that the document is "invalid" — with a neutral hint about why, and two escapes: pick a different photo
+/// (primary) or type the details by hand (secondary). The on-device privacy fact is stated once, globally,
+/// via the shared chrome's ``PrivacyNoticeAction`` — not repeated per screen. Mirrors the Android
+/// `SavedImageEmptyContent`.
 ///
 /// - Parameters:
 ///   - onChooseDifferent: re-launch the photo picker.
@@ -98,9 +96,6 @@ internal struct SavedImageEmptyScreen: View {
                 .font(.title2.weight(.semibold))
             Text(String(localized: "tessera_scanner_saved_image_empty_body", bundle: .module))
                 .font(.body)
-            Text(String(localized: "tessera_scanner_saved_image_empty_privacy", bundle: .module))
-                .font(.caption)
-                .foregroundStyle(.secondary)
 
             Spacer()
 

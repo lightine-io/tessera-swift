@@ -32,6 +32,14 @@ struct ScannerScaffold<Content: View>: View {
                 content()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+            // "Powered by Tessera" attribution, shown once on every screen — a quiet, theme-coloured footer
+            // that respects the safe area (`.safeAreaInset` is the SwiftUI idiom for a persistent bottom bar
+            // that never overlaps scrollable content, mirroring the Android Scaffold's `bottomBar`).
+            // Overridable like every `tessera_*` key: a blank resolved string renders nothing at all
+            // (`PoweredByFooter`), so the opt-out actually reclaims the space.
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                PoweredByFooter()
+            }
             .navigationTitle(String(localized: "tessera_scanner_title", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -45,15 +53,41 @@ struct ScannerScaffold<Content: View>: View {
                 }
                 // The scan-timeout countdown (TES-125), shown on EVERY screen while a finite `scanTimeout`
                 // runs (the host set a session deadline) — so the user always knows there is a limit and how
-                // long is left. Nothing shows when `scanTimeout` is `nil` (`timeRemaining == nil`). Mirrors
-                // the Android top bar's `ScanCountdownChip` placement next to its privacy action; iOS has no
-                // privacy action yet, so this sits alone in the trailing toolbar slot.
+                // long is left. Nothing shows when `scanTimeout` is `nil` (`timeRemaining == nil`).
                 if let timeRemaining {
                     ToolbarItem(placement: .topBarTrailing) {
                         ScanCountdownChip(remaining: timeRemaining)
                     }
                 }
+                // The privacy / transparency notice, reachable on every screen from the shared chrome rather
+                // than repeated as ad-hoc copy per screen — one coherent, opt-in explanation of what the
+                // scanner does with the document. Placed AFTER the countdown chip, mirroring the Android top
+                // bar's `actions { ScanCountdownChip(...); PrivacyNoticeAction() }` order.
+                ToolbarItem(placement: .topBarTrailing) {
+                    PrivacyNoticeAction()
+                }
             }
+        }
+    }
+}
+
+/// The "Powered by Tessera" attribution footer, shown once on every screen via the scaffold's safe-area
+/// inset. A quiet, secondary-styled line so it adapts to light / dark and never competes with the content.
+/// Overridable like every `tessera_*` key — a consumer can set an empty string to remove it: this renders
+/// nothing at all when the resolved string is blank, so the opt-out actually reclaims the space rather than
+/// leaving a blank, padded band. Mirrors the Android `PoweredByFooter`.
+private struct PoweredByFooter: View {
+    var body: some View {
+        let text = String(localized: "tessera_scanner_powered_by", bundle: .module)
+        if text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            EmptyView()
+        } else {
+            Text(text)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 6)
+                .accessibilityIdentifier("tessera-mrz-powered-by")
         }
     }
 }

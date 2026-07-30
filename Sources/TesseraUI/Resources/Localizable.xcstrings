@@ -71,16 +71,6 @@
         }
       }
     },
-    "tessera_scanner_cancel": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cancel"
-          }
-        }
-      }
-    },
     "tessera_scanner_category_identity_card": {
       "localizations": {
         "en": {
@@ -207,6 +197,86 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@ - %2$@"
+          }
+        }
+      }
+    },
+    "tessera_scanner_explainer_action": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What's the MRZ?"
+          }
+        }
+      }
+    },
+    "tessera_scanner_explainer_dismiss": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Got it"
+          }
+        }
+      }
+    },
+    "tessera_scanner_explainer_doc_label": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PASSPORT"
+          }
+        }
+      }
+    },
+    "tessera_scanner_explainer_intro": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MRZ is short for machine-readable zone. It's the block of text a scanner can read."
+          }
+        }
+      }
+    },
+    "tessera_scanner_explainer_title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What's the MRZ?"
+          }
+        }
+      }
+    },
+    "tessera_scanner_explainer_where_body": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Along the bottom of the document - the last 2 or 3 lines. It's also on ID cards, visas and residence permits."
+          }
+        }
+      }
+    },
+    "tessera_scanner_explainer_where_title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Where to find it"
+          }
+        }
+      }
+    },
+    "tessera_scanner_explainer_zone_caption": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letters, numbers and < fillers, in 2 or 3 lines."
           }
         }
       }
@@ -611,6 +681,56 @@
         }
       }
     },
+    "tessera_scanner_powered_by": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Powered by Tessera"
+          }
+        }
+      }
+    },
+    "tessera_scanner_privacy_action": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privacy"
+          }
+        }
+      }
+    },
+    "tessera_scanner_privacy_dialog_body": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tessera reads your document right here on your device. Nothing is uploaded or saved anywhere. What it reads is handed back to the app you are using, and that app decides what happens next."
+          }
+        }
+      }
+    },
+    "tessera_scanner_privacy_dialog_dismiss": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Got it"
+          }
+        }
+      }
+    },
+    "tessera_scanner_privacy_dialog_title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your document stays on your device"
+          }
+        }
+      }
+    },
     "tessera_scanner_read_failed_body": {
       "localizations": {
         "en": {
@@ -791,16 +911,6 @@
         }
       }
     },
-    "tessera_scanner_saved_image_analyzing_on_device": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "On-device — the photo is not uploaded."
-          }
-        }
-      }
-    },
     "tessera_scanner_saved_image_analyzing_reading": {
       "localizations": {
         "en": {
@@ -837,16 +947,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Couldn't find the MRZ in this image. Use a clear photo of the printed document - photos of screens or faint copies often don't read."
-          }
-        }
-      }
-    },
-    "tessera_scanner_saved_image_empty_privacy": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The photo stays on your device. This SDK doesn't upload or store it."
           }
         }
       }
@@ -947,6 +1047,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Flashlight"
+          }
+        }
+      }
+    },
+    "tessera_scanner_torch_state_off": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Off"
+          }
+        }
+      }
+    },
+    "tessera_scanner_torch_state_on": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On"
           }
         }
       }

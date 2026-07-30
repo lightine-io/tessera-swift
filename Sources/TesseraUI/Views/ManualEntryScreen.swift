@@ -18,17 +18,18 @@ import SwiftUI
 ///
 /// - Parameters:
 ///   - text: the in-progress typed MRZ text (the model's hoisted draft — it survives method switches).
-///   - parseFailed: whether the last "Read this" failed to parse; shown as an inline neutral note. Any edit
-///     clears it (the model resets the flag on ``onTextChange``).
+///   - parseFailed: whether the last "Read this" failed to parse; shown as an inline error note, after the
+///     observations, right before the action button. Any edit clears it (the model resets the flag on
+///     ``onTextChange``).
 ///   - onTextChange: called with the new text on every edit.
-///   - onRead: called when the user taps the read action (format auto-detected).
-///   - onBack: cancels manual entry (the flow reports Cancelled).
+///   - onRead: called when the user taps the read action (format auto-detected). Disabled while the trimmed
+///     text is empty — there is nothing to read, and there is no per-screen cancel here (mirrors Android:
+///     the top-bar ✕ is the only escape, so this screen offers no separate "Cancel" button).
 internal struct ManualEntryScreen: View {
     let text: String
     let parseFailed: Bool
     let onTextChange: (String) -> Void
     let onRead: () -> Void
-    let onBack: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -68,16 +69,6 @@ internal struct ManualEntryScreen: View {
                         .accessibilityLabel(String(localized: "tessera_scanner_manual_field_label", bundle: .module))
                     }
 
-                    // The inline parse-failed note (mirrors the Android `parseFailed` inline path): neutral,
-                    // the typed text stays, and any edit clears it. Never a jump to the read-failed screen —
-                    // that screen's "blurred or partial" framing mislabels typed input.
-                    if parseFailed {
-                        Text(String(localized: "tessera_scanner_manual_parse_failed", bundle: .module))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .accessibilityIdentifier("tessera-mrz-manual-parse-failed")
-                    }
-
                     Divider()
 
                     Text(String(localized: "tessera_scanner_review_observations_header", bundle: .module))
@@ -93,9 +84,24 @@ internal struct ManualEntryScreen: View {
                             }
                         }
                     }
+
+                    // The inline parse-failed note, AFTER the observations, right before the action button —
+                    // an error, not a neutral note (mirrors the Android `parseFailed` inline path and its
+                    // `colorScheme.error` styling). The typed text stays, and any edit clears it. Never a jump
+                    // to the read-failed screen — that screen's "blurred or partial" framing mislabels typed
+                    // input.
+                    if parseFailed {
+                        Text(String(localized: "tessera_scanner_manual_parse_failed", bundle: .module))
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                            .accessibilityIdentifier("tessera-mrz-manual-parse-failed")
+                    }
                 }
             }
 
+            // Disabled while the field is blank — there is nothing to read, and attempting an empty parse
+            // would otherwise report a "couldn't read" as if the input were malformed rather than simply
+            // absent (mirrors the Android `enabled = state.text.isNotBlank()`).
             Button {
                 onRead()
             } label: {
@@ -103,16 +109,8 @@ internal struct ManualEntryScreen: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+            .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             .accessibilityIdentifier("tessera-mrz-manual-read")
-
-            Button {
-                onBack()
-            } label: {
-                Text(String(localized: "tessera_scanner_cancel", bundle: .module))
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.bordered)
-            .accessibilityIdentifier("tessera-mrz-manual-cancel")
         }
         .padding(24)
         .contentMaxWidth()

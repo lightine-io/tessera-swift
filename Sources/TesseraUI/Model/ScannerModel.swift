@@ -41,6 +41,15 @@ final class ScannerModel {
     // Applies `torchOnByDefault` once per session, so it is not re-forced on every preview-session update.
     private var torchDefaultApplied = false
 
+    /// Whether the currently bound camera device has a flash/torch unit at all — the gate the torch button's
+    /// visibility checks (TES-84 mirror of the Android `scanner.hasTorch()`). `AVCaptureMrzScanner` (the K/N
+    /// scanner) exposes no `hasTorch`/`torch` seam of its own, so this is derived here from the published
+    /// ``previewSession``'s bound video device — the same seam ``setTorch(_:)`` already reads. `false` while
+    /// no session is live (nothing to check yet).
+    var hasTorch: Bool {
+        currentCaptureDevice()?.hasTorch ?? false
+    }
+
     private let config: MrzScannerConfig
     private let onResult: (TesseraUIResult) -> Void
 
@@ -148,6 +157,34 @@ final class ScannerModel {
         teardownScanner()
         deadlineTask?.cancel()
         deadlineTask = nil
+    }
+
+    // TEMP TES-129 wave-4 instrumentation — PII-safe per-frame text line for the device console.
+    // Logs ONLY type names and quality counts; never OCR text, never parsed fields. Remove before merge.
+    private func logFrame(_ result: MrzScanResult) {
+        let kind: String
+        var detail = ""
+        switch result {
+        case let decoded as MrzScanResultDecoded:
+            kind = "Decoded"
+            detail = " parse=\(String(describing: type(of: decoded.parse))) lines=\(decoded.quality.recognizedLineCount)"
+        case let notFound as MrzScanResultNoMrzFound:
+            kind = "NoMrzFound"
+            detail = " lines=\(notFound.quality.recognizedLineCount)"
+        case let capture as MrzScanResultCaptureError:
+            kind = "CaptureError"
+            detail = " error=\(String(describing: type(of: capture.error)))"
+        default:
+            kind = String(describing: type(of: result))
+        }
+        print("TESSERA-FRAME \(kind)\(detail) state=\(stateName) routed=\(decodeRouted)")
+    }
+
+    private var stateName: String {
+        switch state {
+        case let .scanning(struggling, gathering): return "scanning(s:\(struggling),g:\(gathering))"
+        default: return String(describing: state).prefix(30).description
+        }
     }
 
     // DECIDED (TES-129, 2026-07-30): flow state is deliberately NOT persisted across scene/process death —
@@ -722,6 +759,9 @@ final class ScannerModel {
     /// (surfacing the "hold steady" cue), Confirmed routes once (the latch stops repeats). Mirrors the Android
     /// `onCameraResult`'s consensus wiring (TES-91).
     private func onCameraResult(_ result: MrzScanResult) {
+        // TEMP TES-129 wave-4 instrumentation (PII-safe: type names + counts ONLY, never recognized text
+        // or parsed fields — the Android golden method). Remove before the tessera-swift PR merges.
+        logFrame(result)
         switch reduceCameraResult(result) {
         case let .goDecoded(decoded):
             guard !decodeRouted, !(decoded.parse is ParseResult.Failure) else { return }

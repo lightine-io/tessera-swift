@@ -283,4 +283,41 @@ struct ScannerDecisionsTests {
         #expect(announcementKey(for: .permissionNeeded) == nil)
         #expect(announcementKey(for: .permissionPermanentlyDenied) == nil)
     }
+
+    // MARK: withoutTrailingFiller — TES-129 item 8, display-only trailing-'<' stripping
+
+    /// Trailing MRZ filler (`<`) is stripped for display; interior fillers and non-filler content are left
+    /// alone — mirrors the Android `String.withoutTrailingFiller` (`trimEnd('<')`).
+    @Test func withoutTrailingFillerStripsOnlyTrailingFillerCharacters() {
+        #expect(withoutTrailingFiller("L898902C<") == "L898902C")
+        #expect(withoutTrailingFiller("L898902C<<<<") == "L898902C")
+        #expect(withoutTrailingFiller("L898902C") == "L898902C")
+        // Interior '<' (a real MRZ separator, e.g. between name components) is not a trailing filler.
+        #expect(withoutTrailingFiller("ERIKSSON<<ANNA") == "ERIKSSON<<ANNA")
+        // All-filler collapses to empty, matching Android's "no row at all" blank check downstream.
+        #expect(withoutTrailingFiller("<<<<<") == "")
+        #expect(withoutTrailingFiller("") == "")
+    }
+
+    // MARK: optionalFieldLabelKey — TES-129 item 3, per-format optional-data label
+
+    /// TD3 always gets the "personal number" label — the SAME key for both the field row and the check-digit
+    /// observation. Every other format gets a neutral label, but a DIFFERENT key per context (the field row
+    /// vs. the check-digit observation), matching the two distinct Android resources for that one concept.
+    @Test func optionalFieldLabelKeyPicksPersonalNumberOnlyForTD3() {
+        #expect(optionalFieldLabelKey(isTD3: true, forCheckDigit: false) == "tessera_scanner_field_optional")
+        #expect(optionalFieldLabelKey(isTD3: true, forCheckDigit: true) == "tessera_scanner_field_optional")
+        #expect(optionalFieldLabelKey(isTD3: false, forCheckDigit: false) == "tessera_scanner_field_optional_data")
+        #expect(optionalFieldLabelKey(isTD3: false, forCheckDigit: true) == "tessera_scanner_check_label_optional_data")
+    }
+
+    // MARK: guidanceMessage — TES-129 item 6, single live-preview guidance precedence
+
+    /// Exactly one guidance message at a time: gathering beats struggling beats the plain framing hint.
+    @Test func guidanceMessagePrecedenceIsGatheringThenStrugglingThenFramingHint() {
+        #expect(guidanceMessage(gathering: true, struggling: true) == .gathering)
+        #expect(guidanceMessage(gathering: true, struggling: false) == .gathering)
+        #expect(guidanceMessage(gathering: false, struggling: true) == .struggling)
+        #expect(guidanceMessage(gathering: false, struggling: false) == .framingHint)
+    }
 }

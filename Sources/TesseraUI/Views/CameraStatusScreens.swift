@@ -12,6 +12,8 @@ import SwiftUI
 //    retry — the only forward path is manual entry.
 //  * StrugglingHint (02): a neutral advisory overlaid on the live preview. Never an error or a verdict — the
 //    camera keeps scanning underneath. Just a "Type it instead" escape alongside the hint text.
+//  * GatheringHint: the "hold steady" cue overlaid on the live preview while the frame-agreement consensus
+//    gate confirms a read across several frames. Advisory only — a small activity indicator plus text.
 //
 // All three are honest statements of a capture condition, never a verdict about a document (Principle 1).
 // The meaning lives in the text, not in colour or motion alone.
@@ -161,5 +163,30 @@ internal struct StrugglingHint: View {
         }
         .padding(24)
         .accessibilityIdentifier("tessera-mrz-struggling-hint")
+    }
+}
+
+/// The "hold steady" gathering cue overlaid on the live preview while the frame-agreement consensus gate
+/// (``MrzDecodeConsensus``) confirms a read across several frames. Gives the consensus wait visible feedback
+/// — a small activity indicator plus "Hold steady…" — so a multi-frame confirmation reads as active progress
+/// rather than lag. Advisory only — it states no error and no verdict (Principle 1); the camera keeps
+/// scanning underneath and a confirmed read routes on normally. Takes render precedence over
+/// ``StrugglingHint`` in the single live-preview guidance region (``guidanceMessage(gathering:struggling:)``)
+/// — getting a decode at all is better news than "still looking". Mirrors the Android `GatheringHint`.
+internal struct GatheringHint: View {
+    var body: some View {
+        VStack(spacing: 8) {
+            ProgressView()
+                .tint(.white)
+                .accessibilityHidden(true) // Decorative — the text carries the meaning.
+            Text(String(localized: "tessera_scanner_gathering_hint", bundle: .module))
+                .font(.callout)
+                .multilineTextAlignment(.center)
+                // Appears on an auto-transition (a read starting to confirm), so it is announced on
+                // appearance without the user needing to move focus to it.
+                .accessibilityAddTraits(.updatesFrequently)
+        }
+        .padding(24)
+        .accessibilityIdentifier("tessera-mrz-gathering")
     }
 }

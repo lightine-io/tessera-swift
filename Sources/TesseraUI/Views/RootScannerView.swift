@@ -55,41 +55,38 @@ struct RootScannerView: View {
     private func body(for state: ScannerState) -> some View {
         switch state {
         case let .scanning(struggling, gathering):
-            CameraPreviewView(session: model.previewSession)
-                .overlay(alignment: .topTrailing) {
-                    if config.showTorchButton {
-                        Button { model.toggleTorch() } label: {
-                            Image(systemName: model.torchOn ? "flashlight.on.fill" : "flashlight.off.fill")
-                                .font(.title2)
-                                .foregroundStyle(.white)
-                                .padding(12)
-                                .background(.black.opacity(0.45), in: Circle())
-                        }
-                        .padding(16)
-                        .accessibilityLabel(String(localized: "tessera_scanner_torch", bundle: .module))
-                        .accessibilityAddTraits(model.torchOn ? .isSelected : [])
-                        .accessibilityIdentifier("tessera-mrz-torch")
-                    }
-                }
-                .overlay(alignment: .top) {
-                    // The consensus "hold steady" cue takes render precedence over the struggling hint,
-                    // mirroring the Android `MrzGuideOverlay` — a decode in progress is better news than
-                    // "still looking", and the struggle latch stays armed underneath.
-                    if gathering {
-                        Text(String(localized: "tessera_scanner_gathering_hint", bundle: .module))
-                            .font(.callout)
+            // The single live-preview guidance region (gathering > struggling > the plain framing hint) now
+            // renders INSIDE CameraPreviewView's MrzGuideOverlay, below the guide box — not as separate top
+            // banners here, so exactly one guidance message ever shows, in one place, over the dimmed scrim.
+            CameraPreviewView(
+                session: model.previewSession,
+                gathering: gathering,
+                struggling: struggling,
+                onManualEntry: { model.enterManualEntry() },
+                showManualEntry: model.showManualEntry
+            )
+            .overlay(alignment: .topTrailing) {
+                // Shown only when the consumer left the torch enabled AND the bound camera actually has a
+                // flash unit (TES-84 mirror) — a device with no flash never gets a dead-looking toggle.
+                if config.showTorchButton && model.hasTorch {
+                    Button { model.toggleTorch() } label: {
+                        Image(systemName: model.torchOn ? "flashlight.on.fill" : "flashlight.off.fill")
+                            .font(.title2)
                             .foregroundStyle(.white)
-                            .padding(.horizontal, 14).padding(.vertical, 8)
-                            .background(.black.opacity(0.55), in: Capsule())
-                            .padding(.top, 24)
-                            .accessibilityIdentifier("tessera-mrz-gathering")
-                    } else if struggling {
-                        StrugglingHint(
-                            onManualEntry: { model.enterManualEntry() },
-                            showManualEntry: model.showManualEntry
-                        )
+                            .padding(12)
+                            .background(.black.opacity(0.45), in: Circle())
                     }
+                    .padding(16)
+                    .accessibilityLabel(String(localized: "tessera_scanner_torch", bundle: .module))
+                    .accessibilityAddTraits(model.torchOn ? .isSelected : [])
+                    .accessibilityValue(
+                        model.torchOn
+                            ? String(localized: "tessera_scanner_torch_state_on", bundle: .module)
+                            : String(localized: "tessera_scanner_torch_state_off", bundle: .module)
+                    )
+                    .accessibilityIdentifier("tessera-mrz-torch")
                 }
+            }
 
         case .permissionNeeded:
             PermissionScreen(
@@ -162,8 +159,7 @@ struct RootScannerView: View {
                 text: text,
                 parseFailed: parseFailed,
                 onTextChange: { model.updateManualText($0) },
-                onRead: { model.readManual(text: text) },
-                onBack: { model.cancel() }
+                onRead: { model.readManual(text: text) }
             )
 
         case .manualFields:

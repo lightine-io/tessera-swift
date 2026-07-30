@@ -364,6 +364,47 @@ func announcementKey(for state: ScannerState) -> String? {
     }
 }
 
+// MARK: - Field label decisions
+
+/// Which `tessera_scanner_field_optional*` / `tessera_scanner_check_label_optional_data` localization key
+/// names the format-specific optional/personal-data field: TD3 carries ICAO's real "personal number" concept
+/// (the SAME label reused for both the field row and its check-digit observation); every other format's MRZ
+/// optional data has no such meaning, so it gets a neutral label instead — and the field row and the
+/// check-digit observation use two DIFFERENT neutral keys there (`forCheckDigit` selects which), matching the
+/// Android source's own two distinct resources for the same non-TD3 concept. Pure so the choice is
+/// host-testable without a document. Mirrors the Android `reviewAllFieldRows` / `parseObservations`
+/// `if (document is TD3) ... else ...` branches (`ReviewScreen.kt:160-164` / `255-257`).
+func optionalFieldLabelKey(isTD3: Bool, forCheckDigit: Bool) -> String {
+    if isTD3 { return "tessera_scanner_field_optional" }
+    return forCheckDigit ? "tessera_scanner_check_label_optional_data" : "tessera_scanner_field_optional_data"
+}
+
+// MARK: - Single live-preview guidance message (TES-95/TES-129)
+
+/// The ONE guidance message the live-preview overlay shows below the framing-guide box — the iOS mirror of
+/// the Android `MrzGuideOverlay`'s single guidance region (`MrzScannerScreen.kt:1595-1694`). Exactly one of
+/// these ever renders at a time.
+enum GuidanceMessage: Equatable {
+    /// The frame-agreement consensus gate is confirming a read across several frames — "Hold steady…".
+    case gathering
+
+    /// No decode for a while — the "still looking / type it instead" nudge.
+    case struggling
+
+    /// Nothing else to show — the plain "line up the document" framing hint.
+    case framingHint
+}
+
+/// The guidance-message precedence: `gathering` beats `struggling` beats the plain framing hint — getting a
+/// decode at all (gathering) is better news than "still looking" (struggling), and either supersedes the
+/// baseline hint. Pure so the precedence itself is host-testable with no view or camera. Mirrors the Android
+/// `MrzGuideOverlay`'s `when { gathering -> ...; struggling -> ...; else -> ... }`.
+func guidanceMessage(gathering: Bool, struggling: Bool) -> GuidanceMessage {
+    if gathering { return .gathering }
+    if struggling { return .struggling }
+    return .framingHint
+}
+
 // MARK: - Time bridge
 
 /// The current instant as a Kotlin `Instant`, for the date-window inference the manual reader does. The K/N
