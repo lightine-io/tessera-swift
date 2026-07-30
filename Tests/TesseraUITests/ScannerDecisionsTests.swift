@@ -21,7 +21,7 @@ struct ScannerDecisionsTests {
     // MARK: routeDecode — the honesty-critical routing
 
     @Test func failureRoutesToReadFailedRegardlessOfMode() {
-        let decoded = assembleManualDecoded(text: "not an mrz at all", hint: .auto)
+        let decoded = assembleManualDecoded(text: "not an mrz at all")
         #expect(decoded.parse is ParseResult.Failure) // precondition
         for mode in [ReviewMode.review, .instantReturn] {
             if case .showReadFailed = routeDecode(decoded, reviewMode: mode) { } else {
@@ -31,7 +31,7 @@ struct ScannerDecisionsTests {
     }
 
     @Test func nonFailureRoutesToReviewOrInstantReturn() {
-        let decoded = assembleManualDecoded(text: Self.icaoTD3, hint: .passport)
+        let decoded = assembleManualDecoded(text: Self.icaoTD3)
         #expect(!(decoded.parse is ParseResult.Failure)) // Success or PartialSuccess — a non-failure
         if case .showReview = routeDecode(decoded, reviewMode: .review) { } else {
             Issue.record("review mode must park a non-failure decode on review")
@@ -56,7 +56,7 @@ struct ScannerDecisionsTests {
         let noMrz = MrzScanResultNoMrzFound(recognizedText: RecognizedText(lines: []), quality: quality())
         if case .stayScanning = reduceCameraResult(noMrz) { } else { Issue.record("no-mrz → stayScanning") }
 
-        let decoded = assembleManualDecoded(text: "x", hint: .auto)
+        let decoded = assembleManualDecoded(text: "x")
         if case .goDecoded = reduceCameraResult(decoded) { } else { Issue.record("a decode → goDecoded") }
     }
 
@@ -140,7 +140,7 @@ struct ScannerDecisionsTests {
     /// reader runs in single-read mode (`tolerant: false`), so `mapSavedImageResult` no longer inspects
     /// `candidates` at all; there is no candidates outcome to route to any more.
     @Test func savedImageMapsToSingleDecodeIgnoringAnyCandidates() {
-        let decoded = assembleManualDecoded(text: Self.icaoTD3, hint: .passport)
+        let decoded = assembleManualDecoded(text: Self.icaoTD3)
         let candidate = MrzCandidate(mrzLines: [], parse: decoded.parse, disambiguations: [])
         let result = SavedImageScanResult(scan: decoded, candidates: [candidate], captureMetadata: nil)
         guard case let .singleDecode(mapped) = mapSavedImageResult(result) else {
@@ -166,7 +166,7 @@ struct ScannerDecisionsTests {
     /// it confirms exactly once.
     @Test func consensusGathersThenConfirmsAcrossAgreeingFrames() {
         let consensus = MrzDecodeConsensus(threshold: 2)
-        let decoded = assembleManualDecoded(text: Self.icaoTD3, hint: .passport)
+        let decoded = assembleManualDecoded(text: Self.icaoTD3)
 
         guard let gathering = consensus.offer(decoded: decoded) as? ConsensusVerdictGathering else {
             Issue.record("the first agreeing frame must gather, not confirm, at threshold 2")
@@ -186,7 +186,7 @@ struct ScannerDecisionsTests {
     /// gate on a fresh live session, so a prior session's votes never carry over.
     @Test func consensusResetClearsThePriorTally() {
         let consensus = MrzDecodeConsensus(threshold: 2)
-        let decoded = assembleManualDecoded(text: Self.icaoTD3, hint: .passport)
+        let decoded = assembleManualDecoded(text: Self.icaoTD3)
         _ = consensus.offer(decoded: decoded) // one vote cast
         consensus.reset()
         guard let gathering = consensus.offer(decoded: decoded) as? ConsensusVerdictGathering else {
@@ -198,14 +198,14 @@ struct ScannerDecisionsTests {
 
     // MARK: inline manual parse-fail (TES-93) — the assembleManualDecoded precondition
 
-    /// ``ScannerModel/readManual(text:hint:)`` inlines the "stay on manual entry with a parseFailed note vs.
+    /// ``ScannerModel/readManual(text:)`` inlines the "stay on manual entry with a parseFailed note vs.
     /// route through ``routeDecode(_:reviewMode:)``" branch itself (mirroring the Android `ManualRaw` `onRead`
     /// branch, itself inlined in `ScannerBody` rather than a separate top-level function) — so there is no
     /// separate pure function to test that branch at this layer. What IS pure and host-testable is the
     /// precondition it switches on: garbage typed text still assembles to a `ParseResult.Failure`, exactly as
     /// it does for the read-failed routing path above.
     @Test func manualParseFailurePreconditionStillHoldsForGarbageInput() {
-        let decoded = assembleManualDecoded(text: "not an mrz at all", hint: .auto)
+        let decoded = assembleManualDecoded(text: "not an mrz at all")
         #expect(decoded.parse is ParseResult.Failure)
     }
 }

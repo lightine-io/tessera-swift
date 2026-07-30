@@ -157,7 +157,7 @@ final class ScannerModel {
     /// mirror of the Android `returnToSource` (from a review, TES-92/TES-96) and the read-failed
     /// `ReadFailedContent.onTryAgain` (hardcoded to re-open the photo picker, since read-failed is only ever
     /// reached via saved-image — a live-camera parse failure never routes while the consensus gate is waiting
-    /// for a clean frame, and manual entry now stays inline on a parse failure, see ``readManual(text:hint:)``).
+    /// for a clean frame, and manual entry now stays inline on a parse failure, see ``readManual(text:)``).
     /// Re-arms the decode latch and the live consensus / struggle-gate state so a fresh camera session starts
     /// clean.
     func rescan() {
@@ -216,8 +216,8 @@ final class ScannerModel {
     /// partial-success routes to review (or straight back under instant-return) exactly as a camera decode
     /// does. A parse failure stays HERE with an inline note — the typed text is preserved and there is no jump
     /// to the camera/photo-flavoured read-failed screen. Mirrors the Android manual-entry `onRead`.
-    func readManual(text: String, hint: ManualFormatHint) {
-        let decoded = assembleManualDecoded(text: text, hint: hint)
+    func readManual(text: String) {
+        let decoded = assembleManualDecoded(text: text)
         if decoded.parse is ParseResult.Failure {
             state = .manualRaw(text: text, parseFailed: true)
         } else {

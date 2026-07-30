@@ -12,7 +12,7 @@ struct ReviewFieldDiagnostic {
         P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<
         L898902C36UTO7408122F1204159ZE184226B<<<<<10
         """
-        let decoded = assembleManualDecoded(text: mrz, hint: .passport)
+        let decoded = assembleManualDecoded(text: mrz)
         let doc: MrzDocument
         if let s = decoded.parse as? ParseResult.Success { doc = s.document }
         else if let p = decoded.parse as? ParseResult.PartialSuccess { doc = p.document }

@@ -230,30 +230,6 @@ func activeMethod(_ state: ScannerState) -> ScanMethod? {
 
 // MARK: - Manual entry assembly
 
-/// Which parser ``assembleManualDecoded(text:hint:referenceTime:)`` runs against the typed lines — a *hint*,
-/// not a transformation. The choice selects the `ManualMrzReader` entry point; it never touches the input the
-/// user typed (reader, not oracle, Principle 1). `expectedLineLength` is the per-line character count the
-/// format expects, or `nil` for ``auto``. Mirrors the Android `ManualFormatHint`.
-enum ManualFormatHint {
-    /// Auto-detect the format from the line count and per-line lengths (`ManualMrzReader.read`).
-    case auto
-
-    /// Parse as TD3 (passport): 2 lines × 44 (`ManualMrzReader.readTD3`).
-    case passport
-
-    /// Parse as TD1 (identity card): 3 lines × 30 (`ManualMrzReader.readTD1`).
-    case idCard
-
-    /// The per-line character count the format expects, or `nil` for ``auto`` (no single expected length).
-    var expectedLineLength: Int? {
-        switch self {
-        case .auto: return nil
-        case .passport: return Int(Td3FormatSpec().lineLength)
-        case .idCard: return Int(Td1FormatSpec().lineLength)
-        }
-    }
-}
-
 /// Splits raw typed text into the MRZ lines the reader parses: newline-separated, blank lines dropped, each
 /// line trimmed of surrounding whitespace. Mirrors the Android `manualLinesOf`.
 func manualLinesOf(_ text: String) -> [String] {
@@ -262,7 +238,7 @@ func manualLinesOf(_ text: String) -> [String] {
         .filter { !$0.isEmpty }
 }
 
-/// Assembles an `MrzScanResultDecoded` from the raw text a user typed, running the `hint`'s `ManualMrzReader`
+/// Assembles an `MrzScanResultDecoded` from the raw text a user typed, running `ManualMrzReader`'s auto-detect
 /// entry point over the split lines and wrapping the parser's verdict together with the typed lines as the
 /// recognized text. The reader stamps `ReadMethod.MANUAL_ENTRY` as provenance, so the resulting `Decoded`
 /// carries manual-entry provenance through unchanged. A garbage or malformed input yields a `Decoded` whose
@@ -275,20 +251,12 @@ func manualLinesOf(_ text: String) -> [String] {
 ///   behaviour matches line-for-line.
 func assembleManualDecoded(
     text: String,
-    hint: ManualFormatHint,
     referenceTime: KotlinInstant = nowInstant()
 ) -> MrzScanResultDecoded {
     let lines = manualLinesOf(text)
-    let reader = ManualMrzReader.shared
-    let parse: ParseResult
-    switch hint {
-    case .auto:
-        parse = reader.read(input: lines, referenceTime_: referenceTime)
-    case .passport:
-        parse = reader.readTD3(input: lines, referenceTime_: referenceTime)
-    case .idCard:
-        parse = reader.readTD1(input: lines, referenceTime_: referenceTime)
-    }
+    // Format always auto-detected from the line count and per-line lengths (TES-100 — the Auto/Passport/
+    // ID-card hint picker is gone on both platforms; a hint never changed the input, only the parser).
+    let parse = ManualMrzReader.shared.read(input: lines, referenceTime_: referenceTime)
     return MrzScanResultDecoded(
         parse: parse,
         recognizedText: RecognizedText(lines: lines.map { RecognizedLine(text: $0, confidence: nil) }),

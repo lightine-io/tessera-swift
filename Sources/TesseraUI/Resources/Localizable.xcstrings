@@ -1,102 +1,22 @@
 {
   "sourceLanguage": "en",
   "strings": {
-    "tessera_scanner_title": {
+    "tessera_scanner_camera_guide": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Scan document"
+            "value": "Line up the bottom of your document with the box."
           }
         }
       }
     },
-    "tessera_scanner_close": {
+    "tessera_scanner_camera_in_use_body": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Close"
-          }
-        }
-      }
-    },
-    "tessera_scanner_method_camera": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Camera"
-          }
-        }
-      }
-    },
-    "tessera_scanner_method_photo": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Photo"
-          }
-        }
-      }
-    },
-    "tessera_scanner_method_keyboard": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Type"
-          }
-        }
-      }
-    },
-    "tessera_scanner_camera_hint": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Point the camera at the document's data page"
-          }
-        }
-      }
-    },
-    "tessera_scanner_initializing_title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Starting camera…"
-          }
-        }
-      }
-    },
-    "tessera_scanner_initializing_body": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Warming up the camera and text reader. This runs on your device."
-          }
-        }
-      }
-    },
-    "tessera_scanner_struggling_hint": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Still looking — try more light or move closer"
-          }
-        }
-      }
-    },
-    "tessera_scanner_struggling_manual": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Type it instead"
+            "value": "Another app is using the camera. Come back to this screen to reconnect."
           }
         }
       }
@@ -111,12 +31,12 @@
         }
       }
     },
-    "tessera_scanner_camera_in_use_body": {
+    "tessera_scanner_camera_manual": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Another app is using the camera — it will reconnect automatically."
+            "value": "Enter details manually"
           }
         }
       }
@@ -126,17 +46,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Reconnecting…"
-          }
-        }
-      }
-    },
-    "tessera_scanner_camera_unavailable_title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Camera unavailable"
+            "value": "Waiting to reconnect…"
           }
         }
       }
@@ -151,12 +61,12 @@
         }
       }
     },
-    "tessera_scanner_camera_manual": {
+    "tessera_scanner_camera_unavailable_title": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Enter details manually"
+            "value": "Camera unavailable"
           }
         }
       }
@@ -171,282 +81,22 @@
         }
       }
     },
-    "tessera_scanner_permission_grant_title": {
+    "tessera_scanner_category_identity_card": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Camera permission needed"
+            "value": "ID card"
           }
         }
       }
     },
-    "tessera_scanner_permission_grant_body": {
+    "tessera_scanner_category_other": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The scanner reads the machine-readable zone on-device; it does not store or upload your document."
-          }
-        }
-      }
-    },
-    "tessera_scanner_permission_grant_action": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Grant access"
-          }
-        }
-      }
-    },
-    "tessera_scanner_permission_denied_title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Camera access is off"
-          }
-        }
-      }
-    },
-    "tessera_scanner_permission_denied_body": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Turn on Camera for this app in Settings to scan. The scanner reads the machine-readable zone on-device; it does not store or upload your document."
-          }
-        }
-      }
-    },
-    "tessera_scanner_permission_open_settings": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open Settings"
-          }
-        }
-      }
-    },
-    "tessera_scanner_permission_rationale": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Camera permission is needed to scan the document"
-          }
-        }
-      }
-    },
-    "tessera_scanner_grant_permission": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Grant camera access"
-          }
-        }
-      }
-    },
-    "tessera_scanner_review_title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "MRZ read"
-          }
-        }
-      }
-    },
-    "tessera_scanner_review_observations_header": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Observations"
-          }
-        }
-      }
-    },
-    "tessera_scanner_review_show_all": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show all fields & raw MRZ ▾"
-          }
-        }
-      }
-    },
-    "tessera_scanner_review_show_less": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show less ▴"
-          }
-        }
-      }
-    },
-    "tessera_scanner_review_use": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Use this result"
-          }
-        }
-      }
-    },
-    "tessera_scanner_review_rescan": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rescan"
-          }
-        }
-      }
-    },
-    "tessera_scanner_review_all_fields_title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "All fields"
-          }
-        }
-      }
-    },
-    "tessera_scanner_review_raw_mrz_header": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Raw MRZ"
-          }
-        }
-      }
-    },
-    "tessera_scanner_field_document": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Document"
-          }
-        }
-      }
-    },
-    "tessera_scanner_field_document_type": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Document type"
-          }
-        }
-      }
-    },
-    "tessera_scanner_field_name": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Name"
-          }
-        }
-      }
-    },
-    "tessera_scanner_field_number": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Number"
-          }
-        }
-      }
-    },
-    "tessera_scanner_field_expiry": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Expiry"
-          }
-        }
-      }
-    },
-    "tessera_scanner_field_issuing_state": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Issuing state"
-          }
-        }
-      }
-    },
-    "tessera_scanner_field_nationality": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nationality"
-          }
-        }
-      }
-    },
-    "tessera_scanner_field_date_of_birth": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Date of birth"
-          }
-        }
-      }
-    },
-    "tessera_scanner_field_sex": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sex"
-          }
-        }
-      }
-    },
-    "tessera_scanner_field_optional": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Personal / optional no."
-          }
-        }
-      }
-    },
-    "tessera_scanner_name_format": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@, %2$@"
-          }
-        }
-      }
-    },
-    "tessera_scanner_document_format": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@ — %2$@"
+            "value": "other"
           }
         }
       }
@@ -457,16 +107,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "passport"
-          }
-        }
-      }
-    },
-    "tessera_scanner_category_identity_card": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "identity card"
           }
         }
       }
@@ -491,102 +131,12 @@
         }
       }
     },
-    "tessera_scanner_category_other": {
+    "tessera_scanner_check_label_composite": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "other"
-          }
-        }
-      }
-    },
-    "tessera_scanner_obs_check_match": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@ check digit matches"
-          }
-        }
-      }
-    },
-    "tessera_scanner_obs_check_mismatch": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@ check digit: recorded %2$@, computed %3$@"
-          }
-        }
-      }
-    },
-    "tessera_scanner_obs_expiry_well_formed": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Expiry %1$@ is a well-formed date"
-          }
-        }
-      }
-    },
-    "tessera_scanner_obs_some_mismatch": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Some checks did not match — verify against the document."
-          }
-        }
-      }
-    },
-    "tessera_scanner_obs_read_by": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Read by %1$@"
-          }
-        }
-      }
-    },
-    "tessera_scanner_read_method_live_camera": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "live camera"
-          }
-        }
-      }
-    },
-    "tessera_scanner_read_method_photo": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "photo"
-          }
-        }
-      }
-    },
-    "tessera_scanner_read_method_manual": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "manual entry"
-          }
-        }
-      }
-    },
-    "tessera_scanner_check_label_document_number": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Document number"
+            "value": "Everything together"
           }
         }
       }
@@ -611,62 +161,362 @@
         }
       }
     },
+    "tessera_scanner_check_label_document_number": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Document number"
+          }
+        }
+      }
+    },
     "tessera_scanner_check_label_optional_data": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Personal / optional no."
+            "value": "Optional data"
           }
         }
       }
     },
-    "tessera_scanner_check_label_composite": {
+    "tessera_scanner_close": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Composite"
+            "value": "Close"
           }
         }
       }
     },
-    "tessera_scanner_quality_format": {
+    "tessera_scanner_date_unresolved_format": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Scan quality: region %1$@ · OCR confidence %2$@ · lines: %3$@"
+            "value": "%1$@ (year not resolved)"
           }
         }
       }
     },
-    "tessera_scanner_quality_region_found": {
+    "tessera_scanner_document_format": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "found"
+            "value": "%1$@ - %2$@"
           }
         }
       }
     },
-    "tessera_scanner_quality_region_not_found": {
+    "tessera_scanner_field_date_of_birth": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "not found"
+            "value": "Date of birth"
           }
         }
       }
     },
-    "tessera_scanner_quality_confidence_unknown": {
+    "tessera_scanner_field_document": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "n/a"
+            "value": "Document"
+          }
+        }
+      }
+    },
+    "tessera_scanner_field_document_type": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Document type"
+          }
+        }
+      }
+    },
+    "tessera_scanner_field_expiry": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expiry"
+          }
+        }
+      }
+    },
+    "tessera_scanner_field_issuing_state": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Issuing state"
+          }
+        }
+      }
+    },
+    "tessera_scanner_field_name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name"
+          }
+        }
+      }
+    },
+    "tessera_scanner_field_nationality": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nationality"
+          }
+        }
+      }
+    },
+    "tessera_scanner_field_number": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Number"
+          }
+        }
+      }
+    },
+    "tessera_scanner_field_optional": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personal number (optional)"
+          }
+        }
+      }
+    },
+    "tessera_scanner_field_optional_data": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Optional data"
+          }
+        }
+      }
+    },
+    "tessera_scanner_field_sex": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sex"
+          }
+        }
+      }
+    },
+    "tessera_scanner_gathering_hint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hold steady…"
+          }
+        }
+      }
+    },
+    "tessera_scanner_grant_permission": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grant camera access"
+          }
+        }
+      }
+    },
+    "tessera_scanner_initializing_body": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Getting the camera ready. This all runs on your device."
+          }
+        }
+      }
+    },
+    "tessera_scanner_initializing_title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starting camera…"
+          }
+        }
+      }
+    },
+    "tessera_scanner_manual_field_label": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MRZ lines"
+          }
+        }
+      }
+    },
+    "tessera_scanner_manual_obs_char_count_one": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Line %1$@: %2$@ character"
+          }
+        }
+      }
+    },
+    "tessera_scanner_manual_obs_char_count_other": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Line %1$@: %2$@ characters"
+          }
+        }
+      }
+    },
+    "tessera_scanner_manual_parse_failed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That didn't match a known MRZ format - check the lines and lengths above."
+          }
+        }
+      }
+    },
+    "tessera_scanner_manual_read": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read this"
+          }
+        }
+      }
+    },
+    "tessera_scanner_manual_title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter the MRZ manually"
+          }
+        }
+      }
+    },
+    "tessera_scanner_method_camera": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera"
+          }
+        }
+      }
+    },
+    "tessera_scanner_method_keyboard": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manual"
+          }
+        }
+      }
+    },
+    "tessera_scanner_method_photo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photo"
+          }
+        }
+      }
+    },
+    "tessera_scanner_name_format": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@"
+          }
+        }
+      }
+    },
+    "tessera_scanner_obs_check_match": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ - check number agrees"
+          }
+        }
+      }
+    },
+    "tessera_scanner_obs_check_mismatch": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ - check number doesn't agree (document shows %2$@, we get %3$@)"
+          }
+        }
+      }
+    },
+    "tessera_scanner_obs_expiry_well_formed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expiry %1$@ is a real date"
+          }
+        }
+      }
+    },
+    "tessera_scanner_obs_read_by": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read by %1$@"
+          }
+        }
+      }
+    },
+    "tessera_scanner_obs_some_mismatch": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Some checks didn't agree. Please compare with your document."
+          }
+        }
+      }
+    },
+    "tessera_scanner_obs_tone_info": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Note:"
           }
         }
       }
@@ -691,22 +541,72 @@
         }
       }
     },
-    "tessera_scanner_obs_tone_info": {
+    "tessera_scanner_permission_denied_body": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Note:"
+            "value": "Turn on Camera for this app in Settings to scan. Everything is read on your device - nothing is uploaded or stored."
           }
         }
       }
     },
-    "tessera_scanner_read_failed_title": {
+    "tessera_scanner_permission_denied_title": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Couldn't read this MRZ"
+            "value": "Camera access is off"
+          }
+        }
+      }
+    },
+    "tessera_scanner_permission_grant_action": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grant access"
+          }
+        }
+      }
+    },
+    "tessera_scanner_permission_grant_body": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The scanner reads your document on this device - nothing is uploaded or stored."
+          }
+        }
+      }
+    },
+    "tessera_scanner_permission_grant_title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera permission needed"
+          }
+        }
+      }
+    },
+    "tessera_scanner_permission_open_settings": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Settings"
+          }
+        }
+      }
+    },
+    "tessera_scanner_permission_rationale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera permission is needed to scan the document"
           }
         }
       }
@@ -716,7 +616,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The text didn't match a known MRZ format — it may be blurred or partial."
+            "value": "We couldn't read the MRZ. It might be blurry, cut off, or not fully in view."
           }
         }
       }
@@ -731,16 +631,6 @@
         }
       }
     },
-    "tessera_scanner_read_failed_try_again": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Try again"
-          }
-        }
-      }
-    },
     "tessera_scanner_read_failed_manual": {
       "localizations": {
         "en": {
@@ -751,162 +641,152 @@
         }
       }
     },
-    "tessera_scanner_manual_title": {
+    "tessera_scanner_read_failed_title": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Type the MRZ"
+            "value": "Couldn't read this MRZ"
           }
         }
       }
     },
-    "tessera_scanner_manual_field_label": {
+    "tessera_scanner_read_failed_try_again": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "MRZ lines"
+            "value": "Try again"
           }
         }
       }
     },
-    "tessera_scanner_manual_hint_auto": {
+    "tessera_scanner_read_method_live_camera": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Auto"
+            "value": "live camera"
           }
         }
       }
     },
-    "tessera_scanner_manual_hint_passport": {
+    "tessera_scanner_read_method_manual": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Passport"
+            "value": "manual entry"
           }
         }
       }
     },
-    "tessera_scanner_manual_hint_id_card": {
+    "tessera_scanner_read_method_photo": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "ID card"
+            "value": "photo"
           }
         }
       }
     },
-    "tessera_scanner_manual_obs_char_count": {
+    "tessera_scanner_review_all_fields_title": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Line %1$@: %2$@ chars"
+            "value": "All fields"
           }
         }
       }
     },
-    "tessera_scanner_manual_obs_short": {
+    "tessera_scanner_review_edit_entry": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Line %1$@ is %2$@ characters short"
+            "value": "Edit entry"
           }
         }
       }
     },
-    "tessera_scanner_manual_obs_over": {
+    "tessera_scanner_review_observations_header": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Line %1$@ is %2$@ characters over"
+            "value": "What we found"
           }
         }
       }
     },
-    "tessera_scanner_manual_obs_hint_note": {
+    "tessera_scanner_review_raw_mrz_header": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Format chips are parser hints, not fixes — nothing is auto-corrected"
+            "value": "MRZ text"
           }
         }
       }
     },
-    "tessera_scanner_manual_privacy": {
+    "tessera_scanner_review_rescan": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Read on this device. The SDK never uploads or stores what you type."
+            "value": "Rescan"
           }
         }
       }
     },
-    "tessera_scanner_manual_read": {
+    "tessera_scanner_review_show_all": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Read what I typed"
+            "value": "Show all fields and MRZ text ▾"
           }
         }
       }
     },
-    "tessera_scanner_saved_image_prompt_title": {
+    "tessera_scanner_review_show_less": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Choose a photo"
+            "value": "Show less ▴"
           }
         }
       }
     },
-    "tessera_scanner_saved_image_prompt_body": {
+    "tessera_scanner_review_title": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pick a photo of the document's data page and it will be read on-device."
+            "value": "Check the details"
           }
         }
       }
     },
-    "tessera_scanner_saved_image_prompt_action": {
+    "tessera_scanner_review_try_another_photo": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Choose photo"
+            "value": "Try another photo"
           }
         }
       }
     },
-    "tessera_scanner_saved_image_analyzing_title": {
+    "tessera_scanner_review_use": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Analyzing photo…"
-          }
-        }
-      }
-    },
-    "tessera_scanner_saved_image_analyzing_reading": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reading the machine-readable zone"
+            "value": "Use this result"
           }
         }
       }
@@ -921,72 +801,22 @@
         }
       }
     },
-    "tessera_scanner_saved_image_candidates_title": {
+    "tessera_scanner_saved_image_analyzing_reading": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "From photo"
+            "value": "Reading the document…"
           }
         }
       }
     },
-    "tessera_scanner_saved_image_candidates_intro": {
+    "tessera_scanner_saved_image_analyzing_title": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Found %1$d possible readings. An ambiguous character differs (bold below) — pick the one matching your document. Nothing is chosen for you."
-          }
-        }
-      }
-    },
-    "tessera_scanner_saved_image_use_this": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Use this ›"
-          }
-        }
-      }
-    },
-    "tessera_scanner_saved_image_differs_here": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "differs here"
-          }
-        }
-      }
-    },
-    "tessera_scanner_saved_image_empty_title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No MRZ found in this photo"
-          }
-        }
-      }
-    },
-    "tessera_scanner_saved_image_empty_body": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The machine-readable zone couldn't be located in this image. Use a printed document's data page — screens and low-contrast copies often don't read."
-          }
-        }
-      }
-    },
-    "tessera_scanner_saved_image_empty_privacy": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The photo stays on your device. This SDK doesn't upload or store it."
+            "value": "Analyzing photo…"
           }
         }
       }
@@ -1001,6 +831,36 @@
         }
       }
     },
+    "tessera_scanner_saved_image_empty_body": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't find the MRZ in this image. Use a clear photo of the printed document - photos of screens or faint copies often don't read."
+          }
+        }
+      }
+    },
+    "tessera_scanner_saved_image_empty_privacy": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The photo stays on your device. This SDK doesn't upload or store it."
+          }
+        }
+      }
+    },
+    "tessera_scanner_saved_image_empty_title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No MRZ found in this photo"
+          }
+        }
+      }
+    },
     "tessera_scanner_saved_image_manual": {
       "localizations": {
         "en": {
@@ -1011,12 +871,62 @@
         }
       }
     },
-    "tessera_scanner_camera_guide": {
+    "tessera_scanner_saved_image_prompt_action": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fit the bottom lines of the document in the frame"
+            "value": "Choose photo"
+          }
+        }
+      }
+    },
+    "tessera_scanner_saved_image_prompt_body": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick a photo of the side with the 2 or 3 lines of MRZ text at the bottom."
+          }
+        }
+      }
+    },
+    "tessera_scanner_saved_image_prompt_title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a photo of your document"
+          }
+        }
+      }
+    },
+    "tessera_scanner_struggling_hint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Can't read it yet. Try more light or move the document farther away."
+          }
+        }
+      }
+    },
+    "tessera_scanner_struggling_manual": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter details manually"
+          }
+        }
+      }
+    },
+    "tessera_scanner_title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan document"
           }
         }
       }
@@ -1026,7 +936,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Torch"
+            "value": "Flashlight"
           }
         }
       }

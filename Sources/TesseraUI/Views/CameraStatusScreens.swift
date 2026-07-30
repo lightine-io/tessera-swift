@@ -24,6 +24,9 @@ import SwiftUI
 /// `CameraInUseContent`.
 internal struct CameraInUseScreen: View {
     let onManualEntry: () -> Void
+    /// Hidden when the consumer's `enabledMethods` excludes manual entry (a camera-only config must not
+    /// route the user into a screen it disabled). Mirrors the Android `showManualEntry` gating.
+    let showManualEntry: Bool
 
     var body: some View {
         VStack(spacing: 16) {
@@ -45,11 +48,13 @@ internal struct CameraInUseScreen: View {
 
             Spacer()
 
-            Button(action: onManualEntry) {
-                Text(String(localized: "tessera_scanner_camera_manual", bundle: .module))
-                    .frame(maxWidth: .infinity)
+            if showManualEntry {
+                Button(action: onManualEntry) {
+                    Text(String(localized: "tessera_scanner_camera_manual", bundle: .module))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
             }
-            .buttonStyle(.borderedProminent)
         }
         .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -63,6 +68,9 @@ internal struct CameraInUseScreen: View {
 /// ``onManualEntry``, typing the details by hand. Mirrors the Android `CameraUnavailableContent`.
 internal struct CameraUnavailableScreen: View {
     let onManualEntry: () -> Void
+    /// Hidden when the consumer's `enabledMethods` excludes manual entry (a camera-only config must not
+    /// route the user into a screen it disabled). Mirrors the Android `showManualEntry` gating.
+    let showManualEntry: Bool
 
     var body: some View {
         VStack(spacing: 16) {
@@ -80,11 +88,13 @@ internal struct CameraUnavailableScreen: View {
 
             Spacer()
 
-            Button(action: onManualEntry) {
-                Text(String(localized: "tessera_scanner_camera_manual", bundle: .module))
-                    .frame(maxWidth: .infinity)
+            if showManualEntry {
+                Button(action: onManualEntry) {
+                    Text(String(localized: "tessera_scanner_camera_manual", bundle: .module))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
             }
-            .buttonStyle(.borderedProminent)
         }
         .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -129,6 +139,9 @@ private struct ReconnectingIndicator: View {
 /// `StrugglingHint`.
 internal struct StrugglingHint: View {
     let onManualEntry: () -> Void
+    /// Hidden when the consumer's `enabledMethods` excludes manual entry (a camera-only config must not
+    /// route the user into a screen it disabled). Mirrors the Android `showManualEntry` gating.
+    let showManualEntry: Bool
 
     var body: some View {
         VStack(spacing: 8) {
@@ -138,11 +151,13 @@ internal struct StrugglingHint: View {
                 // The hint overlays the preview via a struggle-timeout auto-transition, so it is announced on
                 // appearance without the user needing to move focus to it.
                 .accessibilityAddTraits(.updatesFrequently)
-            Button(action: onManualEntry) {
-                Text(String(localized: "tessera_scanner_struggling_manual", bundle: .module))
+            if showManualEntry {
+                Button(action: onManualEntry) {
+                    Text(String(localized: "tessera_scanner_struggling_manual", bundle: .module))
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.tint)
             }
-            .buttonStyle(.plain)
-            .foregroundStyle(.tint)
         }
         .padding(24)
         .accessibilityIdentifier("tessera-mrz-struggling-hint")

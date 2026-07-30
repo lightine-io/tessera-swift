@@ -20,6 +20,8 @@ internal struct ReadFailedScreen: View {
     let capturedText: RecognizedText
     let onTryAgain: () -> Void
     let onManualEntry: () -> Void
+    /// Hidden when the consumer's `enabledMethods` excludes manual entry. Mirrors Android's `showManualEntry`.
+    let showManualEntry: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -52,12 +54,14 @@ internal struct ReadFailedScreen: View {
             .buttonStyle(.borderedProminent)
             .accessibilityIdentifier("tessera-mrz-read-failed-try-again")
 
-            Button(action: onManualEntry) {
-                Text(String(localized: "tessera_scanner_read_failed_manual", bundle: .module))
-                    .frame(maxWidth: .infinity)
+            if showManualEntry {
+                Button(action: onManualEntry) {
+                    Text(String(localized: "tessera_scanner_read_failed_manual", bundle: .module))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .accessibilityIdentifier("tessera-mrz-read-failed-manual")
             }
-            .buttonStyle(.bordered)
-            .accessibilityIdentifier("tessera-mrz-read-failed-manual")
         }
         .padding(24)
         .contentMaxWidth()

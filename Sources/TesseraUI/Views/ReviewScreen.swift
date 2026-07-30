@@ -63,9 +63,27 @@ private let symbolInfo = "ⓘ"
 internal struct ReviewScreen: View {
     let decoded: MrzScanResultDecoded
     let expanded: Bool
+    /// Which reading method produced this review — drives the provenance-aware secondary action label
+    /// ("Rescan" / "Try another photo" / "Edit entry"), mirroring the Android `secondaryActionLabel`.
+    let source: ScanMethod
     let onToggleExpanded: () -> Void
     let onUse: () -> Void
     let onRescan: () -> Void
+
+    /// The collapsed summary's observation set: mismatches + the advisory + provenance ONLY — every passing
+    /// ✓ check moves to the expanded view (TES-96). Mirrors the Android `reviewSummaryObservations`.
+    private var reviewSummaryObservations: [ReviewObservation] {
+        reviewObservations.filter { $0.tone != .matches }
+    }
+
+    /// "Rescan" / "Try another photo" / "Edit entry" per the review's source method.
+    private var secondaryActionLabel: String {
+        switch source {
+        case .camera: String(localized: "tessera_scanner_review_rescan", bundle: .module)
+        case .savedImage: String(localized: "tessera_scanner_review_try_another_photo", bundle: .module)
+        case .manualEntry: String(localized: "tessera_scanner_review_edit_entry", bundle: .module)
+        }
+    }
 
     var body: some View {
         if expanded {
@@ -96,8 +114,10 @@ internal struct ReviewScreen: View {
 
                     Text(String(localized: "tessera_scanner_review_observations_header", bundle: .module))
                         .font(.subheadline.weight(.semibold))
+                    // Mismatches + advisory + provenance ONLY — every passing check moves to the expanded view
+                    // (reviewObservations, unfiltered) rather than repeating a wall of ✓ rows here (TES-96).
                     VStack(alignment: .leading, spacing: 6) {
-                        ForEach(Array(reviewObservations.enumerated()), id: \.offset) { ReviewObservationRow($0.element) }
+                        ForEach(Array(reviewSummaryObservations.enumerated()), id: \.offset) { ReviewObservationRow($0.element) }
                     }
 
                     Button(action: onToggleExpanded) {
@@ -115,7 +135,7 @@ internal struct ReviewScreen: View {
             .accessibilityIdentifier("tessera-mrz-review-use")
 
             Button(action: onRescan) {
-                Text(String(localized: "tessera_scanner_review_rescan", bundle: .module))
+                Text(secondaryActionLabel)
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.bordered)
@@ -127,8 +147,12 @@ internal struct ReviewScreen: View {
         .accessibilityIdentifier("tessera-mrz-review")
     }
 
-    // The expanded all-fields + raw-MRZ view (mockup 03c). The primary action here is `onUse`; there is no
-    // rescan on the expanded view. A "Show less ▴" collapse returns to the summary.
+    // The expanded all-fields + raw-MRZ view (mockup 03c). Shows the FULL observation set (every ✓ and ‼ row,
+    // plus provenance — unlike the summary's mismatches-only view, TES-96) and every raw MRZ line, never
+    // wrapped or truncated (forced left-to-right regardless of the ambient locale — Principle 5). The pinned
+    // actions mirror the collapsed view's: `onUse` and the provenance-aware secondary action (Rescan / Try
+    // another photo / Edit entry), so that action stays reachable here too. A "Show less ▴" collapse returns
+    // to the summary.
     private var expandedBody: some View {
         let document = reviewDocument
         return VStack(alignment: .leading, spacing: 16) {
@@ -142,15 +166,25 @@ internal struct ReviewScreen: View {
 
                     Divider()
 
+                    Text(String(localized: "tessera_scanner_review_observations_header", bundle: .module))
+                        .font(.subheadline.weight(.semibold))
+                    // The FULL set — every ✓ match and ‼ mismatch, plus provenance — unlike the summary's
+                    // mismatches-only view (TES-96).
+                    VStack(alignment: .leading, spacing: 6) {
+                        ForEach(Array(reviewObservations.enumerated()), id: \.offset) { ReviewObservationRow($0.element) }
+                    }
+
+                    Divider()
+
                     Text(String(localized: "tessera_scanner_review_raw_mrz_header", bundle: .module))
                         .font(.subheadline.weight(.semibold))
+                    // Forced left-to-right regardless of the ambient locale — an MRZ is always printed
+                    // left-to-right per ICAO 9303, and RTL would otherwise mirror the visual order of a string
+                    // that must stay verbatim (Principle 5).
                     ForEach(Array(document.rawLines.enumerated()), id: \.offset) { _, line in
                         MonoLine(line)
                     }
-
-                    ReviewObservationRow(
-                        ReviewObservation(symbol: symbolInfo, text: scanQualityText, tone: .info)
-                    )
+                    .environment(\.layoutDirection, .leftToRight)
 
                     Button(action: onToggleExpanded) {
                         Text(String(localized: "tessera_scanner_review_show_less", bundle: .module))
@@ -165,6 +199,15 @@ internal struct ReviewScreen: View {
             }
             .buttonStyle(.borderedProminent)
             .accessibilityIdentifier("tessera-mrz-review-use")
+
+            // Rescan / Try another photo / Edit entry, matching the collapsed view's provenance-aware label
+            // (TES-96 — the expanded view previously dropped this action entirely).
+            Button(action: onRescan) {
+                Text(secondaryActionLabel)
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .accessibilityIdentifier("tessera-mrz-review-rescan")
         }
         .padding(24)
         .contentMaxWidth()
@@ -385,18 +428,6 @@ internal struct ReviewScreen: View {
         return String(localized: "tessera_scanner_read_method_live_camera", bundle: .module)
     }
 
-    /// The scan-quality line for the expanded view: region status, OCR confidence, recognized line count.
-    /// Mirrors the Android `scanQualityText`.
-    private var scanQualityText: String {
-        let quality = decoded.quality
-        let region = quality.mrzRegionFound
-            ? String(localized: "tessera_scanner_quality_region_found", bundle: .module)
-            : String(localized: "tessera_scanner_quality_region_not_found", bundle: .module)
-        let confidence = quality.ocrConfidence.map { formatConfidence($0.floatValue) }
-            ?? String(localized: "tessera_scanner_quality_confidence_unknown", bundle: .module)
-        return substituting(String(localized: "tessera_scanner_quality_format", bundle: .module),
-                            region, confidence, "\(quality.recognizedLineCount)")
-    }
 }
 
 // MARK: - Free display helpers (shared)
@@ -418,14 +449,6 @@ func unicharToString(_ value: unichar) -> String {
 /// The raw glyph on the document, shown verbatim (the transparency stance) — mirrors `rawSex.toString()`.
 func charDisplay(_ value: unichar) -> String { unicharToString(value) }
 
-/// Two-decimal OCR confidence (e.g. 0.94), locale-independent so the value reads the same everywhere. Mirrors
-/// the Android `formatConfidence`.
-func formatConfidence(_ value: Float) -> String {
-    let hundredths = min(max(Int(value * 100), 0), 100)
-    let whole = hundredths / 100
-    let frac = hundredths % 100
-    return "\(whole).\(String(format: "%02d", frac))"
-}
 
 // MARK: - Reusable components
 
@@ -461,47 +484,6 @@ struct MonoLine: View {
                 .fixedSize(horizontal: true, vertical: false)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-}
-
-/// One MRZ line with the columns in `highlightColumns` emphasised — the differing glyphs a saved-image
-/// candidate resolved (mockup 07). Same monospace, single-line, horizontally-scrollable, never-truncated shape
-/// as ``MonoLine``, but each highlighted column is drawn bold and tinted. Non-colour a11y: the bold weight is
-/// itself a non-colour signal, and a merged accessibility label appends a spoken "…, differs here" note so a
-/// screen-reader user learns which characters differ. Mirrors the Android `MonoLineHighlighted`.
-struct MonoLineHighlighted: View {
-    let text: String
-    let highlightColumns: Set<Int>
-
-    var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            styled
-                .font(.system(.body, design: .monospaced))
-                .lineLimit(1)
-                .fixedSize(horizontal: true, vertical: false)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .accessibilityElement()
-        .accessibilityLabel(accessibilityText)
-    }
-
-    private var styled: Text {
-        let chars = Array(text)
-        var result = Text("")
-        for (index, char) in chars.enumerated() {
-            var piece = Text(String(char))
-            if highlightColumns.contains(index) {
-                piece = piece.fontWeight(.bold).foregroundColor(.accentColor)
-            }
-            result = result + piece
-        }
-        return result
-    }
-
-    private var accessibilityText: String {
-        let hasHighlight = highlightColumns.contains { $0 >= 0 && $0 < text.count }
-        guard hasHighlight else { return text }
-        return "\(text), \(String(localized: "tessera_scanner_saved_image_differs_here", bundle: .module))"
     }
 }
 

@@ -32,6 +32,8 @@ internal struct PermissionScreen: View {
     let onOpenSettings: () -> Void
     let onManualEntry: () -> Void
     let hasRequestHandler: Bool
+    /// Hidden when the consumer's `enabledMethods` excludes manual entry. Mirrors Android's `showManualEntry`.
+    let showManualEntry: Bool
 
     var body: some View {
         switch state {
@@ -44,7 +46,8 @@ internal struct PermissionScreen: View {
                 // button is drawn (only the rationale + the manual-entry escape remain).
                 primaryLabel: hasRequestHandler ? String(localized: "tessera_scanner_permission_grant_action", bundle: .module) : nil,
                 onPrimary: onGrant,
-                onManualEntry: onManualEntry
+                onManualEntry: onManualEntry,
+                showManualEntry: showManualEntry
             )
 
         case .permanentlyDenied:
@@ -55,7 +58,8 @@ internal struct PermissionScreen: View {
                 // Open Settings is the UI's own navigation — always available in this mode.
                 primaryLabel: String(localized: "tessera_scanner_permission_open_settings", bundle: .module),
                 onPrimary: onOpenSettings,
-                onManualEntry: onManualEntry
+                onManualEntry: onManualEntry,
+                showManualEntry: showManualEntry
             )
 
         // The gate never dispatches .granted here (it shows the live preview instead); defensively a no-op.
@@ -77,6 +81,8 @@ private struct PermissionScaffold: View {
     let primaryLabel: String?
     let onPrimary: () -> Void
     let onManualEntry: () -> Void
+    /// Hidden when the consumer's `enabledMethods` excludes manual entry. Mirrors Android's `showManualEntry`.
+    let showManualEntry: Bool
 
     var body: some View {
         VStack(spacing: 12) {
@@ -104,13 +110,15 @@ private struct PermissionScaffold: View {
                 .buttonStyle(.borderedProminent)
             }
 
-            Button {
-                onManualEntry()
-            } label: {
-                Text(String(localized: "tessera_scanner_camera_manual", bundle: .module))
-                    .frame(maxWidth: .infinity)
+            if showManualEntry {
+                Button {
+                    onManualEntry()
+                } label: {
+                    Text(String(localized: "tessera_scanner_camera_manual", bundle: .module))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
             }
-            .buttonStyle(.bordered)
         }
         .padding(24)
         .contentMaxWidth()

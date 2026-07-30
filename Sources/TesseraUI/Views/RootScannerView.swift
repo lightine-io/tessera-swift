@@ -47,9 +47,7 @@ struct RootScannerView: View {
     @ViewBuilder
     private func body(for state: ScannerState) -> some View {
         switch state {
-        // `gathering` (the consensus "hold steady" cue) is state-only for now — a later view wave renders it;
-        // it takes render precedence over `struggling`, mirroring the Android `MrzGuideOverlay`.
-        case let .scanning(struggling, _):
+        case let .scanning(struggling, gathering):
             CameraPreviewView(session: model.previewSession)
                 .overlay(alignment: .topTrailing) {
                     if config.showTorchButton {
@@ -67,8 +65,22 @@ struct RootScannerView: View {
                     }
                 }
                 .overlay(alignment: .top) {
-                    if struggling {
-                        StrugglingHint(onManualEntry: { model.enterManualEntry() })
+                    // The consensus "hold steady" cue takes render precedence over the struggling hint,
+                    // mirroring the Android `MrzGuideOverlay` — a decode in progress is better news than
+                    // "still looking", and the struggle latch stays armed underneath.
+                    if gathering {
+                        Text(String(localized: "tessera_scanner_gathering_hint", bundle: .module))
+                            .font(.callout)
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 14).padding(.vertical, 8)
+                            .background(.black.opacity(0.55), in: Capsule())
+                            .padding(.top, 24)
+                            .accessibilityIdentifier("tessera-mrz-gathering")
+                    } else if struggling {
+                        StrugglingHint(
+                            onManualEntry: { model.enterManualEntry() },
+                            showManualEntry: model.showManualEntry
+                        )
                     }
                 }
 
@@ -78,7 +90,8 @@ struct RootScannerView: View {
                 onGrant: { model.requestPermission() },
                 onOpenSettings: { model.openSettings() },
                 onManualEntry: { model.enterManualEntry() },
-                hasRequestHandler: config.onRequestPermission != nil
+                hasRequestHandler: config.onRequestPermission != nil,
+                showManualEntry: model.showManualEntry
             )
 
         case .permissionPermanentlyDenied:
@@ -87,19 +100,27 @@ struct RootScannerView: View {
                 onGrant: { model.requestPermission() },
                 onOpenSettings: { model.openSettings() },
                 onManualEntry: { model.enterManualEntry() },
-                hasRequestHandler: config.onRequestPermission != nil
+                hasRequestHandler: config.onRequestPermission != nil,
+                showManualEntry: model.showManualEntry
             )
 
         case .cameraInUse:
-            CameraInUseScreen(onManualEntry: { model.enterManualEntry() })
+            CameraInUseScreen(
+                onManualEntry: { model.enterManualEntry() },
+                showManualEntry: model.showManualEntry
+            )
 
         case .cameraUnavailable:
-            CameraUnavailableScreen(onManualEntry: { model.enterManualEntry() })
+            CameraUnavailableScreen(
+                onManualEntry: { model.enterManualEntry() },
+                showManualEntry: model.showManualEntry
+            )
 
-        case let .review(decoded, expanded, _):
+        case let .review(decoded, expanded, source):
             ReviewScreen(
                 decoded: decoded,
                 expanded: expanded,
+                source: source,
                 onToggleExpanded: { model.toggleReviewExpanded() },
                 onUse: { model.confirmReview() },
                 onRescan: { model.rescan() }
@@ -109,7 +130,8 @@ struct RootScannerView: View {
             ReadFailedScreen(
                 capturedText: capturedText,
                 onTryAgain: { model.rescan() },
-                onManualEntry: { model.enterManualEntry() }
+                onManualEntry: { model.enterManualEntry() },
+                showManualEntry: model.showManualEntry
             )
 
         case .awaitingSavedImagePick:
@@ -119,23 +141,21 @@ struct RootScannerView: View {
             SavedImageAnalyzingScreen()
 
         // No candidates state: saved-image reading runs a single strict decode (TES-86/TES-91), so a picked
-        // photo either decodes (routes like a camera decode) or reads as empty. `SavedImageCandidatesScreen`
-        // is unreachable now — a later wave removes it.
+        // photo either decodes (routes like a camera decode) or reads as empty.
 
         case .savedImageEmpty:
             SavedImageEmptyScreen(
                 onChooseDifferent: { model.launchPhotoPicker() },
-                onManualEntry: { model.enterManualEntry() }
+                onManualEntry: { model.enterManualEntry() },
+                showManualEntry: model.showManualEntry
             )
 
-        // `parseFailed` is state-only for now — a later view wave renders the inline parse-fail note
-        // (`ManualEntryScreen` does not yet accept it); the flag itself already keeps the flow on this screen
-        // instead of routing to read-failed (see `ScannerModel.readManual(text:hint:)`).
-        case let .manualRaw(text, _):
+        case let .manualRaw(text, parseFailed):
             ManualEntryScreen(
                 text: text,
+                parseFailed: parseFailed,
                 onTextChange: { model.updateManualText($0) },
-                onRead: { hint in model.readManual(text: text, hint: hint) },
+                onRead: { model.readManual(text: text) },
                 onBack: { model.cancel() }
             )
 
