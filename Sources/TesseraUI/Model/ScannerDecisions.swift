@@ -2,8 +2,8 @@ import Foundation
 import Tessera
 
 // The pure, camera-free, SwiftUI-free decision layer — the iOS mirror of the Android module's decision
-// functions (`routeDecode`, `reduceCameraResult`, `permissionScreenState`, `mapSavedImageResult`,
-// `initialState`, `switcherMethods`, `showsMethodSwitcher`, `assembleManualDecoded`, `candidateDecoded`).
+// functions (`routeDecode`, `reduceCameraResult`, `struggleGateAdvance`, `permissionScreenState`,
+// `mapSavedImageResult`, `initialState`, `switcherMethods`, `showsMethodSwitcher`, `assembleManualDecoded`).
 // Each is behaviour-preserving with its Android counterpart so both platforms make the same choices, and each
 // is a free function (or a small value type) with no UI or camera dependency, host-unit-testable off-device.
 //
@@ -12,7 +12,9 @@ import Tessera
 //     accepted reading);
 //   * a `ParseResultPartialSuccess` (check-digit mismatch) is NOT a failure — it follows the Success path
 //     (review, never diverted): the UI never treats a mismatch as a failure (Principle 1);
-//   * saved-image candidates are surfaced as-is, in the order returned, never auto-ranked or auto-picked.
+//   * saved-image and live-camera decoding both run a single strict read (no tolerant candidate enumeration,
+//     no auto-ranking or auto-picking among readings) — a picked photo either decodes or reads as empty, and
+//     a live frame either confirms through consensus or the camera keeps looking.
 
 // MARK: - Decode routing
 
@@ -60,38 +62,56 @@ enum CameraFlowEffect {
     /// The camera cannot be started (terminal). Show the unavailable notice; no auto-recovery, no retry.
     case goCameraUnavailable
 
-    /// A transient per-frame miss (`NoMrzFound` / `OcrFailed`) — keep scanning, no state change of its own.
-    case stayScanning
+    /// A transient per-frame miss (`NoMrzFound` / `OcrFailed`) — keep scanning, no routing of its own.
+    /// `sawText` is TES-97's "did OCR return any text at all on this frame" signal
+    /// (`quality.recognizedLineCount > 0`): `false` for a frame with nothing recognisable in view, `true` for
+    /// a frame where OCR saw text that just did not form an MRZ shape. ``ScannerModel`` folds this across the
+    /// session (``struggleGateAdvance(sawTextEver:sawText:)``) to decide whether the struggle timeout is
+    /// allowed to show the struggling overlay at all. Mirrors the Android `StayScanning(sawText)`.
+    case stayScanning(sawText: Bool)
 }
 
 /// The flow-state decision for one `MrzScanResult` off the scanner's stream, decided purely from the result
 /// kind. A `CaptureError` carrying `CameraInUse` is recoverable (the caller lets it self-resume); one
-/// carrying `CameraUnavailable` is terminal; `OcrFailed` and a `NoMrzFound` keep scanning. `PermissionDenied`
-/// is not mapped to a distinct effect: the model's own permission gate owns the permission path before the
-/// stream starts, so a permission-denied capture error simply keeps scanning. Mirrors the Android
-/// `reduceCameraResult`.
+/// carrying `CameraUnavailable` is terminal; `OcrFailed` and a `NoMrzFound` keep scanning, carrying whether
+/// this frame's `quality.recognizedLineCount` was non-zero (TES-97 — "OCR saw text" vs "nothing in view at
+/// all"). `PermissionDenied` is not mapped to a distinct effect: the model's own permission gate owns the
+/// permission path before the stream starts, so a permission-denied capture error simply keeps scanning.
+/// Mirrors the Android `reduceCameraResult`.
 func reduceCameraResult(_ result: MrzScanResult) -> CameraFlowEffect {
     switch result {
     case let decoded as MrzScanResultDecoded:
         return .goDecoded(decoded: decoded)
-    case is MrzScanResultNoMrzFound:
-        return .stayScanning
+    case let noMrz as MrzScanResultNoMrzFound:
+        return .stayScanning(sawText: noMrz.quality.recognizedLineCount > 0)
     case let captureError as MrzScanResultCaptureError:
+        let sawText = captureError.quality.recognizedLineCount > 0
         switch captureError.error {
         case is CameraErrorCameraInUse:
             return .goCameraInUse
         case is CameraErrorCameraUnavailable:
             return .goCameraUnavailable
         case is CameraErrorOcrFailed:
-            return .stayScanning
+            return .stayScanning(sawText: sawText)
         case is CameraErrorPermissionDenied:
-            return .stayScanning
+            return .stayScanning(sawText: sawText)
         default:
-            return .stayScanning
+            return .stayScanning(sawText: sawText)
         }
     default:
-        return .stayScanning
+        return .stayScanning(sawText: false)
     }
+}
+
+/// Folds one `.stayScanning` effect into whether OCR has returned text at least once this scanning session
+/// (TES-97) — an OR-fold: `sawTextEver` stays `true` once any frame carried text, regardless of later
+/// text-free frames (a document that briefly leaves frame should not un-arm struggling). This is the gate
+/// ``ScannerModel`` checks before showing the struggling overlay: without it, a struggle timeout with nothing
+/// ever in view would show "try more light or move the document farther away" — misleading advice when there
+/// was never anything to read in the first place. Pure so the "ANY, not the latest frame" semantics is
+/// host-testable without a timer or camera. Mirrors the Android `struggleGateAdvance`.
+func struggleGateAdvance(sawTextEver: Bool, sawText: Bool) -> Bool {
+    sawTextEver || sawText
 }
 
 // MARK: - Permission screen state
@@ -134,26 +154,22 @@ func permissionScreenState(granted: Bool, hasAsked: Bool, showRationale: Bool) -
 /// What a `SavedImageScanResult` means for the flow, decided purely from the result — the saved-image sibling
 /// of ``DecodeRoute``. Mirrors the Android `SavedImageOutcome`.
 enum SavedImageOutcome {
-    /// Tolerant reading surfaced one or more candidate reconstructions — show them all for the user to choose
-    /// among (mockup 07). The UI never picks one (Principle 1 / ADR-023).
-    case candidates(candidates: [MrzCandidate])
-
-    /// No candidates, but the primary read decoded an MRZ — route it exactly as a camera decode would.
+    /// The primary read decoded an MRZ — route it exactly as a camera decode would, through
+    /// ``routeDecode(_:reviewMode:)`` (so a parse failure still shows the read-failed screen, a success goes
+    /// to review, etc.).
     case singleDecode(decoded: MrzScanResultDecoded)
 
     /// No MRZ was found in the photo (or the capture step failed) — the empty screen (mockup 07b).
     case empty
 }
 
-/// Maps a `SavedImageScanResult` to the flow outcome: any candidates → ``SavedImageOutcome/candidates(candidates:)``
-/// (surfaced all together, unranked); else a `Decoded` primary scan → ``SavedImageOutcome/singleDecode(decoded:)``;
-/// else → ``SavedImageOutcome/empty``. The candidates-first order is deliberate — when tolerant reading
-/// resolved a genuinely ambiguous glyph, the honest thing is to show every reading and let the user pick,
-/// never silently collapse to the primary decode. Mirrors the Android `mapSavedImageResult`.
+/// Maps a `SavedImageScanResult` to the flow outcome: a `Decoded` primary scan →
+/// ``SavedImageOutcome/singleDecode(decoded:)``; else → ``SavedImageOutcome/empty``. The reader is used in
+/// single-read mode (`tolerant: false`, see `ScannerModel.readPickedPhoto`), so `result.candidates` is always
+/// empty here — this mapping only ever sees the primary scan (there is no candidates outcome; a picked photo
+/// either decodes or reads as empty, mirroring the Android saved-image flow, TES-86/TES-91). Mirrors the
+/// Android `mapSavedImageResult`.
 func mapSavedImageResult(_ result: SavedImageScanResult) -> SavedImageOutcome {
-    if !result.candidates.isEmpty {
-        return .candidates(candidates: result.candidates)
-    }
     if let decoded = result.scan as? MrzScanResultDecoded {
         return .singleDecode(decoded: decoded)
     }
@@ -167,15 +183,15 @@ func mapSavedImageResult(_ result: SavedImageScanResult) -> SavedImageOutcome {
 /// empty set is treated as camera defensively. Mirrors the Android `initialState`.
 func initialState(enabledMethods: Set<ScanMethod>) -> ScannerState {
     if enabledMethods.contains(.camera) {
-        return .scanning(struggling: false)
+        return .scanning(struggling: false, gathering: false)
     }
     if enabledMethods.contains(.manualEntry) {
-        return .manualRaw(text: "")
+        return .manualRaw(text: "", parseFailed: false)
     }
     if enabledMethods.contains(.savedImage) {
         return .awaitingSavedImagePick
     }
-    return .scanning(struggling: false)
+    return .scanning(struggling: false, gathering: false)
 }
 
 /// The reading methods the switcher offers, decided purely from the enabled set — only the enabled ones, in
@@ -280,23 +296,6 @@ func assembleManualDecoded(
             mrzRegionFound: true,
             ocrConfidence: nil,
             recognizedLineCount: Int32(lines.count)
-        )
-    )
-}
-
-/// Wraps a chosen `MrzCandidate` into an `MrzScanResultDecoded` so the picked candidate routes through
-/// ``routeDecode(_:reviewMode:)`` exactly as a camera or manual decode does — its own `parse` verdict carried
-/// through unchanged (the SDK adds no judgement; the user already chose). The reconstructed lines become the
-/// recognized text verbatim (Principle 5); quality reflects that the MRZ region was found with an unknown OCR
-/// confidence (a candidate carries no per-line score). Mirrors the Android `candidateDecoded`.
-func candidateDecoded(_ candidate: MrzCandidate) -> MrzScanResultDecoded {
-    MrzScanResultDecoded(
-        parse: candidate.parse,
-        recognizedText: RecognizedText(lines: candidate.mrzLines.map { RecognizedLine(text: $0, confidence: nil) }),
-        quality: ScanQuality(
-            mrzRegionFound: true,
-            ocrConfidence: nil,
-            recognizedLineCount: Int32(candidate.mrzLines.count)
         )
     )
 }

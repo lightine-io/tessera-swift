@@ -13,8 +13,12 @@ import Tessera
 enum ScannerState {
     /// The live camera preview is running and looking for an MRZ (mockup 01). `struggling` flips true once
     /// the configured struggle timeout elapses with no decode, to overlay the "still looking / type it
-    /// instead" hint on the preview (mockup 02).
-    case scanning(struggling: Bool)
+    /// instead" hint on the preview (mockup 02). `gathering` flips true while the frame-agreement consensus
+    /// gate (``MrzDecodeConsensus``) has seen a parseable decode but has not yet reached agreement across
+    /// enough frames, to overlay the "hold steady" cue — it takes render precedence over `struggling`, since
+    /// getting a decode at all means progress is being made. Mirrors the Android `Scanning(struggling,
+    /// gathering)`.
+    case scanning(struggling: Bool, gathering: Bool)
 
     /// The camera permission is not held and can still be requested (mockup 04).
     case permissionNeeded
@@ -31,8 +35,10 @@ enum ScannerState {
     /// An MRZ decoded and the user is reviewing the parsed fields and observations before accepting (mockup
     /// 03 for a clean read, 03b for a check-digit mismatch). `expanded` toggles the all-fields + raw-MRZ view
     /// (mockup 03c). `decoded` is the SDK's verbatim result, carried as-is — the UI adds no judgement of its
-    /// own (Principle 1).
-    case review(decoded: MrzScanResultDecoded, expanded: Bool)
+    /// own (Principle 1). `source` is which method produced this reading, so a rescan/edit-entry returns to
+    /// the method that produced it — camera, saved-image, or manual (prefilling the typed lines back, TES-93)
+    /// — rather than always the live camera. Mirrors the Android `Review(decoded, expanded, source)`.
+    case review(decoded: MrzScanResultDecoded, expanded: Bool, source: ScanMethod)
 
     /// OCR produced text that did not parse as any known MRZ format (a `ParseResultFailure`), so the captured
     /// text is shown verbatim for the user to retry or switch to manual entry (mockup 08). `capturedText` is
@@ -41,22 +47,28 @@ enum ScannerState {
 
     /// The saved-image method is the entry point and the flow is waiting for the photo picker to be launched.
     /// A momentary state: the model triggers the picker on entering it — either a pick routes on (analyzing →
-    /// candidates / single decode / empty) or a dismissed picker leaves this showing a neutral re-pick prompt,
-    /// so the screen is never blank.
+    /// single decode / empty) or a dismissed picker leaves this showing a neutral re-pick prompt, so the
+    /// screen is never blank.
     case awaitingSavedImagePick
 
     /// A picked photo is being analysed for an MRZ (mockup 07c).
     case savedImageAnalyzing
 
-    /// Tolerant saved-image reading surfaced one or more candidate reconstructions for the user to choose
-    /// among (mockup 07). Exposed all together — the UI never picks one (Principle 1 / ADR-023).
-    case savedImageCandidates(candidates: [MrzCandidate])
-
     /// The picked photo contained no readable MRZ (mockup 07b).
+    ///
+    /// - Note: there is deliberately no candidates state here — saved-image reading runs a single strict
+    ///   decode (`tolerant: false`, mirroring the Android saved-image flow, TES-86/TES-91), so a picked photo
+    ///   either decodes (routes exactly like a camera decode) or reads as empty; there is never a set of
+    ///   candidate reconstructions to choose among. `SavedImageCandidatesScreen` (Views) is unreachable now —
+    ///   a later wave removes it.
     case savedImageEmpty
 
-    /// Manual entry of the MRZ lines as raw text (mockup 06). `text` is the in-progress input.
-    case manualRaw(text: String)
+    /// Manual entry of the MRZ lines as raw text (mockup 06). `text` is the in-progress input. `parseFailed`
+    /// is set when the last submitted read did not parse — an inline note shown on this same screen, never a
+    /// jump to the read-failed screen (which is camera/photo-flavoured and would mislabel typed input). Any
+    /// edit clears it (see ``ScannerModel/updateManualText(_:)``). Mirrors the Android `ManualRaw(text,
+    /// parseFailed)`.
+    case manualRaw(text: String, parseFailed: Bool)
 
     /// Manual entry as individual fields rather than raw MRZ lines (mockup 06b). The strings are the
     /// in-progress field inputs, verbatim; the SDK parses them, it does not correct them.

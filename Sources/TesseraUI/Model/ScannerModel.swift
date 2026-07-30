@@ -57,6 +57,50 @@ final class ScannerModel {
     /// so it survives the state transitions the collector drives — e.g. a camera-in-use → scanning resume.
     private var decodeRouted = false
 
+    /// Frame-agreement gate over the live decode stream (TES-91 mirror): a decode routes on only once
+    /// ``consensusReads`` frames read the SAME document, so a transient OCR misread the MRZ has no check
+    /// digit for (e.g. a filler `<` read as a letter in the name field) cannot win on one bad frame. Reset
+    /// alongside ``decodeRouted`` whenever a fresh live session begins (``selectMethod(_:)``,
+    /// ``rescan()``). Saved-image / manual entry are one-shot and route without this gate. Mirrors the
+    /// Android `consensus` (`remember(config.consensusReads) { MrzDecodeConsensus(...) }`).
+    private var consensus = MrzDecodeConsensus(threshold: ScannerModel.consensusReads)
+
+    /// How many agreeing frames the live consensus gate requires before a reading is confirmed. Hardcoded to
+    /// mirror `MrzDecodeConsensus.DEFAULT_THRESHOLD` (mrz-camera-core) — unlike the Android `MrzScannerConfig`,
+    /// this iOS `MrzScannerConfig` has no `consensusReads` extension point yet, so there is nothing to plumb a
+    /// consumer override through; add one here if/when the config gains that knob.
+    private static let consensusReads: Int32 = 2
+
+    /// Wall-clock of the last frame the consensus gate reported as gathering, so the "hold steady" cue lingers
+    /// briefly instead of strobing: detection flickers frame-to-frame even on a steady card (a miss between
+    /// two decodes is normal), so the cue clears only after ``gatheringCueLinger`` with no decode. Mirrors the
+    /// Android `lastDecodeAtMs` / `GATHERING_CUE_LINGER_MS`.
+    private var lastGatheringAt: Date?
+    private let gatheringCueLinger: TimeInterval = 0.6
+
+    /// TES-97 mirror: whether OCR has returned text for at least one frame during this scanning session — the
+    /// gate for entering `struggling` (something is in view but unparseable) rather than staying on the plain
+    /// framing guide (nothing has been in view at all, so "try more light or move farther away" would be
+    /// misleading). Reset alongside ``decodeRouted`` whenever a fresh live session begins.
+    private var sawTextEver = false
+
+    /// TES-97 mirror: whether the configured struggle timeout has already elapsed for this session. Split
+    /// from ``sawTextEver`` so a frame that only starts carrying text AFTER the timer already fired still
+    /// flips the UI to struggling the moment it arrives (see the `.stayScanning` branch in
+    /// ``onCameraResult(_:)``), rather than requiring text to have appeared before the timer.
+    private var struggleTimeoutElapsed = false
+
+    /// Guards ``armStruggleTimeout()`` so it fires once per live session, the first time the preview session
+    /// goes live (mirrors the Android `awaitCameraActiveThenTimeout` gate) rather than at scan-intent —
+    /// camera-boot time must not count against the struggle budget.
+    private var struggleTimeoutArmed = false
+
+    /// TES-93 mirror: the in-progress manual-entry text, hoisted here (survives the flow's lifetime) rather
+    /// than living only inside `ScannerState.manualRaw` — which a naive `selectMethod` / `rescan` would
+    /// rebuild from scratch (an empty `.manualRaw`), silently discarding whatever the user had typed on a
+    /// Manual→other→Manual round trip.
+    private var manualDraft = ""
+
     init(config: MrzScannerConfig, onResult: @escaping (TesseraUIResult) -> Void) {
         self.config = config
         self.onResult = onResult
@@ -83,52 +127,102 @@ final class ScannerModel {
         onResult(.cancelled(.userDismissed))
     }
 
+    /// Whether the manual-entry escape (offered from the struggling hint, both camera-status notices, and the
+    /// permission gate) should be shown at all — `false` when the consumer's `enabledMethods` excludes
+    /// `.manualEntry`, so a camera-only config never routes the user into a screen they cannot reach any other
+    /// way. Mirrors the Android `showManualEntry`.
+    var showManualEntry: Bool {
+        config.enabledMethods.contains(.manualEntry)
+    }
+
     /// Switching reading method from the switcher: camera → scanning, photo → the await-pick launcher state,
-    /// type → manual raw. Re-arms the decode latch so a fresh method's first decode routes on. Mirrors the
-    /// Android `onSelectMethod`.
+    /// type → manual raw (prefilled from the hoisted ``manualDraft``, TES-93 — a Manual→other→Manual round
+    /// trip must not silently discard what the user already typed). Re-arms the decode latch and the live
+    /// consensus / struggle-gate state so a fresh method starts clean. Mirrors the Android `onSelectMethod`.
     func selectMethod(_ method: ScanMethod) {
-        decodeRouted = false
+        resetLiveSessionGates()
         switch method {
         case .camera:
-            transition(to: .scanning(struggling: false))
+            transition(to: .scanning(struggling: false, gathering: false))
         case .savedImage:
             transition(to: .awaitingSavedImagePick)
         case .manualEntry:
-            transition(to: .manualRaw(text: ""))
+            transition(to: .manualRaw(text: manualDraft, parseFailed: false))
         }
     }
 
     // MARK: - Per-screen hooks
 
-    /// Rescanning / trying again arms the flow for a fresh decode: clear the one-shot latch so the next
-    /// decoded frame routes on rather than being swallowed as a repeat, then return to scanning.
+    /// Rescanning / trying again: returns to whichever method produced the current outcome screen — the iOS
+    /// mirror of the Android `returnToSource` (from a review, TES-92/TES-96) and the read-failed
+    /// `ReadFailedContent.onTryAgain` (hardcoded to re-open the photo picker, since read-failed is only ever
+    /// reached via saved-image — a live-camera parse failure never routes while the consensus gate is waiting
+    /// for a clean frame, and manual entry now stays inline on a parse failure, see ``readManual(text:hint:)``).
+    /// Re-arms the decode latch and the live consensus / struggle-gate state so a fresh camera session starts
+    /// clean.
     func rescan() {
+        resetLiveSessionGates()
+        switch state {
+        case let .review(decoded, _, source):
+            returnToSource(source, decoded: decoded)
+        case .readFailed:
+            launchPhotoPicker()
+        default:
+            transition(to: .scanning(struggling: false, gathering: false))
+        }
+    }
+
+    /// Returns to whichever reading method produced a ``ScannerState/review(decoded:expanded:source:)`` —
+    /// camera → the live preview, saved-image → re-open the picker, manual → the entry screen, PREFILLED with
+    /// the lines that were actually submitted for this review (TES-93 — editing a manual-provenance reading
+    /// should not start from a blank field). Mirrors the Android `returnToSource`.
+    private func returnToSource(_ source: ScanMethod, decoded: MrzScanResultDecoded) {
+        switch source {
+        case .camera:
+            transition(to: .scanning(struggling: false, gathering: false))
+        case .savedImage:
+            launchPhotoPicker()
+        case .manualEntry:
+            manualDraft = decoded.recognizedText.lines.map(\.text).joined(separator: "\n")
+            transition(to: .manualRaw(text: manualDraft, parseFailed: false))
+        }
+    }
+
+    /// Clears the one-shot decode latch and the live-session gates (consensus tally, struggle-gate latches,
+    /// the struggle-timer arm latch) — called whenever a fresh live session begins (``selectMethod(_:)``,
+    /// ``rescan()``), mirroring the Android flow's paired resets of `decodeRouted` / `consensus` /
+    /// `sawTextEver` / `struggleTimeoutElapsed`.
+    private func resetLiveSessionGates() {
         decodeRouted = false
-        transition(to: .scanning(struggling: false))
+        consensus.reset()
+        sawTextEver = false
+        struggleTimeoutElapsed = false
+        struggleTimeoutArmed = false
     }
 
-    /// Enter manual raw entry (the read-failed / struggle escape).
+    /// Enter manual raw entry (the read-failed / struggle escape), prefilled from the hoisted ``manualDraft``.
     func enterManualEntry() {
-        transition(to: .manualRaw(text: ""))
+        transition(to: .manualRaw(text: manualDraft, parseFailed: false))
     }
 
-    /// Bind the in-progress manual text (called on every edit).
+    /// Bind the in-progress manual text (called on every edit) — mirrored into the hoisted ``manualDraft``
+    /// (TES-93) and clears a prior parse-failed note (the input the user is fixing is no longer "failed").
     func updateManualText(_ text: String) {
-        state = .manualRaw(text: text)
+        manualDraft = text
+        state = .manualRaw(text: text, parseFailed: false)
     }
 
-    /// Assemble a `Decoded` from the typed text and route it exactly as a camera decode — a parse failure
-    /// shows the read-failed screen, a success / partial-success goes to review (or straight back under
-    /// instant-return). Mirrors the Android manual-entry `onRead`.
+    /// Assemble a `Decoded` from the typed text (pure, host-tested; format auto-detected). A success /
+    /// partial-success routes to review (or straight back under instant-return) exactly as a camera decode
+    /// does. A parse failure stays HERE with an inline note — the typed text is preserved and there is no jump
+    /// to the camera/photo-flavoured read-failed screen. Mirrors the Android manual-entry `onRead`.
     func readManual(text: String, hint: ManualFormatHint) {
-        routeThroughDecode(assembleManualDecoded(text: text, hint: hint))
-    }
-
-    /// The user chose a saved-image candidate: wrap it into a `Decoded` and route it exactly as any decode —
-    /// its own parse verdict carried through, no SDK judgement (the user decided). Mirrors the Android
-    /// candidate `onPick`.
-    func pickCandidate(_ candidate: MrzCandidate) {
-        routeThroughDecode(candidateDecoded(candidate))
+        let decoded = assembleManualDecoded(text: text, hint: hint)
+        if decoded.parse is ParseResult.Failure {
+            state = .manualRaw(text: text, parseFailed: true)
+        } else {
+            routeThroughDecode(decoded, source: .manualEntry)
+        }
     }
 
     // MARK: - Saved-image reading
@@ -146,11 +240,14 @@ final class ScannerModel {
         Task { await readPickedPhoto(item) }
     }
 
-    /// Reads the picked photo through the tolerant `SavedImageMrzReader`, entirely on-device, then applies the
-    /// pure ``mapSavedImageResult(_:)``: candidates → the candidates screen (never picking one); a single
-    /// decode → routed exactly as a camera decode; nothing readable → the empty screen. Saved-image reading is
-    /// opt-in and off by default — reaching here means the consumer enabled ``ScanMethod/savedImage``, which
-    /// IS the acknowledgement (ADR-023), so the acknowledgement is constructed here with no separate screen.
+    /// Reads the picked photo through the `SavedImageMrzReader` in single-read mode, entirely on-device, then
+    /// applies the pure ``mapSavedImageResult(_:)``: a single decode → routed exactly as a camera decode;
+    /// nothing readable → the empty screen. Single read, like the live camera (TES-86/TES-91) — no tolerant
+    /// candidate enumeration and no "choose the reading" screen; if OCR misread an ambiguous glyph, the
+    /// review's check-digit observations surface it and the user rescans, the same safety net the camera has.
+    /// Saved-image reading is opt-in and off by default — reaching here means the consumer enabled
+    /// ``ScanMethod/savedImage``, which IS the acknowledgement (ADR-023), so the acknowledgement is
+    /// constructed here with no separate screen.
     private func readPickedPhoto(_ item: PhotosPickerItem) async {
         guard
             let data = try? await item.loadTransferable(type: Data.self),
@@ -168,7 +265,12 @@ final class ScannerModel {
             acknowledgement: acknowledgement,
             recognizer: VisionSavedImageRecognizerKt.visionSavedImageRecognizer(acknowledgement: acknowledgement),
             mode: ParsingMode.strict,
-            tolerant: true,
+            // Single read, like the live camera — no tolerant candidate enumeration and no "Choose the
+            // reading" screen (TES-86/TES-91). A photo takes its one best read straight to review; if OCR
+            // misread an ambiguous glyph, the review's check-digit observations surface it and the user
+            // rescans. (Headless consumers can still opt into tolerant reading via `SavedImageMrzReader`
+            // directly.)
+            tolerant: false,
             metadataReader: nil,
             metadataPolicy: CaptureMetadataPolicy.none,
             telemetry: NoOpTelemetrySink(),
@@ -184,17 +286,15 @@ final class ScannerModel {
         let result = boxed.value
         reader.close()
 
-        // Arm the decode latch afresh so a candidate / single-decode route fires.
+        // Arm the decode latch afresh so a single-decode route fires.
         decodeRouted = false
         guard let result else {
             state = .savedImageEmpty
             return
         }
         switch mapSavedImageResult(result) {
-        case let .candidates(candidates):
-            state = .savedImageCandidates(candidates: candidates)
         case let .singleDecode(decoded):
-            routeThroughDecode(decoded)
+            routeThroughDecode(decoded, source: .savedImage)
         case .empty:
             state = .savedImageEmpty
         }
@@ -213,13 +313,13 @@ final class ScannerModel {
 
     /// Toggle the review screen's expanded all-fields view.
     func toggleReviewExpanded() {
-        guard case let .review(decoded, expanded) = state else { return }
-        state = .review(decoded: decoded, expanded: !expanded)
+        guard case let .review(decoded, expanded, source) = state else { return }
+        state = .review(decoded: decoded, expanded: !expanded, source: source)
     }
 
     /// Confirm the reviewed decode — hand it back to the host.
     func confirmReview() {
-        guard case let .review(decoded, _) = state else { return }
+        guard case let .review(decoded, _, _) = state else { return }
         onResult(.confirmed(decoded))
     }
 
@@ -299,7 +399,7 @@ final class ScannerModel {
         case .permissionNeeded, .permissionPermanentlyDenied:
             switch evaluatePermission() {
             case .granted:
-                transition(to: .scanning(struggling: false))
+                transition(to: .scanning(struggling: false, gathering: false))
             case .needsGrant:
                 state = .permissionNeeded
             case .permanentlyDenied:
@@ -313,9 +413,12 @@ final class ScannerModel {
     // MARK: - Camera wiring
 
     /// Starts (or keeps running) the live scanner for the scanning state. Constructs the scanner with preview
-    /// armed on first use, begins collecting `results` and `previewSession`, and arms the struggle timeout.
+    /// armed on first use, begins collecting `results` and `previewSession`, and arms the scan-timeout
+    /// deadline. The struggle timeout is armed separately, once the preview actually goes live (see
+    /// ``deliverPreviewSession(_:)`` — TES-97 item 6), not here at scan-intent.
     private func startScanningIfNeeded() {
         if scanner != nil { return }
+        struggleTimeoutArmed = false
 
         // TODO(screen): the camera-permission gate (permissionScreenState over the read-only AVFoundation
         // authorization signals + config.onRequestPermission) lands with the permission-screen slice. The
@@ -323,7 +426,11 @@ final class ScannerModel {
         // keeps it scanning (the gate governs the permission path once wired).
         let scanner = AVCaptureMrzScanner(
             recognizer: VisionMrzTextRecognizer(),
-            mode: ParsingMode.strict,
+            // LENIENT strips whitespace before shape-matching, exactly as the Android live camera does
+            // (TES-86): Vision routinely injects spaces into MRZ lines, and under STRICT those lines fail
+            // their fixed width so the MRZ band is never detected. Whitespace is never meaningful in an MRZ,
+            // so stripping it is safe.
+            mode: ParsingMode.lenient,
             telemetry: NoOpTelemetrySink(),
             cameraPosition: 1 // AVCaptureDevicePositionBack
         )
@@ -356,14 +463,18 @@ final class ScannerModel {
             try? await previewBox.flow.collect(collector: collector)
         }
 
-        armStruggleTimeout()
         armScanTimeout()
         scanner.start()
     }
 
-    /// After the configured struggle timeout with no decode, flip the scanning state to `struggling`. The
-    /// camera keeps running, so a decode arriving later still routes; a non-finite timeout means "never
-    /// struggle", so the timer does not arm. Mirrors the Android struggle `LaunchedEffect`.
+    /// After the configured struggle timeout with no decode, marks the timeout elapsed and — if OCR has
+    /// already seen text at least once this session (``sawTextEver``) — flips the scanning state to
+    /// `struggling`. The camera keeps running, so a decode arriving later still routes; a non-finite timeout
+    /// means "never struggle", so the timer does not arm. A later qualifying frame after the timer still flips
+    /// it on retroactively (see the `.stayScanning` branch in ``onCameraResult(_:)``). Armed once per live
+    /// session the first time the preview goes live (``deliverPreviewSession(_:)``, TES-97 item 6) — not at
+    /// scan-intent — so camera-boot time is never counted against the budget. Mirrors the Android struggle
+    /// `LaunchedEffect` / `onStruggling`.
     private func armStruggleTimeout() {
         struggleTask?.cancel()
         // A nil struggleTimeout means "never struggle".
@@ -373,8 +484,10 @@ final class ScannerModel {
             try? await Task.sleep(nanoseconds: nanos)
             guard !Task.isCancelled else { return }
             await MainActor.run {
-                guard let self, case .scanning = self.state else { return }
-                self.state = .scanning(struggling: true)
+                guard let self else { return }
+                self.struggleTimeoutElapsed = true
+                guard case let .scanning(struggling, gathering) = self.state, !struggling, self.sawTextEver else { return }
+                self.state = .scanning(struggling: true, gathering: gathering)
             }
         }
     }
@@ -410,6 +523,8 @@ final class ScannerModel {
         torchOn = false
         torchDefaultApplied = false
         struggleTask?.cancel(); struggleTask = nil
+        struggleTimeoutArmed = false
+        lastGatheringAt = nil
         scanTimeoutTask?.cancel(); scanTimeoutTask = nil
         resultsTask?.cancel(); resultsTask = nil
         previewTask?.cancel(); previewTask = nil
@@ -429,10 +544,18 @@ final class ScannerModel {
     /// Main-actor delivery of the latest published `AVCaptureSession` (or `nil`), for the preview view.
     private func deliverPreviewSession(_ session: UnsafeTransfer<AVCaptureSession?>) {
         previewSession = session.value
+        guard session.value != nil else { return }
         // Honour torchOnByDefault the first time the camera opens (the device is now reachable via the session).
-        if session.value != nil, config.torchOnByDefault, !torchDefaultApplied {
+        if config.torchOnByDefault, !torchDefaultApplied {
             torchDefaultApplied = true
             setTorch(true)
+        }
+        // TES-97 item 6: the struggle timeout is camera-scoped and must measure time actively scanning, not
+        // camera boot — arm it the first time the preview session goes live this session (mirrors the Android
+        // `awaitCameraActiveThenTimeout` gate ahead of the struggle `LaunchedEffect`), not at scan-intent.
+        if !struggleTimeoutArmed {
+            struggleTimeoutArmed = true
+            armStruggleTimeout()
         }
     }
 
@@ -471,37 +594,77 @@ final class ScannerModel {
     /// resulting effect is applied here. Repeated decoded frames are guarded by the ``decodeRouted`` latch
     /// (route only the first). A camera-in-use notice self-resumes: any later non-error result flips the flow
     /// back to scanning, so no retry is needed.
+    ///
+    /// A decoded frame is a transient bad frame if it did not parse (blurred/garbled OCR) — live camera keeps
+    /// scanning and waits for a clean frame rather than committing to read-failed on one bad read (TES-86); a
+    /// parseable frame is offered to the consensus gate (``consensus``) rather than routed on sight, so a
+    /// transient misread the MRZ has no check digit for cannot win on one frame — Gathering keeps scanning
+    /// (surfacing the "hold steady" cue), Confirmed routes once (the latch stops repeats). Mirrors the Android
+    /// `onCameraResult`'s consensus wiring (TES-91).
     private func onCameraResult(_ result: MrzScanResult) {
         switch reduceCameraResult(result) {
         case let .goDecoded(decoded):
-            if !decodeRouted {
+            guard !decodeRouted, !(decoded.parse is ParseResult.Failure) else { return }
+            switch consensus.offer(decoded: decoded) {
+            case is ConsensusVerdictConfirmed:
                 decodeRouted = true
-                routeThroughDecode(decoded)
+                routeThroughDecode(decoded, source: .camera)
+            case is ConsensusVerdictGathering:
+                lastGatheringAt = Date()
+                if case let .scanning(struggling, gathering) = state, !gathering {
+                    state = .scanning(struggling: struggling, gathering: true)
+                }
+            default:
+                break
             }
         case .goCameraInUse:
             state = .cameraInUse
         case .goCameraUnavailable:
             state = .cameraUnavailable
-        case .stayScanning:
+        case let .stayScanning(sawText):
+            // TES-97: fold whether OCR has returned text at least once this session — the gate for whether the
+            // struggle timeout is allowed to show struggling at all (see armStruggleTimeout()).
+            sawTextEver = struggleGateAdvance(sawTextEver: sawTextEver, sawText: sawText)
+
             // A transient miss. If a recoverable camera-in-use notice is showing, a clean frame proves the
             // camera reconnected — return to scanning.
             if case .cameraInUse = state {
-                state = .scanning(struggling: false)
+                state = .scanning(struggling: false, gathering: false)
+                return
+            }
+            guard case let .scanning(struggling, gathering) = state else { return }
+            var newStruggling = struggling
+            var newGathering = gathering
+            // Clear the "hold steady" cue only after the linger window with no decode, so a single miss
+            // between two decodes (normal even on a steady card) does not strobe it.
+            if newGathering, let lastGathering = lastGatheringAt,
+               Date().timeIntervalSince(lastGathering) > gatheringCueLinger {
+                newGathering = false
+            }
+            // TES-97: the struggle timeout already elapsed, but nothing carried text until just now — this
+            // qualifying frame arriving late still flips the UI to struggling retroactively.
+            if !newStruggling, struggleTimeoutElapsed, sawTextEver {
+                newStruggling = true
+            }
+            if newStruggling != struggling || newGathering != gathering {
+                state = .scanning(struggling: newStruggling, gathering: newGathering)
             }
         }
     }
 
     /// Routes a decode to the matching state via ``routeDecode(_:reviewMode:)`` — shared by the camera path,
-    /// manual entry, and candidate pick, all of which produce a `Decoded` that follows the identical routing.
-    /// Mirrors the Android `routeDecoded` / `routeThroughDecode`.
-    private func routeThroughDecode(_ decoded: MrzScanResultDecoded) {
+    /// manual entry, and saved-image, all of which produce a `Decoded` that follows the identical routing.
+    /// `source` is carried onto ``ScannerState/review(decoded:expanded:source:)`` so a rescan/edit-entry
+    /// returns to the method that produced it (TES-92/TES-93/TES-96). Mirrors the Android `routeDecoded` /
+    /// `routeThroughDecode`.
+    private func routeThroughDecode(_ decoded: MrzScanResultDecoded, source: ScanMethod) {
         switch routeDecode(decoded, reviewMode: config.reviewMode) {
         case let .showReadFailed(capturedText):
             transition(to: .readFailed(capturedText: capturedText))
         case let .returnConfirmed(decoded):
             onResult(.confirmed(decoded))
         case let .showReview(decoded):
-            transition(to: .review(decoded: decoded, expanded: false))
+            transition(to: .review(decoded: decoded, expanded: false, source: source))
         }
     }
 }

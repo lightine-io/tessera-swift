@@ -86,13 +86,126 @@ struct ScannerDecisionsTests {
     }
 
     @Test func switcherShowsOnCaptureAndEntryScreensOnly() {
-        #expect(showsMethodSwitcher(.scanning(struggling: false)))
-        #expect(showsMethodSwitcher(.manualRaw(text: "")))
+        #expect(showsMethodSwitcher(.scanning(struggling: false, gathering: false)))
+        #expect(showsMethodSwitcher(.manualRaw(text: "", parseFailed: false)))
         #expect(showsMethodSwitcher(.awaitingSavedImagePick))
         #expect(showsMethodSwitcher(.savedImageEmpty))
         // Not on outcome / gate screens.
         #expect(!showsMethodSwitcher(.readFailed(capturedText: RecognizedText(lines: []))))
         #expect(!showsMethodSwitcher(.cameraUnavailable))
         #expect(!showsMethodSwitcher(.permissionNeeded))
+    }
+
+    // MARK: struggleGateAdvance — TES-97 struggle-gate fold
+
+    /// An OR-fold: once any frame carried text, `sawTextEver` stays `true` regardless of later text-free
+    /// frames (a document that briefly leaves frame must not un-arm the struggling overlay).
+    @Test func struggleGateAdvanceIsAnOrFoldThatNeverUnLatches() {
+        #expect(struggleGateAdvance(sawTextEver: false, sawText: false) == false)
+        #expect(struggleGateAdvance(sawTextEver: false, sawText: true) == true)
+        #expect(struggleGateAdvance(sawTextEver: true, sawText: false) == true)
+        #expect(struggleGateAdvance(sawTextEver: true, sawText: true) == true)
+    }
+
+    // MARK: reduceCameraResult — TES-97 sawText propagation
+
+    /// `stayScanning`'s `sawText` mirrors `quality.recognizedLineCount > 0` for both the transient-miss
+    /// result kinds it covers — a `NoMrzFound` and a `CaptureError(OcrFailed)` frame.
+    @Test func stayScanningCarriesWhetherOcrSawTextOnTheFrame() {
+        let textyQuality = ScanQuality(mrzRegionFound: false, ocrConfidence: nil, recognizedLineCount: 2)
+        let emptyQuality = quality() // recognizedLineCount: 0
+
+        let noMrzWithText = MrzScanResultNoMrzFound(recognizedText: RecognizedText(lines: []), quality: textyQuality)
+        guard case let .stayScanning(sawText) = reduceCameraResult(noMrzWithText) else {
+            Issue.record("no-mrz must stayScanning"); return
+        }
+        #expect(sawText)
+
+        let noMrzEmpty = MrzScanResultNoMrzFound(recognizedText: RecognizedText(lines: []), quality: emptyQuality)
+        guard case let .stayScanning(sawTextEmpty) = reduceCameraResult(noMrzEmpty) else {
+            Issue.record("no-mrz must stayScanning"); return
+        }
+        #expect(!sawTextEmpty)
+
+        let ocrFailedWithText = MrzScanResultCaptureError(error: CameraErrorOcrFailed(message: "x"), quality: textyQuality)
+        guard case let .stayScanning(sawTextOcr) = reduceCameraResult(ocrFailedWithText) else {
+            Issue.record("ocr-failed must stayScanning"); return
+        }
+        #expect(sawTextOcr)
+    }
+
+    // MARK: mapSavedImageResult — single-read saved image (TES-86/TES-91)
+
+    /// A `Decoded` primary scan always maps to `singleDecode`, even when `candidates` is non-empty — the
+    /// reader runs in single-read mode (`tolerant: false`), so `mapSavedImageResult` no longer inspects
+    /// `candidates` at all; there is no candidates outcome to route to any more.
+    @Test func savedImageMapsToSingleDecodeIgnoringAnyCandidates() {
+        let decoded = assembleManualDecoded(text: Self.icaoTD3, hint: .passport)
+        let candidate = MrzCandidate(mrzLines: [], parse: decoded.parse, disambiguations: [])
+        let result = SavedImageScanResult(scan: decoded, candidates: [candidate], captureMetadata: nil)
+        guard case let .singleDecode(mapped) = mapSavedImageResult(result) else {
+            Issue.record("a Decoded scan must map to singleDecode even with non-empty candidates")
+            return
+        }
+        #expect(mapped === decoded)
+    }
+
+    @Test func savedImageMapsToEmptyWhenNothingWasFound() {
+        let noMrz = MrzScanResultNoMrzFound(recognizedText: RecognizedText(lines: []), quality: quality())
+        let result = SavedImageScanResult(scan: noMrz, candidates: [], captureMetadata: nil)
+        if case .empty = mapSavedImageResult(result) { } else {
+            Issue.record("a NoMrzFound scan must map to empty")
+        }
+    }
+
+    // MARK: MrzDecodeConsensus wiring — the live consensus gate (TES-91)
+
+    /// `MrzDecodeConsensus` itself is camera-free and pure, so its ``ScannerModel`` wiring (the `is
+    /// ConsensusVerdictConfirmed` / `is ConsensusVerdictGathering` dispatch) is host-testable directly:
+    /// below `threshold` agreeing frames it reports `Gathering` (the "hold steady" cue), and at `threshold`
+    /// it confirms exactly once.
+    @Test func consensusGathersThenConfirmsAcrossAgreeingFrames() {
+        let consensus = MrzDecodeConsensus(threshold: 2)
+        let decoded = assembleManualDecoded(text: Self.icaoTD3, hint: .passport)
+
+        guard let gathering = consensus.offer(decoded: decoded) as? ConsensusVerdictGathering else {
+            Issue.record("the first agreeing frame must gather, not confirm, at threshold 2")
+            return
+        }
+        #expect(gathering.agreement == 1)
+        #expect(gathering.threshold == 2)
+
+        guard let confirmed = consensus.offer(decoded: decoded) as? ConsensusVerdictConfirmed else {
+            Issue.record("the second agreeing frame must confirm at threshold 2")
+            return
+        }
+        #expect(!(confirmed.decoded.parse is ParseResult.Failure))
+    }
+
+    /// `reset()` clears the tally — the iOS mirror of ``ScannerModel/resetLiveSessionGates()`` re-arming the
+    /// gate on a fresh live session, so a prior session's votes never carry over.
+    @Test func consensusResetClearsThePriorTally() {
+        let consensus = MrzDecodeConsensus(threshold: 2)
+        let decoded = assembleManualDecoded(text: Self.icaoTD3, hint: .passport)
+        _ = consensus.offer(decoded: decoded) // one vote cast
+        consensus.reset()
+        guard let gathering = consensus.offer(decoded: decoded) as? ConsensusVerdictGathering else {
+            Issue.record("after reset the tally must restart from zero, not confirm on the first re-offer")
+            return
+        }
+        #expect(gathering.agreement == 1)
+    }
+
+    // MARK: inline manual parse-fail (TES-93) — the assembleManualDecoded precondition
+
+    /// ``ScannerModel/readManual(text:hint:)`` inlines the "stay on manual entry with a parseFailed note vs.
+    /// route through ``routeDecode(_:reviewMode:)``" branch itself (mirroring the Android `ManualRaw` `onRead`
+    /// branch, itself inlined in `ScannerBody` rather than a separate top-level function) — so there is no
+    /// separate pure function to test that branch at this layer. What IS pure and host-testable is the
+    /// precondition it switches on: garbage typed text still assembles to a `ParseResult.Failure`, exactly as
+    /// it does for the read-failed routing path above.
+    @Test func manualParseFailurePreconditionStillHoldsForGarbageInput() {
+        let decoded = assembleManualDecoded(text: "not an mrz at all", hint: .auto)
+        #expect(decoded.parse is ParseResult.Failure)
     }
 }

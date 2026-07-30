@@ -47,7 +47,9 @@ struct RootScannerView: View {
     @ViewBuilder
     private func body(for state: ScannerState) -> some View {
         switch state {
-        case let .scanning(struggling):
+        // `gathering` (the consensus "hold steady" cue) is state-only for now — a later view wave renders it;
+        // it takes render precedence over `struggling`, mirroring the Android `MrzGuideOverlay`.
+        case let .scanning(struggling, _):
             CameraPreviewView(session: model.previewSession)
                 .overlay(alignment: .topTrailing) {
                     if config.showTorchButton {
@@ -94,7 +96,7 @@ struct RootScannerView: View {
         case .cameraUnavailable:
             CameraUnavailableScreen(onManualEntry: { model.enterManualEntry() })
 
-        case let .review(decoded, expanded):
+        case let .review(decoded, expanded, _):
             ReviewScreen(
                 decoded: decoded,
                 expanded: expanded,
@@ -116,12 +118,9 @@ struct RootScannerView: View {
         case .savedImageAnalyzing:
             SavedImageAnalyzingScreen()
 
-        case let .savedImageCandidates(candidates):
-            SavedImageCandidatesScreen(
-                candidates: candidates,
-                onPick: { model.pickCandidate($0) },
-                onChooseDifferent: { model.launchPhotoPicker() }
-            )
+        // No candidates state: saved-image reading runs a single strict decode (TES-86/TES-91), so a picked
+        // photo either decodes (routes like a camera decode) or reads as empty. `SavedImageCandidatesScreen`
+        // is unreachable now — a later wave removes it.
 
         case .savedImageEmpty:
             SavedImageEmptyScreen(
@@ -129,7 +128,10 @@ struct RootScannerView: View {
                 onManualEntry: { model.enterManualEntry() }
             )
 
-        case let .manualRaw(text):
+        // `parseFailed` is state-only for now — a later view wave renders the inline parse-fail note
+        // (`ManualEntryScreen` does not yet accept it); the flag itself already keeps the flow on this screen
+        // instead of routing to read-failed (see `ScannerModel.readManual(text:hint:)`).
+        case let .manualRaw(text, _):
             ManualEntryScreen(
                 text: text,
                 onTextChange: { model.updateManualText($0) },
