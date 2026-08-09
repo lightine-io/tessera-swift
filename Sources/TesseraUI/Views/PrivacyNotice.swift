@@ -22,13 +22,14 @@ struct PrivacyNoticeAction: View {
         Button {
             showDialog = true
         } label: {
-            HStack(spacing: 4) {
-                // Decorative glyph (like the scaffold's ✕): hidden from accessibility so the screen reader
-                // announces only "Privacy", not the circled-i character.
-                Text("ⓘ").accessibilityHidden(true)
-                Text(String(localized: "tessera_scanner_privacy_action", bundle: .module))
-            }
+            // Icon-only, the iOS toolbar idiom (like the scaffold's ✕ and every stock app): an SF Symbol
+            // never gets the system's tappable-text underline treatment, scales with Dynamic Type, and
+            // carries the localized "Privacy" as its spoken label below. The Android top bar keeps its
+            // "ⓘ Privacy" text form — parity is the affordance (privacy notice reachable from the top bar
+            // on every screen), presentation follows each platform's idiom.
+            Image(systemName: "info.circle")
         }
+        .accessibilityLabel(String(localized: "tessera_scanner_privacy_action", bundle: .module))
         .accessibilityIdentifier("tessera-mrz-privacy-action")
         .alert(
             String(localized: "tessera_scanner_privacy_dialog_title", bundle: .module),

@@ -63,7 +63,11 @@ struct RootScannerView: View {
                 gathering: gathering,
                 struggling: struggling,
                 onManualEntry: { model.enterManualEntry() },
-                showManualEntry: model.showManualEntry
+                showManualEntry: model.showManualEntry,
+                // WYSIWYG band alignment (TES-129): the viewfinder reports the guide box's real on-screen
+                // region (already converted to metadata-output space) and the model retargets Vision's OCR
+                // band to it — the iOS mirror of Android's ViewPort alignment.
+                onMetadataGuideRegion: { model.updateMrzGuideRegion(metadataRect: $0) }
             )
             .overlay(alignment: .topTrailing) {
                 // Shown only when the consumer left the torch enabled AND the bound camera actually has a

@@ -56,6 +56,10 @@ final class ScannerModel {
     /// The live scanner, created lazily when the camera path first runs (so a camera-disabled config never
     /// touches AVFoundation). `enablePreview()` is armed at construction, before `start()`.
     private var scanner: AVCaptureMrzScanner?
+
+    /// The live scanner's Vision recognizer, kept so the viewfinder's measured guide region can retarget the
+    /// OCR band after construction (``updateMrzGuideRegion(metadataRect:)``). Lives and dies with `scanner`.
+    private var recognizer: VisionMrzTextRecognizer?
     private var resultsTask: Task<Void, Never>?
     private var previewTask: Task<Void, Never>?
     private var struggleTask: Task<Void, Never>?
@@ -159,33 +163,6 @@ final class ScannerModel {
         deadlineTask = nil
     }
 
-    // TEMP TES-129 wave-4 instrumentation — PII-safe per-frame text line for the device console.
-    // Logs ONLY type names and quality counts; never OCR text, never parsed fields. Remove before merge.
-    private func logFrame(_ result: MrzScanResult) {
-        let kind: String
-        var detail = ""
-        switch result {
-        case let decoded as MrzScanResultDecoded:
-            kind = "Decoded"
-            detail = " parse=\(String(describing: type(of: decoded.parse))) lines=\(decoded.quality.recognizedLineCount)"
-        case let notFound as MrzScanResultNoMrzFound:
-            kind = "NoMrzFound"
-            detail = " lines=\(notFound.quality.recognizedLineCount)"
-        case let capture as MrzScanResultCaptureError:
-            kind = "CaptureError"
-            detail = " error=\(String(describing: type(of: capture.error)))"
-        default:
-            kind = String(describing: type(of: result))
-        }
-        print("TESSERA-FRAME \(kind)\(detail) state=\(stateName) routed=\(decodeRouted)")
-    }
-
-    private var stateName: String {
-        switch state {
-        case let .scanning(struggling, gathering): return "scanning(s:\(struggling),g:\(gathering))"
-        default: return String(describing: state).prefix(30).description
-        }
-    }
 
     // DECIDED (TES-129, 2026-07-30): flow state is deliberately NOT persisted across scene/process death —
     // no SceneStorage/Codable snapshot, unlike Android's saved-instance restoration (TES-102). iOS has no
@@ -431,7 +408,12 @@ final class ScannerModel {
         let reader = SavedImageMrzReader<NSURL>(
             acknowledgement: acknowledgement,
             recognizer: VisionSavedImageRecognizerKt.visionSavedImageRecognizer(acknowledgement: acknowledgement),
-            mode: ParsingMode.strict,
+            // LENIENT, mirroring the Android saved-image path and this file's own live-camera reasoning
+            // (TES-86/TES-129): Vision routinely injects stray spaces into MRZ lines — in photos exactly as
+            // in camera frames — and under STRICT those lines fail their fixed width, so a perfectly
+            // readable photo reports "no MRZ" (device-verified 2026-08-09). Whitespace is never meaningful
+            // in an MRZ, so stripping it is safe.
+            mode: ParsingMode.lenient,
             // Single read, like the live camera — no tolerant candidate enumeration and no "Choose the
             // reading" screen (TES-86/TES-91). A photo takes its one best read straight to review; if OCR
             // misread an ambiguous glyph, the review's check-digit observations surface it and the user
@@ -441,7 +423,12 @@ final class ScannerModel {
             metadataReader: nil,
             metadataPolicy: CaptureMetadataPolicy.none,
             telemetry: NoOpTelemetrySink(),
-            referenceTimeProvider: { nowInstant() }
+            // @Sendable so the closure does NOT inherit this model's main-actor isolation: the K/N analyzer
+            // invokes it on its background analysis thread — and only on a SUCCESSFUL decode (it timestamps
+            // the decode), which is why the isolation trap stayed latent until the first photo actually
+            // decoded (SIGTRAP via dispatch_assert_queue, device crash log 2026-08-09). `nowInstant()` is a
+            // free function touching no actor state, so the hop is safe.
+            referenceTimeProvider: { @Sendable in nowInstant() }
         )
         // The scan result is a non-Sendable K/N type produced on Vision's callback thread; move it onto the
         // main actor as a single-owner transfer (the same discipline the flow-collection bridge uses).
@@ -596,11 +583,15 @@ final class ScannerModel {
         // authorization signals + config.onRequestPermission) lands with the permission-screen slice. The
         // scanner surfaces CaptureError(PermissionDenied) on the stream in the meantime; reduceCameraResult
         // keeps it scanning (the gate governs the permission path once wired).
-        // Restrict OCR to the MRZ band the guide marks (TES-86 mirror): Vision reads only the centred
-        // guide-box band, not the whole frame — noise above the MRZ (name, address lines) otherwise breaks
-        // detection. Opt-in, so headless consumers' default reading is unchanged.
+        // Restrict OCR to the MRZ band the guide marks (TES-86 mirror): Vision reads only the guide-box
+        // band, not the whole frame — noise above the MRZ (name, address lines) otherwise breaks detection.
+        // Opt-in, so headless consumers' default reading is unchanged. The parameterless call is the centred
+        // approximation until the viewfinder reports the guide's real on-screen region (aspect-fill crops
+        // the frame and the guide sits low, so the two genuinely differ); the WYSIWYG rect then retargets it
+        // via updateMrzGuideRegion — the iOS mirror of Android's ViewPort alignment.
         let recognizer = VisionMrzTextRecognizer()
         recognizer.restrictToMrzBand()
+        self.recognizer = recognizer
         let scanner = AVCaptureMrzScanner(
             recognizer: recognizer,
             // LENIENT strips whitespace before shape-matching, exactly as the Android live camera does
@@ -689,6 +680,30 @@ final class ScannerModel {
         scanner?.stop()
         scanner?.close()
         scanner = nil
+        recognizer = nil
+    }
+
+    /// Retargets the OCR band to the guide's real on-screen region — called by the viewfinder whenever its
+    /// layout resolves or changes, with the guide rect already converted by AVFoundation's own
+    /// `metadataOutputRectOfInterest(for:)` (so `metadataRect` is normalized against the unrotated capture
+    /// buffer, top-left origin — the recognizer maps it into Vision's space internally). No-op when the
+    /// live scanner is not running (nothing to retarget; a later start re-reports on layout).
+    func updateMrzGuideRegion(metadataRect: CGRect) {
+        recognizer?.restrictToMrzBand(
+            x: metadataRect.origin.x,
+            y: metadataRect.origin.y,
+            width: metadataRect.size.width,
+            height: metadataRect.size.height
+        )
+        // Aim continuous AF at the same region (TES-132): the guide window is not the frame centre, and
+        // centre-weighted AF otherwise focuses the background while the document blurs. Same converted
+        // rect — focusPointOfInterest documents the same metadata-output space.
+        scanner?.focusOnRegion(
+            x: metadataRect.origin.x,
+            y: metadataRect.origin.y,
+            width: metadataRect.size.width,
+            height: metadataRect.size.height
+        )
     }
 
     /// Main-actor delivery of one collected result. The value is non-Sendable (a K/N reference type), so it
@@ -759,9 +774,6 @@ final class ScannerModel {
     /// (surfacing the "hold steady" cue), Confirmed routes once (the latch stops repeats). Mirrors the Android
     /// `onCameraResult`'s consensus wiring (TES-91).
     private func onCameraResult(_ result: MrzScanResult) {
-        // TEMP TES-129 wave-4 instrumentation (PII-safe: type names + counts ONLY, never recognized text
-        // or parsed fields — the Android golden method). Remove before the tessera-swift PR merges.
-        logFrame(result)
         switch reduceCameraResult(result) {
         case let .goDecoded(decoded):
             guard !decodeRouted, !(decoded.parse is ParseResult.Failure) else { return }
