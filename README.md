@@ -2,7 +2,7 @@
 
 Swift Package Manager (SPM) distribution of **Tessera** — a vendor-neutral SDK for reading and validating identity-document data (Machine Readable Zones) — for iOS / Swift consumers.
 
-> **Current release: `0.3.0`.** Headless live-camera and saved-image (pre-captured) MRZ reading (AVFoundation + Apple Vision) plus the ICAO Doc 9303 parsing / validation / generation core, vended as the `Tessera` XCFramework.
+> **Current release: `0.5.0`.** The optional SwiftUI default scanner UI (`TesseraUI`), plus headless live-camera, saved-image (pre-captured), and manual-entry MRZ reading (AVFoundation + Apple Vision) and the ICAO Doc 9303 parsing / validation / generation core, vended as the `Tessera` XCFramework.
 
 ## What this repository is
 
@@ -15,13 +15,13 @@ This package vends two library products:
 | Product | What it is |
 |---|---|
 | **`Tessera`** | The headless SDK: MRZ parsing / validation / generation plus the AVFoundation + Apple Vision live-camera scanner, vended as the `Tessera` XCFramework (built from the [main project](https://github.com/lightine-io/tessera) and attached to its GitHub release). |
-| **`TesseraUI`** | *(new in `0.5.0`, in development)* The optional default MRZ scanner UI — hand-written SwiftUI layered over the headless `Tessera` APIs. A single entry view (`MrzScannerView`) plus `MrzScannerConfig` and a result callback. Its public surface freezes at the `0.5.0` tag, lockstep-versioned with `Tessera`. |
+| **`TesseraUI`** | *(shipped in `0.5.0`)* The optional default MRZ scanner UI — hand-written SwiftUI layered over the headless `Tessera` APIs. A single entry view (`MrzScannerView`) plus `MrzScannerConfig` and a result callback; live-camera, saved-photo, and manual-entry reading with a review step, localized copy, and VoiceOver support. Its public surface is frozen as of the `0.5.0` tag ([ADR-007](https://lightine.youtrack.cloud/articles/TES-A-37)), lockstep-versioned with `Tessera`. |
 
 Import only what you need — `import Tessera` for the headless SDK, `import TesseraUI` for the default UI (which re-exports the headless types it hands back).
 
 ## Using it
 
-In Xcode: **File → Add Package Dependencies…**, enter this repository's URL and choose version **`0.3.0`** (or "Up to Next Major"). Then:
+In Xcode: **File → Add Package Dependencies…**, enter this repository's URL and choose version **`0.5.0`** (or "Up to Next Major"). Then:
 
 ```swift
 import Tessera
@@ -31,7 +31,7 @@ Or in a `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/lightine-io/tessera-swift", from: "0.3.0"),
+    .package(url: "https://github.com/lightine-io/tessera-swift", from: "0.5.0"),
 ]
 ```
 
@@ -42,5 +42,5 @@ Minimum deployment target: **iOS 18**.
 ## Links
 
 - **Main project & source:** https://github.com/lightine-io/tessera
-- **Release & XCFramework:** https://github.com/lightine-io/tessera/releases/tag/v0.3.0
+- **Release & XCFramework:** https://github.com/lightine-io/tessera/releases/tag/v0.5.0
 - **License:** [Apache-2.0](LICENSE)
