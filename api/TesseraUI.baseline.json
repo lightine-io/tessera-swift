@@ -1629,6 +1629,78 @@
           },
           {
             "kind": "Var",
+            "name": "hapticFeedback",
+            "printedName": "hapticFeedback",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:9TesseraUI16MrzScannerConfigV14hapticFeedbackSbvp",
+            "mangledName": "$s9TesseraUI16MrzScannerConfigV14hapticFeedbackSbvp",
+            "moduleName": "TesseraUI",
+            "declAttributes": [
+              "HasStorage"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Bool",
+                    "printedName": "Swift.Bool",
+                    "usr": "s:Sb"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:9TesseraUI16MrzScannerConfigV14hapticFeedbackSbvg",
+                "mangledName": "$s9TesseraUI16MrzScannerConfigV14hapticFeedbackSbvg",
+                "moduleName": "TesseraUI",
+                "implicit": true,
+                "declAttributes": [
+                  "Transparent"
+                ],
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Bool",
+                    "printedName": "Swift.Bool",
+                    "usr": "s:Sb"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:9TesseraUI16MrzScannerConfigV14hapticFeedbackSbvs",
+                "mangledName": "$s9TesseraUI16MrzScannerConfigV14hapticFeedbackSbvs",
+                "moduleName": "TesseraUI",
+                "implicit": true,
+                "declAttributes": [
+                  "Transparent"
+                ],
+                "accessorKind": "set"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
             "name": "theme",
             "printedName": "theme",
             "children": [
@@ -1853,7 +1925,7 @@
           {
             "kind": "Constructor",
             "name": "init",
-            "printedName": "init(enabledMethods:reviewMode:showTorchButton:torchOnByDefault:struggleTimeout:scanTimeout:theme:onRequestPermission:)",
+            "printedName": "init(enabledMethods:reviewMode:showTorchButton:torchOnByDefault:struggleTimeout:scanTimeout:hapticFeedback:theme:onRequestPermission:)",
             "children": [
               {
                 "kind": "TypeNominal",
@@ -1929,6 +2001,13 @@
               },
               {
                 "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "hasDefaultArg": true,
+                "usr": "s:Sb"
+              },
+              {
+                "kind": "TypeNominal",
                 "name": "MrzScannerTheme",
                 "printedName": "TesseraUI.MrzScannerTheme",
                 "hasDefaultArg": true,
@@ -1969,8 +2048,8 @@
               }
             ],
             "declKind": "Constructor",
-            "usr": "s:9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR05theme19onRequestPermissionACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgAsA0cD5ThemeVyyYbcSgtcfc",
-            "mangledName": "$s9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR05theme19onRequestPermissionACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgAsA0cD5ThemeVyyYbcSgtcfc",
+            "usr": "s:9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR014hapticFeedback5theme19onRequestPermissionACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgATSbAA0cD5ThemeVyyYbcSgtcfc",
+            "mangledName": "$s9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR014hapticFeedback5theme19onRequestPermissionACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgATSbAA0cD5ThemeVyyYbcSgtcfc",
             "moduleName": "TesseraUI",
             "init_kind": "Designated"
           }

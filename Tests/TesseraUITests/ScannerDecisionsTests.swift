@@ -320,4 +320,24 @@ struct ScannerDecisionsTests {
         #expect(guidanceMessage(gathering: false, struggling: true) == .struggling)
         #expect(guidanceMessage(gathering: false, struggling: false) == .framingHint)
     }
+
+    // MARK: dismissReason — TES-115, the Android dismissReasonFor mirror
+
+    @Test func dismissReasonIsCameraUnavailableOnlyFromTheTerminalCameraErrorScreen() {
+        #expect(dismissReason(for: .cameraUnavailable) == .cameraUnavailable)
+        // The in-use notice is recoverable, not terminal — a close from it is a plain dismissal.
+        #expect(dismissReason(for: .cameraInUse) == .userDismissed)
+    }
+
+    @Test func dismissReasonIsPermissionDeniedFromEitherPermissionScreen() {
+        #expect(dismissReason(for: .permissionNeeded) == .permissionDenied)
+        #expect(dismissReason(for: .permissionPermanentlyDenied) == .permissionDenied)
+    }
+
+    @Test func dismissReasonIsUserDismissedEverywhereElse() {
+        #expect(dismissReason(for: .scanning(struggling: false, gathering: false)) == .userDismissed)
+        #expect(dismissReason(for: .manualRaw(text: "", parseFailed: false)) == .userDismissed)
+        #expect(dismissReason(for: .awaitingSavedImagePick) == .userDismissed)
+        #expect(dismissReason(for: .savedImageEmpty) == .userDismissed)
+    }
 }

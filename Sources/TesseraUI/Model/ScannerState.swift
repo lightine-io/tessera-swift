@@ -59,8 +59,8 @@ enum ScannerState {
     /// - Note: there is deliberately no candidates state here — saved-image reading runs a single strict
     ///   decode (`tolerant: false`, mirroring the Android saved-image flow, TES-86/TES-91), so a picked photo
     ///   either decodes (routes exactly like a camera decode) or reads as empty; there is never a set of
-    ///   candidate reconstructions to choose among. `SavedImageCandidatesScreen` (Views) is unreachable now —
-    ///   a later wave removes it.
+    ///   candidate reconstructions to choose among (the old candidates screen was removed with its Android
+    ///   counterpart).
     case savedImageEmpty
 
     /// Manual entry of the MRZ lines as raw text (mockup 06). `text` is the in-progress input. `parseFailed`
@@ -69,8 +69,4 @@ enum ScannerState {
     /// edit clears it (see ``ScannerModel/updateManualText(_:)``). Mirrors the Android `ManualRaw(text,
     /// parseFailed)`.
     case manualRaw(text: String, parseFailed: Bool)
-
-    /// Manual entry as individual fields rather than raw MRZ lines (mockup 06b). The strings are the
-    /// in-progress field inputs, verbatim; the SDK parses them, it does not correct them.
-    case manualFields(documentNumber: String, dateOfBirth: String, dateOfExpiry: String, nationality: String)
 }

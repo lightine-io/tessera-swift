@@ -35,6 +35,11 @@ final class ScannerModel {
     /// been asked, so the permanent-denial face is reached without a separate rationale signal.
     private var hasAskedPermission = false
 
+    /// The trigger for the accepted-read confirm haptic (TES-134): bumped exactly when the live-camera
+    /// consensus gate confirms a read, observed by the root view's `.sensoryFeedback` (which gates on
+    /// ``MrzScannerConfig/hapticFeedback``). A counter — not a Bool — so back-to-back sessions retrigger.
+    private(set) var confirmedReadHaptic = 0
+
     /// Whether the torch is currently on (reflected by the torch button). K/N does not expose the AVFoundation
     /// torch API, so the torch is driven here in Swift via the capture device published on the session.
     private(set) var torchOn = false
@@ -264,9 +269,13 @@ final class ScannerModel {
 
     // MARK: - Global chrome hooks
 
-    /// The global cancel (the top bar's ✕). Reports `Cancelled(userDismissed)`.
+    /// The global cancel (the top bar's ✕). Reports WHY the flow ended based on what the user was looking
+    /// at when they closed (TES-115, the Android `dismissReasonFor` mirror): the terminal
+    /// camera-unavailable screen → ``DismissReason/cameraUnavailable``, either permission screen →
+    /// ``DismissReason/permissionDenied``, anything else — including the recoverable in-use notice —
+    /// ``DismissReason/userDismissed``. The decision is the pure ``dismissReason(for:)``.
     func cancel() {
-        onResult(.cancelled(.userDismissed))
+        onResult(.cancelled(dismissReason(for: state)))
     }
 
     /// Whether the manual-entry escape (offered from the struggling hint, both camera-status notices, and the
@@ -579,10 +588,9 @@ final class ScannerModel {
         if scanner != nil { return }
         struggleTimeoutArmed = false
 
-        // TODO(screen): the camera-permission gate (permissionScreenState over the read-only AVFoundation
-        // authorization signals + config.onRequestPermission) lands with the permission-screen slice. The
-        // scanner surfaces CaptureError(PermissionDenied) on the stream in the meantime; reduceCameraResult
-        // keeps it scanning (the gate governs the permission path once wired).
+        // The permission gate lives in applyStateEntry (permissionScreenState over the read-only
+        // authorization signals), which routes to a permission state BEFORE this is reached from .scanning;
+        // the scanner's own CaptureError(PermissionDenied) stays non-terminal in reduceCameraResult.
         // Restrict OCR to the MRZ band the guide marks (TES-86 mirror): Vision reads only the guide-box
         // band, not the whole frame — noise above the MRZ (name, address lines) otherwise breaks detection.
         // Opt-in, so headless consumers' default reading is unchanged. The parameterless call is the centred
@@ -780,6 +788,10 @@ final class ScannerModel {
             switch consensus.offer(decoded: decoded) {
             case is ConsensusVerdictConfirmed:
                 decodeRouted = true
+                // TES-134 (Android hapticFeedback mirror): bump the sensory-feedback trigger the moment a
+                // live-camera read is accepted — the view's `.sensoryFeedback` plays the confirm haptic
+                // (gated there on `config.hapticFeedback`). Camera path only, exactly like Android.
+                confirmedReadHaptic += 1
                 routeThroughDecode(decoded, source: .camera)
             case is ConsensusVerdictGathering:
                 lastGatheringAt = Date()

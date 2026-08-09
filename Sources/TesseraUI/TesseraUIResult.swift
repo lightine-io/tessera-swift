@@ -10,10 +10,12 @@ public enum DismissReason: Sendable, Hashable {
     /// ``MrzScannerConfig/scanTimeout`` elapsed with no decode.
     case timedOut
 
-    /// The camera is unavailable on this device (terminal — no retry offered).
+    /// The camera could not be started (a terminal capture error) and the user closed the flow from that
+    /// screen. The recoverable camera-in-use notice is NOT this — closing from it is ``userDismissed``.
     case cameraUnavailable
 
-    /// The camera permission the UI needs is not granted.
+    /// The camera permission was not granted and the user closed the flow from a permission screen (grant
+    /// or permanently-denied) rather than granting it or continuing another way.
     case permissionDenied
 }
 

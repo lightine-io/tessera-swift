@@ -27,17 +27,16 @@ enum ObservationTone {
 /// One stated observation about a reading — a symbol, its text, and its tone. The meaning lives in `text` and
 /// in the tone's spoken prefix (see ``ReviewObservationRow``), never in colour alone, so it survives for a
 /// screen-reader user (non-colour a11y). Mirrors the Android `ReviewObservation`.
-struct ReviewObservation: Identifiable {
-    let id = UUID()
+struct ReviewObservation {
     let symbol: String
     let text: String
     let tone: ObservationTone
 }
 
 /// One key/value summary row: `label` on the start, monospace `value` on the end. Mirrors the Android
-/// `FieldRow`.
-struct FieldRow: Identifiable {
-    let id = UUID()
+/// `FieldRow`. Deliberately NOT `Identifiable`: rows are rebuilt per body evaluation, so any stored id
+/// would be fresh each time — the `ForEach`es render by stable position (`\.offset`) instead.
+struct FieldRow {
     let label: String
     let value: String
 }

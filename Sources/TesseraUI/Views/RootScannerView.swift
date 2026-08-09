@@ -29,6 +29,14 @@ struct RootScannerView: View {
             body(for: model.state)
         }
         .scannerTheme(config.theme)
+        // A short confirming haptic the moment a live-camera read is accepted (TES-134, Android
+        // `hapticFeedback` mirror): the model bumps the trigger exactly when the consensus gate confirms a
+        // camera read. `.sensoryFeedback` honours the system haptic setting; the closure gates the
+        // consumer's opt-out (`nil` = no feedback). Camera path only — manual/saved-image have their own
+        // interaction feedback.
+        .sensoryFeedback(trigger: model.confirmedReadHaptic) { _, _ in
+            config.hapticFeedback ? .success : nil
+        }
         .photosPicker(
             isPresented: $model.photoPickerPresented,
             selection: $model.pickedItem,
@@ -165,11 +173,6 @@ struct RootScannerView: View {
                 onTextChange: { model.updateManualText($0) },
                 onRead: { model.readManual(text: text) }
             )
-
-        case .manualFields:
-            // Field-by-field manual entry (mockup 06b) is deferred beyond 0.5.0 (TES-79). This state is never
-            // produced by the flow; guarded defensively so the switch stays exhaustive.
-            EmptyView()
         }
     }
 }

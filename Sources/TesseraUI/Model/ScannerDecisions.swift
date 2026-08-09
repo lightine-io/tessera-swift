@@ -149,6 +149,22 @@ func permissionScreenState(granted: Bool, hasAsked: Bool, showRationale: Bool) -
     return .needsGrant
 }
 
+// MARK: - Dismiss reason (TES-115)
+
+/// The ``DismissReason`` the global cancel (the top bar's ✕) carries — decided purely from what the user
+/// was looking at when they closed (the Android `dismissReasonFor` mirror): the terminal
+/// camera-unavailable screen → ``DismissReason/cameraUnavailable``; either permission screen →
+/// ``DismissReason/permissionDenied``; anything else — including the recoverable in-use notice, which is
+/// not terminal — ``DismissReason/userDismissed``. Reports what happened, decides nothing beyond it:
+/// whether an unusable camera or an ungranted permission matters is the host's call.
+func dismissReason(for state: ScannerState) -> DismissReason {
+    switch state {
+    case .cameraUnavailable: .cameraUnavailable
+    case .permissionNeeded, .permissionPermanentlyDenied: .permissionDenied
+    default: .userDismissed
+    }
+}
+
 // MARK: - Saved-image outcome mapping
 
 /// What a `SavedImageScanResult` means for the flow, decided purely from the result — the saved-image sibling

@@ -98,6 +98,11 @@ public struct MrzScannerConfig: Sendable {
     /// ``DismissReason/timedOut``. `nil` (the default) never times out.
     public var scanTimeout: Duration?
 
+    /// Fire a short confirming haptic the moment a live-camera read is accepted (default `true`) — the
+    /// hands-free "it scanned" cue. Honours the device's system haptic setting. Camera path only
+    /// (manual/saved-image get their own interaction feedback). Mirrors the Android `hapticFeedback`.
+    public var hapticFeedback: Bool
+
     /// The bounded theming seam; see ``MrzScannerTheme``.
     public var theme: MrzScannerTheme
 
@@ -112,6 +117,7 @@ public struct MrzScannerConfig: Sendable {
         torchOnByDefault: Bool = false,
         struggleTimeout: Duration? = .seconds(10),
         scanTimeout: Duration? = nil,
+        hapticFeedback: Bool = true,
         theme: MrzScannerTheme = MrzScannerTheme(),
         onRequestPermission: (@Sendable () -> Void)? = nil
     ) {
@@ -121,6 +127,7 @@ public struct MrzScannerConfig: Sendable {
         self.torchOnByDefault = torchOnByDefault
         self.struggleTimeout = struggleTimeout
         self.scanTimeout = scanTimeout
+        self.hapticFeedback = hapticFeedback
         self.theme = theme
         self.onRequestPermission = onRequestPermission
     }

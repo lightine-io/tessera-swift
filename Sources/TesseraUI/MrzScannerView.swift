@@ -14,10 +14,10 @@ import Tessera
 /// }
 /// ```
 ///
-/// - Note: **Scaffold.** This 0.5.0 slice (TES-55) establishes the frozen public surface, the SPM product,
-///   and the CI/test/API-guard machinery. The actual screens — live preview, review, manual, saved-image,
-///   the method switcher, and the state machine mirroring Android — land in later iOS slices
-///   (TES-56/59/60/72/73/74/75) and require the K/N live-preview seam tracked in TES-82.
+/// - Note: All screens are implemented — live preview, review, manual raw entry, saved-image, the camera
+///   status/permission screens, and the method switcher (TES-55/56/57/59/60/72/73/74/75), with full ADR-027
+///   state coverage. Field-by-field manual entry (mockup 06b) was decided against entirely (TES-79,
+///   won't-do: typed fields are a host-app form, not a document read).
 public struct MrzScannerView: View {
     private let config: MrzScannerConfig
     private let onResult: (TesseraUIResult) -> Void
@@ -35,8 +35,7 @@ public struct MrzScannerView: View {
 
     public var body: some View {
         // The state-machine-driven UI: RootScannerView owns the ScannerModel, dispatches the matching screen
-        // under the shared ScannerScaffold chrome, and applies the theme. The leaf screen bodies land in
-        // later slices; the foundation (state model, decisions, live preview, scaffold, theme) is here.
+        // under the shared ScannerScaffold chrome, and applies the theme.
         RootScannerView(config: config, onResult: onResult)
     }
 }
