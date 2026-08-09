@@ -28,11 +28,44 @@ CURRENT="$(mktemp -t "$MODULE.current.XXXXXX.json")"
 # "Debug-iphonesimulator"; replace each such quoted value wholesale. The API structure carries no paths.
 # Two machine/run-specific tokens the digester echoes into the dump's tool-args tail: the -I/-F products
 # search paths, and the -o temp output filename (a fresh mktemp name each run). Neutralize both.
+#
+# Hardened at the 0.5.0 release gate (TES-82): the original sed pass left two other toolchain-varying
+# artifacts in the dump, which broke baseline portability the first time the local Xcode and the CI
+# runner's Xcode diverged (26.6 local vs 26.3 CI):
+#   1. tool_arguments — embeds the absolute SDK path and -sdk-version build id of whichever Xcode ran
+#      the digester. Dropped wholesale: invocation echo, not API surface.
+#   2. Suppressible conformances (Copyable / Escapable / BitwiseCopyable) — whether the digester EMITS
+#      them varies by Swift toolchain version. Dropped from conformance lists. Deliberate trade-off:
+#      the guard no longer catches a real `~Copyable`/`~Escapable` surface change — rare enough to
+#      accept for a portable baseline, and a change that drastic surfaces in review regardless.
+# JSON-aware (python3, present on macOS + the runners) so the scrub survives formatting differences.
 normalize() {
-  sed -E \
-    -e 's#"[^"]*Debug-iphonesimulator[^"]*"#"PRODUCTS"#g' \
-    -e 's#"[^"]*'"$MODULE"'\.current[^"]*"#"OUTPUT"#g' \
-    "$1"
+  python3 - "$1" <<'PY'
+import json, sys
+
+SUPPRESSIBLE = {"Copyable", "Escapable", "BitwiseCopyable"}
+
+def scrub(node):
+    if isinstance(node, dict):
+        node.pop("tool_arguments", None)
+        conformances = node.get("conformances")
+        if isinstance(conformances, list):
+            node["conformances"] = [
+                c for c in conformances
+                if not (isinstance(c, dict) and c.get("printedName") in SUPPRESSIBLE)
+            ]
+        for value in node.values():
+            scrub(value)
+    elif isinstance(node, list):
+        for value in node:
+            scrub(value)
+
+with open(sys.argv[1]) as f:
+    data = json.load(f)
+scrub(data)
+json.dump(data, sys.stdout, indent=1, sort_keys=True)
+sys.stdout.write("\n")
+PY
 }
 
 echo "==> Building $SCHEME for iOS Simulator (clean, into $DDP)"
