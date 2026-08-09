@@ -1,0 +1,2618 @@
+{
+ "ABIRoot": {
+  "children": [
+   {
+    "declKind": "Import",
+    "kind": "Import",
+    "moduleName": "TesseraUI",
+    "name": "AVFoundation",
+    "printedName": "AVFoundation"
+   },
+   {
+    "declKind": "Import",
+    "kind": "Import",
+    "moduleName": "TesseraUI",
+    "name": "Foundation",
+    "printedName": "Foundation"
+   },
+   {
+    "declKind": "Import",
+    "kind": "Import",
+    "moduleName": "TesseraUI",
+    "name": "Foundation",
+    "printedName": "Foundation"
+   },
+   {
+    "declKind": "Import",
+    "kind": "Import",
+    "moduleName": "TesseraUI",
+    "name": "Foundation",
+    "printedName": "Foundation"
+   },
+   {
+    "declKind": "Import",
+    "kind": "Import",
+    "moduleName": "TesseraUI",
+    "name": "Foundation",
+    "printedName": "Foundation"
+   },
+   {
+    "declKind": "Import",
+    "kind": "Import",
+    "moduleName": "TesseraUI",
+    "name": "Observation",
+    "printedName": "Observation"
+   },
+   {
+    "declKind": "Import",
+    "kind": "Import",
+    "moduleName": "TesseraUI",
+    "name": "SwiftOnoneSupport",
+    "printedName": "SwiftOnoneSupport"
+   },
+   {
+    "declKind": "Import",
+    "kind": "Import",
+    "moduleName": "TesseraUI",
+    "name": "SwiftUI",
+    "printedName": "SwiftUI"
+   },
+   {
+    "declKind": "Import",
+    "kind": "Import",
+    "moduleName": "TesseraUI",
+    "name": "Tessera",
+    "printedName": "Tessera"
+   },
+   {
+    "declKind": "Import",
+    "kind": "Import",
+    "moduleName": "TesseraUI",
+    "name": "UIKit",
+    "printedName": "UIKit"
+   },
+   {
+    "declKind": "Import",
+    "kind": "Import",
+    "moduleName": "TesseraUI",
+    "name": "_Concurrency",
+    "printedName": "_Concurrency"
+   },
+   {
+    "declKind": "Import",
+    "kind": "Import",
+    "moduleName": "TesseraUI",
+    "name": "_PhotosUI_SwiftUI",
+    "printedName": "_PhotosUI_SwiftUI"
+   },
+   {
+    "declKind": "Import",
+    "kind": "Import",
+    "moduleName": "TesseraUI",
+    "name": "_StringProcessing",
+    "printedName": "_StringProcessing"
+   },
+   {
+    "declKind": "Import",
+    "kind": "Import",
+    "moduleName": "TesseraUI",
+    "name": "_SwiftConcurrencyShims",
+    "printedName": "_SwiftConcurrencyShims"
+   },
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ScanMethod",
+          "printedName": "TesseraUI.ScanMethod",
+          "usr": "s:9TesseraUI10ScanMethodO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ScanMethod",
+            "printedName": "TesseraUI.ScanMethod",
+            "usr": "s:9TesseraUI10ScanMethodO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraUI.ScanMethod.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraUI.ScanMethod.Type) -> TesseraUI.ScanMethod"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI10ScanMethodO6camerayA2CmF",
+      "moduleName": "TesseraUI",
+      "name": "camera",
+      "printedName": "camera",
+      "usr": "s:9TesseraUI10ScanMethodO6camerayA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ScanMethod",
+          "printedName": "TesseraUI.ScanMethod",
+          "usr": "s:9TesseraUI10ScanMethodO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ScanMethod",
+            "printedName": "TesseraUI.ScanMethod",
+            "usr": "s:9TesseraUI10ScanMethodO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraUI.ScanMethod.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraUI.ScanMethod.Type) -> TesseraUI.ScanMethod"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI10ScanMethodO10savedImageyA2CmF",
+      "moduleName": "TesseraUI",
+      "name": "savedImage",
+      "printedName": "savedImage",
+      "usr": "s:9TesseraUI10ScanMethodO10savedImageyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ScanMethod",
+          "printedName": "TesseraUI.ScanMethod",
+          "usr": "s:9TesseraUI10ScanMethodO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ScanMethod",
+            "printedName": "TesseraUI.ScanMethod",
+            "usr": "s:9TesseraUI10ScanMethodO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraUI.ScanMethod.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraUI.ScanMethod.Type) -> TesseraUI.ScanMethod"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI10ScanMethodO11manualEntryyA2CmF",
+      "moduleName": "TesseraUI",
+      "name": "manualEntry",
+      "printedName": "manualEntry",
+      "usr": "s:9TesseraUI10ScanMethodO11manualEntryyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "ScanMethod",
+        "printedName": "TesseraUI.ScanMethod",
+        "usr": "s:9TesseraUI10ScanMethodO"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "ScanMethod",
+        "printedName": "TesseraUI.ScanMethod",
+        "usr": "s:9TesseraUI10ScanMethodO"
+       }
+      ],
+      "declAttributes": [
+       "Implements"
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "implicit": true,
+      "kind": "Function",
+      "mangledName": "$s9TesseraUI10ScanMethodO21__derived_enum_equalsySbAC_ACtFZ",
+      "moduleName": "TesseraUI",
+      "name": "__derived_enum_equals",
+      "printedName": "__derived_enum_equals(_:_:)",
+      "static": true,
+      "usr": "s:9TesseraUI10ScanMethodO21__derived_enum_equalsySbAC_ACtFZ"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Void",
+        "printedName": "()"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "Hasher",
+        "paramValueOwnership": "InOut",
+        "printedName": "Swift.Hasher",
+        "usr": "s:s6HasherV"
+       }
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "implicit": true,
+      "kind": "Function",
+      "mangledName": "$s9TesseraUI10ScanMethodO4hash4intoys6HasherVz_tF",
+      "moduleName": "TesseraUI",
+      "name": "hash",
+      "printedName": "hash(into:)",
+      "usr": "s:9TesseraUI10ScanMethodO4hash4intoys6HasherVz_tF"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI10ScanMethodO9hashValueSivg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI10ScanMethodO9hashValueSivg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Int",
+        "printedName": "Swift.Int",
+        "usr": "s:Si"
+       }
+      ],
+      "declKind": "Var",
+      "implicit": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI10ScanMethodO9hashValueSivp",
+      "moduleName": "TesseraUI",
+      "name": "hashValue",
+      "printedName": "hashValue",
+      "usr": "s:9TesseraUI10ScanMethodO9hashValueSivp"
+     }
+    ],
+    "conformances": [
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSH",
+      "name": "Hashable",
+      "printedName": "Hashable",
+      "usr": "s:SH"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss16SendableMetatypeP",
+      "name": "SendableMetatype",
+      "printedName": "SendableMetatype",
+      "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
+     }
+    ],
+    "declKind": "Enum",
+    "isEnumExhaustive": true,
+    "kind": "TypeDecl",
+    "mangledName": "$s9TesseraUI10ScanMethodO",
+    "moduleName": "TesseraUI",
+    "name": "ScanMethod",
+    "printedName": "ScanMethod",
+    "usr": "s:9TesseraUI10ScanMethodO"
+   },
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ReviewMode",
+          "printedName": "TesseraUI.ReviewMode",
+          "usr": "s:9TesseraUI10ReviewModeO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ReviewMode",
+            "printedName": "TesseraUI.ReviewMode",
+            "usr": "s:9TesseraUI10ReviewModeO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraUI.ReviewMode.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraUI.ReviewMode.Type) -> TesseraUI.ReviewMode"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI10ReviewModeO6reviewyA2CmF",
+      "moduleName": "TesseraUI",
+      "name": "review",
+      "printedName": "review",
+      "usr": "s:9TesseraUI10ReviewModeO6reviewyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ReviewMode",
+          "printedName": "TesseraUI.ReviewMode",
+          "usr": "s:9TesseraUI10ReviewModeO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ReviewMode",
+            "printedName": "TesseraUI.ReviewMode",
+            "usr": "s:9TesseraUI10ReviewModeO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraUI.ReviewMode.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraUI.ReviewMode.Type) -> TesseraUI.ReviewMode"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI10ReviewModeO13instantReturnyA2CmF",
+      "moduleName": "TesseraUI",
+      "name": "instantReturn",
+      "printedName": "instantReturn",
+      "usr": "s:9TesseraUI10ReviewModeO13instantReturnyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "ReviewMode",
+        "printedName": "TesseraUI.ReviewMode",
+        "usr": "s:9TesseraUI10ReviewModeO"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "ReviewMode",
+        "printedName": "TesseraUI.ReviewMode",
+        "usr": "s:9TesseraUI10ReviewModeO"
+       }
+      ],
+      "declAttributes": [
+       "Implements"
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "implicit": true,
+      "kind": "Function",
+      "mangledName": "$s9TesseraUI10ReviewModeO21__derived_enum_equalsySbAC_ACtFZ",
+      "moduleName": "TesseraUI",
+      "name": "__derived_enum_equals",
+      "printedName": "__derived_enum_equals(_:_:)",
+      "static": true,
+      "usr": "s:9TesseraUI10ReviewModeO21__derived_enum_equalsySbAC_ACtFZ"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Void",
+        "printedName": "()"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "Hasher",
+        "paramValueOwnership": "InOut",
+        "printedName": "Swift.Hasher",
+        "usr": "s:s6HasherV"
+       }
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "implicit": true,
+      "kind": "Function",
+      "mangledName": "$s9TesseraUI10ReviewModeO4hash4intoys6HasherVz_tF",
+      "moduleName": "TesseraUI",
+      "name": "hash",
+      "printedName": "hash(into:)",
+      "usr": "s:9TesseraUI10ReviewModeO4hash4intoys6HasherVz_tF"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI10ReviewModeO9hashValueSivg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI10ReviewModeO9hashValueSivg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Int",
+        "printedName": "Swift.Int",
+        "usr": "s:Si"
+       }
+      ],
+      "declKind": "Var",
+      "implicit": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI10ReviewModeO9hashValueSivp",
+      "moduleName": "TesseraUI",
+      "name": "hashValue",
+      "printedName": "hashValue",
+      "usr": "s:9TesseraUI10ReviewModeO9hashValueSivp"
+     }
+    ],
+    "conformances": [
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSH",
+      "name": "Hashable",
+      "printedName": "Hashable",
+      "usr": "s:SH"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss16SendableMetatypeP",
+      "name": "SendableMetatype",
+      "printedName": "SendableMetatype",
+      "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
+     }
+    ],
+    "declKind": "Enum",
+    "isEnumExhaustive": true,
+    "kind": "TypeDecl",
+    "mangledName": "$s9TesseraUI10ReviewModeO",
+    "moduleName": "TesseraUI",
+    "name": "ReviewMode",
+    "printedName": "ReviewMode",
+    "usr": "s:9TesseraUI10ReviewModeO"
+   },
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "DarkMode",
+          "printedName": "TesseraUI.DarkMode",
+          "usr": "s:9TesseraUI8DarkModeO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "DarkMode",
+            "printedName": "TesseraUI.DarkMode",
+            "usr": "s:9TesseraUI8DarkModeO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraUI.DarkMode.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraUI.DarkMode.Type) -> TesseraUI.DarkMode"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI8DarkModeO4autoyA2CmF",
+      "moduleName": "TesseraUI",
+      "name": "auto",
+      "printedName": "auto",
+      "usr": "s:9TesseraUI8DarkModeO4autoyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "DarkMode",
+          "printedName": "TesseraUI.DarkMode",
+          "usr": "s:9TesseraUI8DarkModeO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "DarkMode",
+            "printedName": "TesseraUI.DarkMode",
+            "usr": "s:9TesseraUI8DarkModeO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraUI.DarkMode.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraUI.DarkMode.Type) -> TesseraUI.DarkMode"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI8DarkModeO2onyA2CmF",
+      "moduleName": "TesseraUI",
+      "name": "on",
+      "printedName": "on",
+      "usr": "s:9TesseraUI8DarkModeO2onyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "DarkMode",
+          "printedName": "TesseraUI.DarkMode",
+          "usr": "s:9TesseraUI8DarkModeO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "DarkMode",
+            "printedName": "TesseraUI.DarkMode",
+            "usr": "s:9TesseraUI8DarkModeO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraUI.DarkMode.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraUI.DarkMode.Type) -> TesseraUI.DarkMode"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI8DarkModeO3offyA2CmF",
+      "moduleName": "TesseraUI",
+      "name": "off",
+      "printedName": "off",
+      "usr": "s:9TesseraUI8DarkModeO3offyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "DarkMode",
+        "printedName": "TesseraUI.DarkMode",
+        "usr": "s:9TesseraUI8DarkModeO"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "DarkMode",
+        "printedName": "TesseraUI.DarkMode",
+        "usr": "s:9TesseraUI8DarkModeO"
+       }
+      ],
+      "declAttributes": [
+       "Implements"
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "implicit": true,
+      "kind": "Function",
+      "mangledName": "$s9TesseraUI8DarkModeO21__derived_enum_equalsySbAC_ACtFZ",
+      "moduleName": "TesseraUI",
+      "name": "__derived_enum_equals",
+      "printedName": "__derived_enum_equals(_:_:)",
+      "static": true,
+      "usr": "s:9TesseraUI8DarkModeO21__derived_enum_equalsySbAC_ACtFZ"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Void",
+        "printedName": "()"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "Hasher",
+        "paramValueOwnership": "InOut",
+        "printedName": "Swift.Hasher",
+        "usr": "s:s6HasherV"
+       }
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "implicit": true,
+      "kind": "Function",
+      "mangledName": "$s9TesseraUI8DarkModeO4hash4intoys6HasherVz_tF",
+      "moduleName": "TesseraUI",
+      "name": "hash",
+      "printedName": "hash(into:)",
+      "usr": "s:9TesseraUI8DarkModeO4hash4intoys6HasherVz_tF"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI8DarkModeO9hashValueSivg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI8DarkModeO9hashValueSivg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Int",
+        "printedName": "Swift.Int",
+        "usr": "s:Si"
+       }
+      ],
+      "declKind": "Var",
+      "implicit": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI8DarkModeO9hashValueSivp",
+      "moduleName": "TesseraUI",
+      "name": "hashValue",
+      "printedName": "hashValue",
+      "usr": "s:9TesseraUI8DarkModeO9hashValueSivp"
+     }
+    ],
+    "conformances": [
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSH",
+      "name": "Hashable",
+      "printedName": "Hashable",
+      "usr": "s:SH"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss16SendableMetatypeP",
+      "name": "SendableMetatype",
+      "printedName": "SendableMetatype",
+      "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
+     }
+    ],
+    "declKind": "Enum",
+    "isEnumExhaustive": true,
+    "kind": "TypeDecl",
+    "mangledName": "$s9TesseraUI8DarkModeO",
+    "moduleName": "TesseraUI",
+    "name": "DarkMode",
+    "printedName": "DarkMode",
+    "usr": "s:9TesseraUI8DarkModeO"
+   },
+   {
+    "children": [
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Color",
+            "printedName": "SwiftUI.Color",
+            "usr": "s:7SwiftUI5ColorV"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "SwiftUI.Color?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI15MrzScannerThemeV10brandColor05SwiftB00G0VSgvg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI15MrzScannerThemeV10brandColor05SwiftB00G0VSgvg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Color",
+            "printedName": "SwiftUI.Color",
+            "usr": "s:7SwiftUI5ColorV"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "SwiftUI.Color?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI15MrzScannerThemeV10brandColor05SwiftB00G0VSgvs",
+        "moduleName": "TesseraUI",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:9TesseraUI15MrzScannerThemeV10brandColor05SwiftB00G0VSgvs"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Color",
+          "printedName": "SwiftUI.Color",
+          "usr": "s:7SwiftUI5ColorV"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "SwiftUI.Color?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declAttributes": [
+       "HasInitialValue",
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI15MrzScannerThemeV10brandColor05SwiftB00G0VSgvp",
+      "moduleName": "TesseraUI",
+      "name": "brandColor",
+      "printedName": "brandColor",
+      "usr": "s:9TesseraUI15MrzScannerThemeV10brandColor05SwiftB00G0VSgvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "DarkMode",
+          "printedName": "TesseraUI.DarkMode",
+          "usr": "s:9TesseraUI8DarkModeO"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI15MrzScannerThemeV8darkModeAA04DarkG0Ovg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI15MrzScannerThemeV8darkModeAA04DarkG0Ovg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "kind": "TypeNominal",
+          "name": "DarkMode",
+          "printedName": "TesseraUI.DarkMode",
+          "usr": "s:9TesseraUI8DarkModeO"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI15MrzScannerThemeV8darkModeAA04DarkG0Ovs",
+        "moduleName": "TesseraUI",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:9TesseraUI15MrzScannerThemeV8darkModeAA04DarkG0Ovs"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "DarkMode",
+        "printedName": "TesseraUI.DarkMode",
+        "usr": "s:9TesseraUI8DarkModeO"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI15MrzScannerThemeV8darkModeAA04DarkG0Ovp",
+      "moduleName": "TesseraUI",
+      "name": "darkMode",
+      "printedName": "darkMode",
+      "usr": "s:9TesseraUI15MrzScannerThemeV8darkModeAA04DarkG0Ovp"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "MrzScannerTheme",
+        "printedName": "TesseraUI.MrzScannerTheme",
+        "usr": "s:9TesseraUI15MrzScannerThemeV"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Color",
+          "printedName": "SwiftUI.Color",
+          "usr": "s:7SwiftUI5ColorV"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "SwiftUI.Color?",
+        "usr": "s:Sq"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "DarkMode",
+        "printedName": "TesseraUI.DarkMode",
+        "usr": "s:9TesseraUI8DarkModeO"
+       }
+      ],
+      "declKind": "Constructor",
+      "init_kind": "Designated",
+      "kind": "Constructor",
+      "mangledName": "$s9TesseraUI15MrzScannerThemeV10brandColor8darkModeAC05SwiftB00G0VSg_AA04DarkI0Otcfc",
+      "moduleName": "TesseraUI",
+      "name": "init",
+      "printedName": "init(brandColor:darkMode:)",
+      "usr": "s:9TesseraUI15MrzScannerThemeV10brandColor8darkModeAC05SwiftB00G0VSg_AA04DarkI0Otcfc"
+     }
+    ],
+    "conformances": [
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss16SendableMetatypeP",
+      "name": "SendableMetatype",
+      "printedName": "SendableMetatype",
+      "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
+     }
+    ],
+    "declKind": "Struct",
+    "kind": "TypeDecl",
+    "mangledName": "$s9TesseraUI15MrzScannerThemeV",
+    "moduleName": "TesseraUI",
+    "name": "MrzScannerTheme",
+    "printedName": "MrzScannerTheme",
+    "usr": "s:9TesseraUI15MrzScannerThemeV"
+   },
+   {
+    "children": [
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ScanMethod",
+            "printedName": "TesseraUI.ScanMethod",
+            "usr": "s:9TesseraUI10ScanMethodO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Set",
+          "printedName": "Swift.Set<TesseraUI.ScanMethod>",
+          "usr": "s:Sh"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV14enabledMethodsShyAA10ScanMethodOGvg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV14enabledMethodsShyAA10ScanMethodOGvg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ScanMethod",
+            "printedName": "TesseraUI.ScanMethod",
+            "usr": "s:9TesseraUI10ScanMethodO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Set",
+          "printedName": "Swift.Set<TesseraUI.ScanMethod>",
+          "usr": "s:Sh"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV14enabledMethodsShyAA10ScanMethodOGvs",
+        "moduleName": "TesseraUI",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV14enabledMethodsShyAA10ScanMethodOGvs"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ScanMethod",
+          "printedName": "TesseraUI.ScanMethod",
+          "usr": "s:9TesseraUI10ScanMethodO"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Set",
+        "printedName": "Swift.Set<TesseraUI.ScanMethod>",
+        "usr": "s:Sh"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI16MrzScannerConfigV14enabledMethodsShyAA10ScanMethodOGvp",
+      "moduleName": "TesseraUI",
+      "name": "enabledMethods",
+      "printedName": "enabledMethods",
+      "usr": "s:9TesseraUI16MrzScannerConfigV14enabledMethodsShyAA10ScanMethodOGvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ReviewMode",
+          "printedName": "TesseraUI.ReviewMode",
+          "usr": "s:9TesseraUI10ReviewModeO"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV10reviewModeAA06ReviewG0Ovg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV10reviewModeAA06ReviewG0Ovg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "kind": "TypeNominal",
+          "name": "ReviewMode",
+          "printedName": "TesseraUI.ReviewMode",
+          "usr": "s:9TesseraUI10ReviewModeO"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV10reviewModeAA06ReviewG0Ovs",
+        "moduleName": "TesseraUI",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV10reviewModeAA06ReviewG0Ovs"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "ReviewMode",
+        "printedName": "TesseraUI.ReviewMode",
+        "usr": "s:9TesseraUI10ReviewModeO"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI16MrzScannerConfigV10reviewModeAA06ReviewG0Ovp",
+      "moduleName": "TesseraUI",
+      "name": "reviewMode",
+      "printedName": "reviewMode",
+      "usr": "s:9TesseraUI16MrzScannerConfigV10reviewModeAA06ReviewG0Ovp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Bool",
+          "printedName": "Swift.Bool",
+          "usr": "s:Sb"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV15showTorchButtonSbvg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV15showTorchButtonSbvg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "kind": "TypeNominal",
+          "name": "Bool",
+          "printedName": "Swift.Bool",
+          "usr": "s:Sb"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV15showTorchButtonSbvs",
+        "moduleName": "TesseraUI",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV15showTorchButtonSbvs"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI16MrzScannerConfigV15showTorchButtonSbvp",
+      "moduleName": "TesseraUI",
+      "name": "showTorchButton",
+      "printedName": "showTorchButton",
+      "usr": "s:9TesseraUI16MrzScannerConfigV15showTorchButtonSbvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Bool",
+          "printedName": "Swift.Bool",
+          "usr": "s:Sb"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV16torchOnByDefaultSbvg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV16torchOnByDefaultSbvg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "kind": "TypeNominal",
+          "name": "Bool",
+          "printedName": "Swift.Bool",
+          "usr": "s:Sb"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV16torchOnByDefaultSbvs",
+        "moduleName": "TesseraUI",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV16torchOnByDefaultSbvs"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI16MrzScannerConfigV16torchOnByDefaultSbvp",
+      "moduleName": "TesseraUI",
+      "name": "torchOnByDefault",
+      "printedName": "torchOnByDefault",
+      "usr": "s:9TesseraUI16MrzScannerConfigV16torchOnByDefaultSbvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Duration",
+            "printedName": "Swift.Duration",
+            "usr": "s:s8DurationV"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Swift.Duration?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVSgvg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVSgvg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Duration",
+            "printedName": "Swift.Duration",
+            "usr": "s:s8DurationV"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Swift.Duration?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVSgvs",
+        "moduleName": "TesseraUI",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVSgvs"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Duration",
+          "printedName": "Swift.Duration",
+          "usr": "s:s8DurationV"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Swift.Duration?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declAttributes": [
+       "HasInitialValue",
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVSgvp",
+      "moduleName": "TesseraUI",
+      "name": "struggleTimeout",
+      "printedName": "struggleTimeout",
+      "usr": "s:9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVSgvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Duration",
+            "printedName": "Swift.Duration",
+            "usr": "s:s8DurationV"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Swift.Duration?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV11scanTimeouts8DurationVSgvg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV11scanTimeouts8DurationVSgvg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Duration",
+            "printedName": "Swift.Duration",
+            "usr": "s:s8DurationV"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Swift.Duration?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV11scanTimeouts8DurationVSgvs",
+        "moduleName": "TesseraUI",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV11scanTimeouts8DurationVSgvs"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Duration",
+          "printedName": "Swift.Duration",
+          "usr": "s:s8DurationV"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Swift.Duration?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declAttributes": [
+       "HasInitialValue",
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI16MrzScannerConfigV11scanTimeouts8DurationVSgvp",
+      "moduleName": "TesseraUI",
+      "name": "scanTimeout",
+      "printedName": "scanTimeout",
+      "usr": "s:9TesseraUI16MrzScannerConfigV11scanTimeouts8DurationVSgvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Bool",
+          "printedName": "Swift.Bool",
+          "usr": "s:Sb"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV14hapticFeedbackSbvg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV14hapticFeedbackSbvg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "kind": "TypeNominal",
+          "name": "Bool",
+          "printedName": "Swift.Bool",
+          "usr": "s:Sb"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV14hapticFeedbackSbvs",
+        "moduleName": "TesseraUI",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV14hapticFeedbackSbvs"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI16MrzScannerConfigV14hapticFeedbackSbvp",
+      "moduleName": "TesseraUI",
+      "name": "hapticFeedback",
+      "printedName": "hapticFeedback",
+      "usr": "s:9TesseraUI16MrzScannerConfigV14hapticFeedbackSbvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "MrzScannerTheme",
+          "printedName": "TesseraUI.MrzScannerTheme",
+          "usr": "s:9TesseraUI15MrzScannerThemeV"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV5themeAA0cD5ThemeVvg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV5themeAA0cD5ThemeVvg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "kind": "TypeNominal",
+          "name": "MrzScannerTheme",
+          "printedName": "TesseraUI.MrzScannerTheme",
+          "usr": "s:9TesseraUI15MrzScannerThemeV"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV5themeAA0cD5ThemeVvs",
+        "moduleName": "TesseraUI",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV5themeAA0cD5ThemeVvs"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "MrzScannerTheme",
+        "printedName": "TesseraUI.MrzScannerTheme",
+        "usr": "s:9TesseraUI15MrzScannerThemeV"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI16MrzScannerConfigV5themeAA0cD5ThemeVvp",
+      "moduleName": "TesseraUI",
+      "name": "theme",
+      "printedName": "theme",
+      "usr": "s:9TesseraUI16MrzScannerConfigV5themeAA0cD5ThemeVvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "children": [
+               {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+               }
+              ],
+              "kind": "TypeNameAlias",
+              "name": "Void",
+              "printedName": "Swift.Void"
+             },
+             {
+              "kind": "TypeNominal",
+              "name": "Void",
+              "printedName": "()"
+             }
+            ],
+            "kind": "TypeFunc",
+            "name": "Function",
+            "printedName": "() -> Swift.Void"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "(() -> Swift.Void)?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV19onRequestPermissionyyYbcSgvg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV19onRequestPermissionyyYbcSgvg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "children": [
+               {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+               }
+              ],
+              "kind": "TypeNameAlias",
+              "name": "Void",
+              "printedName": "Swift.Void"
+             },
+             {
+              "kind": "TypeNominal",
+              "name": "Void",
+              "printedName": "()"
+             }
+            ],
+            "kind": "TypeFunc",
+            "name": "Function",
+            "printedName": "() -> Swift.Void"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "(() -> Swift.Void)?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV19onRequestPermissionyyYbcSgvs",
+        "moduleName": "TesseraUI",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV19onRequestPermissionyyYbcSgvs"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "kind": "TypeNominal",
+              "name": "Void",
+              "printedName": "()"
+             }
+            ],
+            "kind": "TypeNameAlias",
+            "name": "Void",
+            "printedName": "Swift.Void"
+           },
+           {
+            "kind": "TypeNominal",
+            "name": "Void",
+            "printedName": "()"
+           }
+          ],
+          "kind": "TypeFunc",
+          "name": "Function",
+          "printedName": "() -> Swift.Void"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "(() -> Swift.Void)?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declAttributes": [
+       "HasInitialValue",
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI16MrzScannerConfigV19onRequestPermissionyyYbcSgvp",
+      "moduleName": "TesseraUI",
+      "name": "onRequestPermission",
+      "printedName": "onRequestPermission",
+      "usr": "s:9TesseraUI16MrzScannerConfigV19onRequestPermissionyyYbcSgvp"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "MrzScannerConfig",
+        "printedName": "TesseraUI.MrzScannerConfig",
+        "usr": "s:9TesseraUI16MrzScannerConfigV"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ScanMethod",
+          "printedName": "TesseraUI.ScanMethod",
+          "usr": "s:9TesseraUI10ScanMethodO"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Set",
+        "printedName": "Swift.Set<TesseraUI.ScanMethod>",
+        "usr": "s:Sh"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "ReviewMode",
+        "printedName": "TesseraUI.ReviewMode",
+        "usr": "s:9TesseraUI10ReviewModeO"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Duration",
+          "printedName": "Swift.Duration",
+          "usr": "s:s8DurationV"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Swift.Duration?",
+        "usr": "s:Sq"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Duration",
+          "printedName": "Swift.Duration",
+          "usr": "s:s8DurationV"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Swift.Duration?",
+        "usr": "s:Sq"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "MrzScannerTheme",
+        "printedName": "TesseraUI.MrzScannerTheme",
+        "usr": "s:9TesseraUI15MrzScannerThemeV"
+       },
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "kind": "TypeNominal",
+              "name": "Void",
+              "printedName": "()"
+             }
+            ],
+            "kind": "TypeNameAlias",
+            "name": "Void",
+            "printedName": "Swift.Void"
+           },
+           {
+            "kind": "TypeNominal",
+            "name": "Void",
+            "printedName": "()"
+           }
+          ],
+          "kind": "TypeFunc",
+          "name": "Function",
+          "printedName": "() -> Swift.Void"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "(() -> Swift.Void)?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declKind": "Constructor",
+      "init_kind": "Designated",
+      "kind": "Constructor",
+      "mangledName": "$s9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR014hapticFeedback5theme19onRequestPermissionACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgATSbAA0cD5ThemeVyyYbcSgtcfc",
+      "moduleName": "TesseraUI",
+      "name": "init",
+      "printedName": "init(enabledMethods:reviewMode:showTorchButton:torchOnByDefault:struggleTimeout:scanTimeout:hapticFeedback:theme:onRequestPermission:)",
+      "usr": "s:9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR014hapticFeedback5theme19onRequestPermissionACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgATSbAA0cD5ThemeVyyYbcSgtcfc"
+     }
+    ],
+    "conformances": [
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss16SendableMetatypeP",
+      "name": "SendableMetatype",
+      "printedName": "SendableMetatype",
+      "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
+     }
+    ],
+    "declKind": "Struct",
+    "kind": "TypeDecl",
+    "mangledName": "$s9TesseraUI16MrzScannerConfigV",
+    "moduleName": "TesseraUI",
+    "name": "MrzScannerConfig",
+    "printedName": "MrzScannerConfig",
+    "usr": "s:9TesseraUI16MrzScannerConfigV"
+   },
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "MrzScannerView",
+        "printedName": "TesseraUI.MrzScannerView",
+        "usr": "s:9TesseraUI14MrzScannerViewV"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "MrzScannerConfig",
+        "printedName": "TesseraUI.MrzScannerConfig",
+        "usr": "s:9TesseraUI16MrzScannerConfigV"
+       },
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Void",
+            "printedName": "()"
+           }
+          ],
+          "kind": "TypeNameAlias",
+          "name": "Void",
+          "printedName": "Swift.Void"
+         },
+         {
+          "kind": "TypeNominal",
+          "name": "TesseraUIResult",
+          "printedName": "TesseraUI.TesseraUIResult",
+          "usr": "s:9TesseraUI0A8UIResultO"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraUI.TesseraUIResult) -> Swift.Void"
+       }
+      ],
+      "declAttributes": [
+       "Custom",
+       "Preconcurrency"
+      ],
+      "declKind": "Constructor",
+      "init_kind": "Designated",
+      "kind": "Constructor",
+      "mangledName": "$s9TesseraUI14MrzScannerViewV6config8onResultAcA0cD6ConfigV_yAA0A8UIResultOctcfc",
+      "moduleName": "TesseraUI",
+      "name": "init",
+      "printedName": "init(config:onResult:)",
+      "usr": "s:9TesseraUI14MrzScannerViewV6config8onResultAcA0cD6ConfigV_yAA0A8UIResultOctcfc"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "View",
+            "printedName": "SwiftUI.View",
+            "usr": "s:7SwiftUI4ViewP"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "OpaqueTypeArchetype",
+          "printedName": "some SwiftUI.View"
+         }
+        ],
+        "declKind": "Accessor",
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI14MrzScannerViewV4bodyQrvg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI14MrzScannerViewV4bodyQrvg"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "View",
+          "printedName": "SwiftUI.View",
+          "usr": "s:7SwiftUI4ViewP"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "OpaqueTypeArchetype",
+        "printedName": "some SwiftUI.View"
+       }
+      ],
+      "declAttributes": [
+       "Custom",
+       "Preconcurrency"
+      ],
+      "declKind": "Var",
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI14MrzScannerViewV4bodyQrvp",
+      "moduleName": "TesseraUI",
+      "name": "body",
+      "printedName": "body",
+      "usr": "s:9TesseraUI14MrzScannerViewV4bodyQrvp"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "View",
+          "printedName": "SwiftUI.View",
+          "usr": "s:7SwiftUI4ViewP"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "OpaqueTypeArchetype",
+        "printedName": "some SwiftUI.View"
+       }
+      ],
+      "declKind": "TypeAlias",
+      "implicit": true,
+      "kind": "TypeAlias",
+      "mangledName": "$s9TesseraUI14MrzScannerViewV4Bodya",
+      "moduleName": "TesseraUI",
+      "name": "Body",
+      "printedName": "Body",
+      "usr": "s:9TesseraUI14MrzScannerViewV4Bodya"
+     }
+    ],
+    "conformances": [
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "View",
+            "printedName": "SwiftUI.View",
+            "usr": "s:7SwiftUI4ViewP"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "OpaqueTypeArchetype",
+          "printedName": "some SwiftUI.View"
+         }
+        ],
+        "kind": "TypeWitness",
+        "name": "Body",
+        "printedName": "Body"
+       }
+      ],
+      "kind": "Conformance",
+      "mangledName": "$s7SwiftUI4ViewP",
+      "name": "View",
+      "printedName": "View",
+      "usr": "s:7SwiftUI4ViewP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss16SendableMetatypeP",
+      "name": "SendableMetatype",
+      "printedName": "SendableMetatype",
+      "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
+     }
+    ],
+    "declAttributes": [
+     "Custom",
+     "Preconcurrency"
+    ],
+    "declKind": "Struct",
+    "kind": "TypeDecl",
+    "mangledName": "$s9TesseraUI14MrzScannerViewV",
+    "moduleName": "TesseraUI",
+    "name": "MrzScannerView",
+    "printedName": "MrzScannerView",
+    "usr": "s:9TesseraUI14MrzScannerViewV"
+   },
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "DismissReason",
+          "printedName": "TesseraUI.DismissReason",
+          "usr": "s:9TesseraUI13DismissReasonO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "DismissReason",
+            "printedName": "TesseraUI.DismissReason",
+            "usr": "s:9TesseraUI13DismissReasonO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraUI.DismissReason.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraUI.DismissReason.Type) -> TesseraUI.DismissReason"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI13DismissReasonO13userDismissedyA2CmF",
+      "moduleName": "TesseraUI",
+      "name": "userDismissed",
+      "printedName": "userDismissed",
+      "usr": "s:9TesseraUI13DismissReasonO13userDismissedyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "DismissReason",
+          "printedName": "TesseraUI.DismissReason",
+          "usr": "s:9TesseraUI13DismissReasonO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "DismissReason",
+            "printedName": "TesseraUI.DismissReason",
+            "usr": "s:9TesseraUI13DismissReasonO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraUI.DismissReason.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraUI.DismissReason.Type) -> TesseraUI.DismissReason"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI13DismissReasonO8timedOutyA2CmF",
+      "moduleName": "TesseraUI",
+      "name": "timedOut",
+      "printedName": "timedOut",
+      "usr": "s:9TesseraUI13DismissReasonO8timedOutyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "DismissReason",
+          "printedName": "TesseraUI.DismissReason",
+          "usr": "s:9TesseraUI13DismissReasonO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "DismissReason",
+            "printedName": "TesseraUI.DismissReason",
+            "usr": "s:9TesseraUI13DismissReasonO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraUI.DismissReason.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraUI.DismissReason.Type) -> TesseraUI.DismissReason"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI13DismissReasonO17cameraUnavailableyA2CmF",
+      "moduleName": "TesseraUI",
+      "name": "cameraUnavailable",
+      "printedName": "cameraUnavailable",
+      "usr": "s:9TesseraUI13DismissReasonO17cameraUnavailableyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "DismissReason",
+          "printedName": "TesseraUI.DismissReason",
+          "usr": "s:9TesseraUI13DismissReasonO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "DismissReason",
+            "printedName": "TesseraUI.DismissReason",
+            "usr": "s:9TesseraUI13DismissReasonO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraUI.DismissReason.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraUI.DismissReason.Type) -> TesseraUI.DismissReason"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI13DismissReasonO16permissionDeniedyA2CmF",
+      "moduleName": "TesseraUI",
+      "name": "permissionDenied",
+      "printedName": "permissionDenied",
+      "usr": "s:9TesseraUI13DismissReasonO16permissionDeniedyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "DismissReason",
+        "printedName": "TesseraUI.DismissReason",
+        "usr": "s:9TesseraUI13DismissReasonO"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "DismissReason",
+        "printedName": "TesseraUI.DismissReason",
+        "usr": "s:9TesseraUI13DismissReasonO"
+       }
+      ],
+      "declAttributes": [
+       "Implements"
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "implicit": true,
+      "kind": "Function",
+      "mangledName": "$s9TesseraUI13DismissReasonO21__derived_enum_equalsySbAC_ACtFZ",
+      "moduleName": "TesseraUI",
+      "name": "__derived_enum_equals",
+      "printedName": "__derived_enum_equals(_:_:)",
+      "static": true,
+      "usr": "s:9TesseraUI13DismissReasonO21__derived_enum_equalsySbAC_ACtFZ"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Void",
+        "printedName": "()"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "Hasher",
+        "paramValueOwnership": "InOut",
+        "printedName": "Swift.Hasher",
+        "usr": "s:s6HasherV"
+       }
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "implicit": true,
+      "kind": "Function",
+      "mangledName": "$s9TesseraUI13DismissReasonO4hash4intoys6HasherVz_tF",
+      "moduleName": "TesseraUI",
+      "name": "hash",
+      "printedName": "hash(into:)",
+      "usr": "s:9TesseraUI13DismissReasonO4hash4intoys6HasherVz_tF"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI13DismissReasonO9hashValueSivg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI13DismissReasonO9hashValueSivg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Int",
+        "printedName": "Swift.Int",
+        "usr": "s:Si"
+       }
+      ],
+      "declKind": "Var",
+      "implicit": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI13DismissReasonO9hashValueSivp",
+      "moduleName": "TesseraUI",
+      "name": "hashValue",
+      "printedName": "hashValue",
+      "usr": "s:9TesseraUI13DismissReasonO9hashValueSivp"
+     }
+    ],
+    "conformances": [
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSH",
+      "name": "Hashable",
+      "printedName": "Hashable",
+      "usr": "s:SH"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss16SendableMetatypeP",
+      "name": "SendableMetatype",
+      "printedName": "SendableMetatype",
+      "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
+     }
+    ],
+    "declKind": "Enum",
+    "isEnumExhaustive": true,
+    "kind": "TypeDecl",
+    "mangledName": "$s9TesseraUI13DismissReasonO",
+    "moduleName": "TesseraUI",
+    "name": "DismissReason",
+    "printedName": "DismissReason",
+    "usr": "s:9TesseraUI13DismissReasonO"
+   },
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "TesseraUIResult",
+            "printedName": "TesseraUI.TesseraUIResult",
+            "usr": "s:9TesseraUI0A8UIResultO"
+           },
+           {
+            "kind": "TypeNominal",
+            "name": "MrzScanResultDecoded",
+            "printedName": "Tessera.MrzScanResultDecoded",
+            "usr": "c:objc(cs)TesseraMrzScanResultDecoded"
+           }
+          ],
+          "kind": "TypeFunc",
+          "name": "Function",
+          "printedName": "(Tessera.MrzScanResultDecoded) -> TesseraUI.TesseraUIResult"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "TesseraUIResult",
+            "printedName": "TesseraUI.TesseraUIResult",
+            "usr": "s:9TesseraUI0A8UIResultO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraUI.TesseraUIResult.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraUI.TesseraUIResult.Type) -> (Tessera.MrzScanResultDecoded) -> TesseraUI.TesseraUIResult"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI0A8UIResultO9confirmedyACSo0A20MrzScanResultDecodedCcACmF",
+      "moduleName": "TesseraUI",
+      "name": "confirmed",
+      "printedName": "confirmed",
+      "usr": "s:9TesseraUI0A8UIResultO9confirmedyACSo0A20MrzScanResultDecodedCcACmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "TesseraUIResult",
+            "printedName": "TesseraUI.TesseraUIResult",
+            "usr": "s:9TesseraUI0A8UIResultO"
+           },
+           {
+            "kind": "TypeNominal",
+            "name": "DismissReason",
+            "printedName": "TesseraUI.DismissReason",
+            "usr": "s:9TesseraUI13DismissReasonO"
+           }
+          ],
+          "kind": "TypeFunc",
+          "name": "Function",
+          "printedName": "(TesseraUI.DismissReason) -> TesseraUI.TesseraUIResult"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "TesseraUIResult",
+            "printedName": "TesseraUI.TesseraUIResult",
+            "usr": "s:9TesseraUI0A8UIResultO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraUI.TesseraUIResult.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraUI.TesseraUIResult.Type) -> (TesseraUI.DismissReason) -> TesseraUI.TesseraUIResult"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI0A8UIResultO9cancelledyAcA13DismissReasonOcACmF",
+      "moduleName": "TesseraUI",
+      "name": "cancelled",
+      "printedName": "cancelled",
+      "usr": "s:9TesseraUI0A8UIResultO9cancelledyAcA13DismissReasonOcACmF"
+     }
+    ],
+    "conformances": [],
+    "declKind": "Enum",
+    "isEnumExhaustive": true,
+    "kind": "TypeDecl",
+    "mangledName": "$s9TesseraUI0A8UIResultO",
+    "moduleName": "TesseraUI",
+    "name": "TesseraUIResult",
+    "printedName": "TesseraUIResult",
+    "usr": "s:9TesseraUI0A8UIResultO"
+   }
+  ],
+  "json_format_version": 8,
+  "kind": "Root",
+  "name": "TesseraUI",
+  "printedName": "TesseraUI"
+ }
+}
