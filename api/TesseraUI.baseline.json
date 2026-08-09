@@ -234,8 +234,7 @@
        }
       ],
       "declAttributes": [
-       "Implements",
-       "Semantics"
+       "Implements"
       ],
       "declKind": "Func",
       "funcSelfKind": "NonMutating",
@@ -316,13 +315,6 @@
     "conformances": [
      {
       "kind": "Conformance",
-      "mangledName": "$sSQ",
-      "name": "Equatable",
-      "printedName": "Equatable",
-      "usr": "s:SQ"
-     },
-     {
-      "kind": "Conformance",
       "mangledName": "$sSH",
       "name": "Hashable",
       "printedName": "Hashable",
@@ -330,10 +322,10 @@
      },
      {
       "kind": "Conformance",
-      "mangledName": "$ss8SendableP",
-      "name": "Sendable",
-      "printedName": "Sendable",
-      "usr": "s:s8SendableP"
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
      },
      {
       "kind": "Conformance",
@@ -341,6 +333,13 @@
       "name": "SendableMetatype",
       "printedName": "SendableMetatype",
       "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
      }
     ],
     "declKind": "Enum",
@@ -450,8 +449,7 @@
        }
       ],
       "declAttributes": [
-       "Implements",
-       "Semantics"
+       "Implements"
       ],
       "declKind": "Func",
       "funcSelfKind": "NonMutating",
@@ -532,13 +530,6 @@
     "conformances": [
      {
       "kind": "Conformance",
-      "mangledName": "$sSQ",
-      "name": "Equatable",
-      "printedName": "Equatable",
-      "usr": "s:SQ"
-     },
-     {
-      "kind": "Conformance",
       "mangledName": "$sSH",
       "name": "Hashable",
       "printedName": "Hashable",
@@ -546,10 +537,10 @@
      },
      {
       "kind": "Conformance",
-      "mangledName": "$ss8SendableP",
-      "name": "Sendable",
-      "printedName": "Sendable",
-      "usr": "s:s8SendableP"
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
      },
      {
       "kind": "Conformance",
@@ -557,6 +548,13 @@
       "name": "SendableMetatype",
       "printedName": "SendableMetatype",
       "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
      }
     ],
     "declKind": "Enum",
@@ -703,8 +701,7 @@
        }
       ],
       "declAttributes": [
-       "Implements",
-       "Semantics"
+       "Implements"
       ],
       "declKind": "Func",
       "funcSelfKind": "NonMutating",
@@ -785,13 +782,6 @@
     "conformances": [
      {
       "kind": "Conformance",
-      "mangledName": "$sSQ",
-      "name": "Equatable",
-      "printedName": "Equatable",
-      "usr": "s:SQ"
-     },
-     {
-      "kind": "Conformance",
       "mangledName": "$sSH",
       "name": "Hashable",
       "printedName": "Hashable",
@@ -799,10 +789,10 @@
      },
      {
       "kind": "Conformance",
-      "mangledName": "$ss8SendableP",
-      "name": "Sendable",
-      "printedName": "Sendable",
-      "usr": "s:s8SendableP"
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
      },
      {
       "kind": "Conformance",
@@ -810,6 +800,13 @@
       "name": "SendableMetatype",
       "printedName": "SendableMetatype",
       "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
      }
     ],
     "declKind": "Enum",
@@ -1036,17 +1033,17 @@
     "conformances": [
      {
       "kind": "Conformance",
-      "mangledName": "$ss8SendableP",
-      "name": "Sendable",
-      "printedName": "Sendable",
-      "usr": "s:s8SendableP"
-     },
-     {
-      "kind": "Conformance",
       "mangledName": "$ss16SendableMetatypeP",
       "name": "SendableMetatype",
       "printedName": "SendableMetatype",
       "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
      }
     ],
     "declKind": "Struct",
@@ -1995,17 +1992,17 @@
     "conformances": [
      {
       "kind": "Conformance",
-      "mangledName": "$ss8SendableP",
-      "name": "Sendable",
-      "printedName": "Sendable",
-      "usr": "s:s8SendableP"
-     },
-     {
-      "kind": "Conformance",
       "mangledName": "$ss16SendableMetatypeP",
       "name": "SendableMetatype",
       "printedName": "SendableMetatype",
       "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
      }
     ],
     "declKind": "Struct",
@@ -2060,8 +2057,8 @@
        }
       ],
       "declAttributes": [
-       "Preconcurrency",
-       "Custom"
+       "Custom",
+       "Preconcurrency"
       ],
       "declKind": "Constructor",
       "init_kind": "Designated",
@@ -2116,8 +2113,8 @@
        }
       ],
       "declAttributes": [
-       "Preconcurrency",
-       "Custom"
+       "Custom",
+       "Preconcurrency"
       ],
       "declKind": "Var",
       "kind": "Var",
@@ -2155,20 +2152,6 @@
     ],
     "conformances": [
      {
-      "kind": "Conformance",
-      "mangledName": "$ss8SendableP",
-      "name": "Sendable",
-      "printedName": "Sendable",
-      "usr": "s:s8SendableP"
-     },
-     {
-      "kind": "Conformance",
-      "mangledName": "$ss16SendableMetatypeP",
-      "name": "SendableMetatype",
-      "printedName": "SendableMetatype",
-      "usr": "s:s16SendableMetatypeP"
-     },
-     {
       "children": [
        {
         "children": [
@@ -2196,11 +2179,25 @@
       "name": "View",
       "printedName": "View",
       "usr": "s:7SwiftUI4ViewP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss16SendableMetatypeP",
+      "name": "SendableMetatype",
+      "printedName": "SendableMetatype",
+      "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
      }
     ],
     "declAttributes": [
-     "Preconcurrency",
-     "Custom"
+     "Custom",
+     "Preconcurrency"
     ],
     "declKind": "Struct",
     "kind": "TypeDecl",
@@ -2382,8 +2379,7 @@
        }
       ],
       "declAttributes": [
-       "Implements",
-       "Semantics"
+       "Implements"
       ],
       "declKind": "Func",
       "funcSelfKind": "NonMutating",
@@ -2464,13 +2460,6 @@
     "conformances": [
      {
       "kind": "Conformance",
-      "mangledName": "$sSQ",
-      "name": "Equatable",
-      "printedName": "Equatable",
-      "usr": "s:SQ"
-     },
-     {
-      "kind": "Conformance",
       "mangledName": "$sSH",
       "name": "Hashable",
       "printedName": "Hashable",
@@ -2478,10 +2467,10 @@
      },
      {
       "kind": "Conformance",
-      "mangledName": "$ss8SendableP",
-      "name": "Sendable",
-      "printedName": "Sendable",
-      "usr": "s:s8SendableP"
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
      },
      {
       "kind": "Conformance",
@@ -2489,6 +2478,13 @@
       "name": "SendableMetatype",
       "printedName": "SendableMetatype",
       "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
      }
     ],
     "declKind": "Enum",

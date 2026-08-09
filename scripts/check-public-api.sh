@@ -44,16 +44,24 @@ normalize() {
 import json, sys
 
 SUPPRESSIBLE = {"Copyable", "Escapable", "BitwiseCopyable"}
+# Compiler-internal attributes whose EMISSION varies by digester version (e.g. @_semantics
+# surfacing as "Semantics" on newer toolchains). Not API surface; dropped for portability.
+INTERNAL_ATTRS = {"Semantics"}
 
 def scrub(node):
     if isinstance(node, dict):
         node.pop("tool_arguments", None)
         conformances = node.get("conformances")
         if isinstance(conformances, list):
-            node["conformances"] = [
+            kept = [
                 c for c in conformances
                 if not (isinstance(c, dict) and c.get("printedName") in SUPPRESSIBLE)
             ]
+            # Emission ORDER also varies by digester version; the set is the contract, not the order.
+            node["conformances"] = sorted(kept, key=lambda c: json.dumps(c, sort_keys=True))
+        attrs = node.get("declAttributes")
+        if isinstance(attrs, list):
+            node["declAttributes"] = sorted(a for a in attrs if a not in INTERNAL_ATTRS)
         for value in node.values():
             scrub(value)
     elif isinstance(node, list):
