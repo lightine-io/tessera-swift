@@ -118,6 +118,14 @@ final class ScannerModel {
     /// Manual→other→Manual round trip.
     private var manualDraft = ""
 
+    /// TES-137 mirror of the Android `MANUAL_ENTRY_MAX_CHARS`: a hard ceiling on the manual-entry draft's
+    /// length, in characters. A real MRZ is at most 3 lines of 44 characters (132 chars) plus a little
+    /// whitespace — 1024 is generously above that so a legitimate typed or pasted MRZ is never truncated,
+    /// while an arbitrarily large paste is bounded before it reaches ``manualDraft`` / ``ScannerState``.
+    /// Truncated, never rejected (reader, not oracle): a 1024-character draft is already not a readable MRZ
+    /// regardless of where the excess came from.
+    private static let manualEntryMaxChars = 1024
+
     // MARK: - Session scan deadline (TES-124/125/126)
 
     /// The time left for the countdown chip, or `nil` when `config.scanTimeout` is `nil` (no deadline → no
@@ -358,9 +366,12 @@ final class ScannerModel {
 
     /// Bind the in-progress manual text (called on every edit) — mirrored into the hoisted ``manualDraft``
     /// (TES-93) and clears a prior parse-failed note (the input the user is fixing is no longer "failed").
+    /// TES-137: truncated to ``manualEntryMaxChars`` before it reaches ``manualDraft`` / ``ScannerState`` —
+    /// bounds a large paste at the source, mirroring the Android `MANUAL_ENTRY_MAX_CHARS` cap.
     func updateManualText(_ text: String) {
-        manualDraft = text
-        state = .manualRaw(text: text, parseFailed: false)
+        let bounded = String(text.prefix(Self.manualEntryMaxChars))
+        manualDraft = bounded
+        state = .manualRaw(text: bounded, parseFailed: false)
     }
 
     /// Assemble a `Decoded` from the typed text (pure, host-tested; format auto-detected). A success /
