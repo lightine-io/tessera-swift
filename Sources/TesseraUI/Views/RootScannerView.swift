@@ -82,7 +82,7 @@ struct RootScannerView: View {
                 // flash unit (TES-84 mirror) — a device with no flash never gets a dead-looking toggle.
                 if config.showTorchButton && model.hasTorch {
                     Button { model.toggleTorch() } label: {
-                        Image(systemName: model.torchOn ? "flashlight.on.fill" : "flashlight.off.fill")
+                        Image(systemName: model.torchOn ? "bolt.fill" : "bolt.slash.fill")
                             .font(.title2)
                             .foregroundStyle(.white)
                             .padding(12)
