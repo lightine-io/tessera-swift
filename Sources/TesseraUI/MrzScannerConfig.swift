@@ -110,6 +110,17 @@ public struct MrzScannerConfig: Sendable {
     /// never requests a permission itself). `nil` (default) means the host owns it entirely.
     public var onRequestPermission: (@Sendable () -> Void)?
 
+    /// The host's string-override seam (TES-139) — the iOS counterpart to Android's resource-merge override.
+    /// `nil` (the default) renders the module's own bundled strings, unchanged.
+    ///
+    /// To override one or more of the module's strings, set this to a bundle that defines an entry — under
+    /// the **same key**, in a **`Localizable` table** (`Localizable.strings` or `Localizable.xcstrings`,
+    /// standard Xcode string-catalog mechanics) — for each key to change; typically `Bundle.main`. Every key
+    /// not defined there falls back to the module's own catalog (`Resources/Localizable.xcstrings`), so a
+    /// host only needs to override the handful of keys it actually wants to change. See ``TesseraStrings``
+    /// for the full lookup contract.
+    public var stringsBundle: Bundle?
+
     public init(
         enabledMethods: Set<ScanMethod> = [.camera, .manualEntry],
         reviewMode: ReviewMode = .review,
@@ -119,7 +130,8 @@ public struct MrzScannerConfig: Sendable {
         scanTimeout: Duration? = nil,
         hapticFeedback: Bool = true,
         theme: MrzScannerTheme = MrzScannerTheme(),
-        onRequestPermission: (@Sendable () -> Void)? = nil
+        onRequestPermission: (@Sendable () -> Void)? = nil,
+        stringsBundle: Bundle? = nil
     ) {
         self.enabledMethods = enabledMethods
         self.reviewMode = reviewMode
@@ -130,5 +142,6 @@ public struct MrzScannerConfig: Sendable {
         self.hapticFeedback = hapticFeedback
         self.theme = theme
         self.onRequestPermission = onRequestPermission
+        self.stringsBundle = stringsBundle
     }
 }

@@ -97,6 +97,7 @@ struct CameraPreviewView: View {
 /// it (the WYSIWYG plumbing reports its real frame). Purely advisory — it never gates capture. The scrim
 /// and frame are decorative (hidden from assistive tech); the guidance message carries the meaning.
 private struct MrzGuideOverlay: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     var gathering: Bool = false
     var struggling: Bool = false
     var onManualEntry: () -> Void = {}
@@ -179,7 +180,7 @@ private struct MrzGuideOverlay: View {
             case .struggling:
                 StrugglingHint(onManualEntry: onManualEntry, showManualEntry: showManualEntry)
             case .framingHint:
-                Text(String(localized: "tessera_scanner_camera_guide", bundle: .module))
+                Text(TesseraStrings.string("tessera_scanner_camera_guide", bundle: stringsBundle))
                     .font(.callout.weight(.medium))
                     .multilineTextAlignment(.center)
                     .padding(24)
@@ -303,15 +304,17 @@ private final class PreviewUIView: UIView {
 /// the first frame is a clear "starting up" state. It auto-swaps to the live viewfinder the instant the
 /// session arrives (no button, no timeout). Mirrors the Android `InitializingContent`.
 struct InitializingContent: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
+
     var body: some View {
         VStack(spacing: 16) {
             ProgressView()
                 .accessibilityHidden(true) // Decorative — the title carries the meaning.
-            Text(String(localized: "tessera_scanner_initializing_title", bundle: .module))
+            Text(TesseraStrings.string("tessera_scanner_initializing_title", bundle: stringsBundle))
                 .font(.title2)
                 .multilineTextAlignment(.center)
                 .accessibilityAddTraits(.updatesFrequently)
-            Text(String(localized: "tessera_scanner_initializing_body", bundle: .module))
+            Text(TesseraStrings.string("tessera_scanner_initializing_body", bundle: stringsBundle))
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

@@ -8,6 +8,7 @@ import SwiftUI
 /// Reader, not oracle (Principle 1): the switcher only chooses *how* to read (which method), never what a
 /// reading means. The scaffold adds no judgement.
 struct ScannerScaffold<Content: View>: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     let enabledMethods: Set<ScanMethod>
     let currentState: ScannerState
     let onClose: () -> Void
@@ -40,7 +41,7 @@ struct ScannerScaffold<Content: View>: View {
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 PoweredByFooter()
             }
-            .navigationTitle(String(localized: "tessera_scanner_title", bundle: .module))
+            .navigationTitle(TesseraStrings.string("tessera_scanner_title", bundle: stringsBundle))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -48,7 +49,7 @@ struct ScannerScaffold<Content: View>: View {
                         // SF Symbol close glyph; the accessibility label carries the spoken name.
                         Image(systemName: "xmark")
                     }
-                    .accessibilityLabel(String(localized: "tessera_scanner_close", bundle: .module))
+                    .accessibilityLabel(TesseraStrings.string("tessera_scanner_close", bundle: stringsBundle))
                     .accessibilityIdentifier("tessera-mrz-close")
                 }
                 // The scan-timeout countdown (TES-125), shown on EVERY screen while a finite `scanTimeout`
@@ -77,8 +78,10 @@ struct ScannerScaffold<Content: View>: View {
 /// nothing at all when the resolved string is blank, so the opt-out actually reclaims the space rather than
 /// leaving a blank, padded band. Mirrors the Android `PoweredByFooter`.
 private struct PoweredByFooter: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
+
     var body: some View {
-        let text = String(localized: "tessera_scanner_powered_by", bundle: .module)
+        let text = TesseraStrings.string("tessera_scanner_powered_by", bundle: stringsBundle)
         if text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             EmptyView()
         } else {
@@ -99,6 +102,7 @@ private struct PoweredByFooter: View {
 /// per-second VoiceOver announcement would spam VoiceOver, so it is read on focus only, matching the Android
 /// chip's non-live-region semantics (`liveRegion` is intentionally absent there too).
 private struct ScanCountdownChip: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     let remaining: Duration
 
     var body: some View {
@@ -110,7 +114,7 @@ private struct ScanCountdownChip: View {
             .background(.secondary.opacity(0.15), in: Capsule())
             .accessibilityElement(children: .combine)
             .accessibilityLabel(
-                substituting(String(localized: "tessera_scanner_time_remaining", bundle: .module), text)
+                substituting(TesseraStrings.string("tessera_scanner_time_remaining", bundle: stringsBundle), text)
             )
             .accessibilityIdentifier("tessera-mrz-countdown")
     }
@@ -120,6 +124,7 @@ private struct ScanCountdownChip: View {
 /// method — Camera / Photo / Type, in that fixed order — with the method matching the current state selected.
 /// When fewer than two methods are enabled there is nothing to switch between, so the whole row is hidden.
 private struct MethodSwitcher: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     let enabledMethods: Set<ScanMethod>
     let currentState: ScannerState
     let onSelectMethod: (ScanMethod) -> Void
@@ -129,7 +134,7 @@ private struct MethodSwitcher: View {
         // Fewer than two enabled methods → nothing to switch between; hide the switcher entirely.
         if methods.count >= 2 {
             Picker(
-                String(localized: "tessera_scanner_title", bundle: .module),
+                TesseraStrings.string("tessera_scanner_title", bundle: stringsBundle),
                 selection: Binding(
                     get: { activeMethod(currentState) ?? methods.first! },
                     set: { onSelectMethod($0) }
@@ -150,9 +155,9 @@ private struct MethodSwitcher: View {
 
     private func methodLabel(_ method: ScanMethod) -> String {
         switch method {
-        case .camera: return String(localized: "tessera_scanner_method_camera", bundle: .module)
-        case .savedImage: return String(localized: "tessera_scanner_method_photo", bundle: .module)
-        case .manualEntry: return String(localized: "tessera_scanner_method_keyboard", bundle: .module)
+        case .camera: return TesseraStrings.string("tessera_scanner_method_camera", bundle: stringsBundle)
+        case .savedImage: return TesseraStrings.string("tessera_scanner_method_photo", bundle: stringsBundle)
+        case .manualEntry: return TesseraStrings.string("tessera_scanner_method_keyboard", bundle: stringsBundle)
         }
     }
 }

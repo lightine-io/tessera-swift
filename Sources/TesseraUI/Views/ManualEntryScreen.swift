@@ -26,6 +26,7 @@ import SwiftUI
 ///     text is empty — there is nothing to read, and there is no per-screen cancel here (mirrors Android:
 ///     the top-bar ✕ is the only escape, so this screen offers no separate "Cancel" button).
 internal struct ManualEntryScreen: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     let text: String
     let parseFailed: Bool
     let onTextChange: (String) -> Void
@@ -33,7 +34,7 @@ internal struct ManualEntryScreen: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(String(localized: "tessera_scanner_manual_title", bundle: .module))
+            Text(TesseraStrings.string("tessera_scanner_manual_title", bundle: stringsBundle))
                 .font(.title2.weight(.semibold))
 
             // The field + observations scroll; the two actions stay pinned below and always reachable —
@@ -46,7 +47,7 @@ internal struct ManualEntryScreen: View {
                     // Forced left-to-right regardless of the ambient locale: an MRZ is always printed
                     // left-to-right per ICAO 9303, and RTL would mirror a string that must stay verbatim.
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(String(localized: "tessera_scanner_manual_field_label", bundle: .module))
+                        Text(TesseraStrings.string("tessera_scanner_manual_field_label", bundle: stringsBundle))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                         TextEditor(
@@ -66,12 +67,12 @@ internal struct ManualEntryScreen: View {
                                 .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
                         )
                         .accessibilityIdentifier("tessera-mrz-manual-raw-field")
-                        .accessibilityLabel(String(localized: "tessera_scanner_manual_field_label", bundle: .module))
+                        .accessibilityLabel(TesseraStrings.string("tessera_scanner_manual_field_label", bundle: stringsBundle))
                     }
 
                     Divider()
 
-                    Text(String(localized: "tessera_scanner_review_observations_header", bundle: .module))
+                    Text(TesseraStrings.string("tessera_scanner_review_observations_header", bundle: stringsBundle))
                         .font(.subheadline.weight(.semibold))
                     VStack(alignment: .leading, spacing: 6) {
                         ForEach(Array(observations.enumerated()), id: \.offset) { _, note in
@@ -91,7 +92,7 @@ internal struct ManualEntryScreen: View {
                     // to the read-failed screen — that screen's "blurred or partial" framing mislabels typed
                     // input.
                     if parseFailed {
-                        Text(String(localized: "tessera_scanner_manual_parse_failed", bundle: .module))
+                        Text(TesseraStrings.string("tessera_scanner_manual_parse_failed", bundle: stringsBundle))
                             .font(.caption)
                             .foregroundStyle(.red)
                             .accessibilityIdentifier("tessera-mrz-manual-parse-failed")
@@ -105,7 +106,7 @@ internal struct ManualEntryScreen: View {
             Button {
                 onRead()
             } label: {
-                Text(String(localized: "tessera_scanner_manual_read", bundle: .module))
+                Text(TesseraStrings.string("tessera_scanner_manual_read", bundle: stringsBundle))
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
@@ -124,10 +125,10 @@ internal struct ManualEntryScreen: View {
     /// Mirrors the Android `manualObservations` plural resource.
     private var observations: [String] {
         manualLinesOf(text).enumerated().map { index, line in
-            let key: String.LocalizationValue = line.count == 1
+            let key: String = line.count == 1
                 ? "tessera_scanner_manual_obs_char_count_one"
                 : "tessera_scanner_manual_obs_char_count_other"
-            return substituting(String(localized: key, bundle: .module), "\(index + 1)", "\(line.count)")
+            return substituting(TesseraStrings.string(key, bundle: stringsBundle), "\(index + 1)", "\(line.count)")
         }
     }
 }

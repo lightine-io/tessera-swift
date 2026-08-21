@@ -25,6 +25,7 @@ import SwiftUI
 /// wait. The "Reconnecting…" indicator states the recoverable status in words. Mirrors the Android
 /// `CameraInUseContent`.
 internal struct CameraInUseScreen: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     let onManualEntry: () -> Void
     /// Hidden when the consumer's `enabledMethods` excludes manual entry (a camera-only config must not
     /// route the user into a screen it disabled). Mirrors the Android `showManualEntry` gating.
@@ -35,13 +36,13 @@ internal struct CameraInUseScreen: View {
             Spacer()
 
             VStack(spacing: 12) {
-                Text(String(localized: "tessera_scanner_camera_in_use_title", bundle: .module))
+                Text(TesseraStrings.string("tessera_scanner_camera_in_use_title", bundle: stringsBundle))
                     .font(.title2)
                     .multilineTextAlignment(.center)
                     // The screen arrives via an auto-transition (another app grabs the camera), so the
                     // recoverable status is announced on appearance without the user moving focus to it.
                     .accessibilityAddTraits(.updatesFrequently)
-                Text(String(localized: "tessera_scanner_camera_in_use_body", bundle: .module))
+                Text(TesseraStrings.string("tessera_scanner_camera_in_use_body", bundle: stringsBundle))
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -52,7 +53,7 @@ internal struct CameraInUseScreen: View {
 
             if showManualEntry {
                 Button(action: onManualEntry) {
-                    Text(String(localized: "tessera_scanner_camera_manual", bundle: .module))
+                    Text(TesseraStrings.string("tessera_scanner_camera_manual", bundle: stringsBundle))
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
@@ -69,6 +70,7 @@ internal struct CameraInUseScreen: View {
 /// reason. This is **terminal**: there is no auto-recovery and no retry — the only forward path is
 /// ``onManualEntry``, typing the details by hand. Mirrors the Android `CameraUnavailableContent`.
 internal struct CameraUnavailableScreen: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     let onManualEntry: () -> Void
     /// Hidden when the consumer's `enabledMethods` excludes manual entry (a camera-only config must not
     /// route the user into a screen it disabled). Mirrors the Android `showManualEntry` gating.
@@ -79,10 +81,10 @@ internal struct CameraUnavailableScreen: View {
             Spacer()
 
             VStack(spacing: 12) {
-                Text(String(localized: "tessera_scanner_camera_unavailable_title", bundle: .module))
+                Text(TesseraStrings.string("tessera_scanner_camera_unavailable_title", bundle: stringsBundle))
                     .font(.title2)
                     .multilineTextAlignment(.center)
-                Text(String(localized: "tessera_scanner_camera_unavailable_body", bundle: .module))
+                Text(TesseraStrings.string("tessera_scanner_camera_unavailable_body", bundle: stringsBundle))
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -92,7 +94,7 @@ internal struct CameraUnavailableScreen: View {
 
             if showManualEntry {
                 Button(action: onManualEntry) {
-                    Text(String(localized: "tessera_scanner_camera_manual", bundle: .module))
+                    Text(TesseraStrings.string("tessera_scanner_camera_manual", bundle: stringsBundle))
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
@@ -111,6 +113,7 @@ internal struct CameraUnavailableScreen: View {
 /// platform's reduce-motion setting via `UIAccessibility.isReduceMotionEnabled`, mirroring the Android
 /// `animationsEnabled()` gate). Mirrors the Android `ReconnectingIndicator`.
 private struct ReconnectingIndicator: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     @State private var pulsed = false
 
     var body: some View {
@@ -126,7 +129,7 @@ private struct ReconnectingIndicator: View {
                         pulsed = true
                     }
                 }
-            Text(String(localized: "tessera_scanner_camera_reconnecting", bundle: .module))
+            Text(TesseraStrings.string("tessera_scanner_camera_reconnecting", bundle: stringsBundle))
                 .font(.caption)
                 .foregroundStyle(.orange)
                 .accessibilityAddTraits(.updatesFrequently)
@@ -140,6 +143,7 @@ private struct ReconnectingIndicator: View {
 /// hint still routes normally). ``onManualEntry`` switches to manual raw entry. Mirrors the Android
 /// `StrugglingHint`.
 internal struct StrugglingHint: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     let onManualEntry: () -> Void
     /// Hidden when the consumer's `enabledMethods` excludes manual entry (a camera-only config must not
     /// route the user into a screen it disabled). Mirrors the Android `showManualEntry` gating.
@@ -147,7 +151,7 @@ internal struct StrugglingHint: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            Text(String(localized: "tessera_scanner_struggling_hint", bundle: .module))
+            Text(TesseraStrings.string("tessera_scanner_struggling_hint", bundle: stringsBundle))
                 .font(.callout)
                 .multilineTextAlignment(.center)
                 // The hint overlays the preview via a struggle-timeout auto-transition, so it is announced on
@@ -155,7 +159,7 @@ internal struct StrugglingHint: View {
                 .accessibilityAddTraits(.updatesFrequently)
             if showManualEntry {
                 Button(action: onManualEntry) {
-                    Text(String(localized: "tessera_scanner_struggling_manual", bundle: .module))
+                    Text(TesseraStrings.string("tessera_scanner_struggling_manual", bundle: stringsBundle))
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(.tint)
@@ -174,12 +178,14 @@ internal struct StrugglingHint: View {
 /// ``StrugglingHint`` in the single live-preview guidance region (``guidanceMessage(gathering:struggling:)``)
 /// — getting a decode at all is better news than "still looking". Mirrors the Android `GatheringHint`.
 internal struct GatheringHint: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
+
     var body: some View {
         VStack(spacing: 8) {
             ProgressView()
                 .tint(.white)
                 .accessibilityHidden(true) // Decorative — the text carries the meaning.
-            Text(String(localized: "tessera_scanner_gathering_hint", bundle: .module))
+            Text(TesseraStrings.string("tessera_scanner_gathering_hint", bundle: stringsBundle))
                 .font(.callout)
                 .multilineTextAlignment(.center)
                 // Appears on an auto-transition (a read starting to confirm), so it is announced on

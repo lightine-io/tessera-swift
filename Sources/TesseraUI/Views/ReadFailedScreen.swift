@@ -17,6 +17,7 @@ import Tessera
 ///   - onTryAgain: go back to scanning and try to read again.
 ///   - onManualEntry: switch to typing the details by hand.
 internal struct ReadFailedScreen: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     let capturedText: RecognizedText
     let onTryAgain: () -> Void
     let onManualEntry: () -> Void
@@ -25,20 +26,20 @@ internal struct ReadFailedScreen: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(String(localized: "tessera_scanner_read_failed_title", bundle: .module))
+            Text(TesseraStrings.string("tessera_scanner_read_failed_title", bundle: stringsBundle))
                 .font(.title2.weight(.semibold))
                 // A decode-landing too (OCR text that didn't parse) — announced on arrival so the outcome
                 // ("Couldn't read this MRZ") reaches a screen-reader user, who needs to know to retry.
                 .accessibilityAddTraits(.isHeader)
 
-            Text(String(localized: "tessera_scanner_read_failed_body", bundle: .module))
+            Text(TesseraStrings.string("tessera_scanner_read_failed_body", bundle: stringsBundle))
                 .font(.body)
                 .foregroundStyle(.secondary)
 
             // The body + captured text scroll; the two actions stay pinned below and always reachable.
             ScrollView {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(String(localized: "tessera_scanner_read_failed_captured_header", bundle: .module))
+                    Text(TesseraStrings.string("tessera_scanner_read_failed_captured_header", bundle: stringsBundle))
                         .font(.subheadline.weight(.semibold))
                     // Forced left-to-right regardless of the ambient locale — an MRZ is always printed
                     // left-to-right per ICAO 9303, and RTL would otherwise mirror the visual order of a
@@ -52,7 +53,7 @@ internal struct ReadFailedScreen: View {
             }
 
             Button(action: onTryAgain) {
-                Text(String(localized: "tessera_scanner_read_failed_try_again", bundle: .module))
+                Text(TesseraStrings.string("tessera_scanner_read_failed_try_again", bundle: stringsBundle))
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
@@ -60,7 +61,7 @@ internal struct ReadFailedScreen: View {
 
             if showManualEntry {
                 Button(action: onManualEntry) {
-                    Text(String(localized: "tessera_scanner_read_failed_manual", bundle: .module))
+                    Text(TesseraStrings.string("tessera_scanner_read_failed_manual", bundle: stringsBundle))
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
