@@ -399,15 +399,39 @@ internal struct ReviewScreen: View {
                      fields.primaryIdentifier, fields.secondaryIdentifier)
     }
 
-    /// "P — passport" from the raw type code and the recognized category; the raw code alone when the code is
-    /// not in the lookup table. Mirrors the Android `documentDisplay`. `documentType` is a Kotlin `@JvmInline`
-    /// value class over its `rawCode` string, so K/N erases it to that `String`; the category is re-derived via
-    /// the exported `DocumentTypeCodeTable` lookup (the erased value carries no accessor of its own).
+    /// "P — passport" from the raw type code and the recognized category; the raw code alone when neither an
+    /// exact `DocumentTypeCodeTable` match nor the ICAO reserved-leading-character fallback recognizes it.
+    /// Mirrors the Android `documentDisplay`, which sources this from mrz-core's `DocumentType.broadCategory`
+    /// (TES-99). `documentType` is a Kotlin `@JvmInline` value class over its `rawCode` string, so K/N erases
+    /// it to that `String` — and, unlike `DocumentTypeCodeTable.lookup(code:)`, `broadCategory` itself is not
+    /// exported across the ObjC boundary at all (confirmed empirically: no selector for it in
+    /// `Tessera.xcframework`'s generated header, only KDoc cross-reference comments). `firstLetterCategory`
+    /// below re-implements broadCategory's fallback half locally — the same reserved-leading-character rule
+    /// documented on the Kotlin side (ICAO Doc 9303 Part 4 §4.4 for P/V, Parts 5/6 for A/C/I); it defines
+    /// nothing new, it mirrors a published standard rule already re-derived once via the table lookup.
     private func documentDisplay(_ documentType: Any) -> String {
         let rawCode = (documentType as? String) ?? "\(documentType)"
-        guard let entry = DocumentTypeCodeTable.shared.lookup(code: rawCode) else { return rawCode }
+        let category = DocumentTypeCodeTable.shared.lookup(code: rawCode)?.category ?? Self.firstLetterCategory(rawCode)
+        guard let category else { return rawCode }
         return substituting(TesseraStrings.string("tessera_scanner_document_format", bundle: stringsBundle),
-                            rawCode, categoryLabel(entry.category))
+                            rawCode, categoryLabel(category))
+    }
+
+    /// The `DocumentCategory` implied by just the first character of `rawCode`, per ICAO Doc 9303 Part 4 §4.4
+    /// (`P`/`V`) and Parts 5/6 (`A`/`C`/`I`) — the same rule `DocumentTypeCodeTable`'s own KDoc documents.
+    /// `nil` when `rawCode` is empty or its first character is not one of those. Case-insensitive. Mirrors
+    /// mrz-core's private `firstLetterCategory`, which backs `DocumentType.broadCategory` (TES-99). `static`
+    /// (internal, not private) so the Testing target can pin it directly — a pure function, no `self` needed.
+    /// `nonisolated` because `ReviewScreen` is a `View` (implicitly `@MainActor`) but this mapping touches no
+    /// UI state, and Swift Testing's `@Test` functions run off the main actor by default.
+    nonisolated static func firstLetterCategory(_ rawCode: String) -> DocumentCategory? {
+        guard let first = rawCode.first else { return nil }
+        switch first.uppercased() {
+        case "P": return DocumentCategory.passport
+        case "I", "A", "C": return DocumentCategory.identityCard
+        case "V": return DocumentCategory.visa
+        default: return nil
+        }
     }
 
     private func categoryLabel(_ category: DocumentCategory) -> String {
