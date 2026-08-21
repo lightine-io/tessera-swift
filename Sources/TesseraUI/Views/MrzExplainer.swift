@@ -22,6 +22,7 @@ private let explainerSpecimenLine2 = "L898902C36UTO7408122F1204159ZE184226B<<<<<
 /// plumbing. White for legibility over the guide overlay's dark scrim (like the framing hint). Mirrors the
 /// Android `MrzExplainerLink`.
 struct MrzExplainerLink: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     @State private var showDialog = false
 
     var body: some View {
@@ -30,7 +31,7 @@ struct MrzExplainerLink: View {
         } label: {
             HStack(spacing: 4) {
                 Text("ⓘ").accessibilityHidden(true)
-                Text(String(localized: "tessera_scanner_explainer_action", bundle: .module))
+                Text(TesseraStrings.string("tessera_scanner_explainer_action", bundle: stringsBundle))
             }
             .foregroundStyle(.white)
         }
@@ -45,30 +46,31 @@ struct MrzExplainerLink: View {
 /// "where to find it" note. Scrollable so it fits small screens and large system font sizes. Split from
 /// ``MrzExplainerLink`` so it is host-presentable directly. Mirrors the Android `MrzExplainerDialog`.
 struct MrzExplainerDialog: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     let onDismiss: () -> Void
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text(String(localized: "tessera_scanner_explainer_intro", bundle: .module))
+                    Text(TesseraStrings.string("tessera_scanner_explainer_intro", bundle: stringsBundle))
                         .font(.body)
                     ExplainerDocumentGraphic()
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(String(localized: "tessera_scanner_explainer_where_title", bundle: .module))
+                        Text(TesseraStrings.string("tessera_scanner_explainer_where_title", bundle: stringsBundle))
                             .font(.subheadline.weight(.semibold))
-                        Text(String(localized: "tessera_scanner_explainer_where_body", bundle: .module))
+                        Text(TesseraStrings.string("tessera_scanner_explainer_where_body", bundle: stringsBundle))
                             .font(.body)
                             .foregroundStyle(.secondary)
                     }
                 }
                 .padding(24)
             }
-            .navigationTitle(String(localized: "tessera_scanner_explainer_title", bundle: .module))
+            .navigationTitle(TesseraStrings.string("tessera_scanner_explainer_title", bundle: stringsBundle))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(String(localized: "tessera_scanner_explainer_dismiss", bundle: .module), action: onDismiss)
+                    Button(TesseraStrings.string("tessera_scanner_explainer_dismiss", bundle: stringsBundle), action: onDismiss)
                 }
             }
         }
@@ -81,9 +83,11 @@ struct MrzExplainerDialog: View {
 /// stating *what* it says. Drawn from theme colours so it adapts to light / dark. Mirrors the Android
 /// `DocumentGraphic` (kept modest — no separate magnified zoom panel).
 private struct ExplainerDocumentGraphic: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(String(localized: "tessera_scanner_explainer_doc_label", bundle: .module))
+            Text(TesseraStrings.string("tessera_scanner_explainer_doc_label", bundle: stringsBundle))
                 .font(.caption2)
                 .tracking(1.5)
                 .foregroundStyle(.secondary)
@@ -112,7 +116,7 @@ private struct ExplainerDocumentGraphic: View {
             // "where to find it" text already carry the meaning (mirrors the Android `clearAndSetSemantics`).
             .accessibilityHidden(true)
 
-            Text(String(localized: "tessera_scanner_explainer_zone_caption", bundle: .module))
+            Text(TesseraStrings.string("tessera_scanner_explainer_zone_caption", bundle: stringsBundle))
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

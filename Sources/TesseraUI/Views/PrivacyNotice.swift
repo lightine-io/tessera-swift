@@ -16,6 +16,7 @@ import SwiftUI
 /// ``ScannerScaffold`` can drop it into the trailing toolbar with no plumbing. Mirrors the Android
 /// `PrivacyNoticeAction`.
 struct PrivacyNoticeAction: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     @State private var showDialog = false
 
     var body: some View {
@@ -29,15 +30,15 @@ struct PrivacyNoticeAction: View {
             // on every screen), presentation follows each platform's idiom.
             Image(systemName: "info.circle")
         }
-        .accessibilityLabel(String(localized: "tessera_scanner_privacy_action", bundle: .module))
+        .accessibilityLabel(TesseraStrings.string("tessera_scanner_privacy_action", bundle: stringsBundle))
         .accessibilityIdentifier("tessera-mrz-privacy-action")
         .alert(
-            String(localized: "tessera_scanner_privacy_dialog_title", bundle: .module),
+            TesseraStrings.string("tessera_scanner_privacy_dialog_title", bundle: stringsBundle),
             isPresented: $showDialog
         ) {
-            Button(String(localized: "tessera_scanner_privacy_dialog_dismiss", bundle: .module)) {}
+            Button(TesseraStrings.string("tessera_scanner_privacy_dialog_dismiss", bundle: stringsBundle)) {}
         } message: {
-            Text(String(localized: "tessera_scanner_privacy_dialog_body", bundle: .module))
+            Text(TesseraStrings.string("tessera_scanner_privacy_dialog_body", bundle: stringsBundle))
         }
     }
 }

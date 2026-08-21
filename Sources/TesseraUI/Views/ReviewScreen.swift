@@ -60,6 +60,7 @@ private let symbolInfo = "ⓘ"
 ///   - onUse: accepts this reading as confirmed. Stays enabled on a check-digit mismatch (Principle 1).
 ///   - onRescan: discards the reading and returns to scanning.
 internal struct ReviewScreen: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     let decoded: MrzScanResultDecoded
     let expanded: Bool
     /// Which reading method produced this review — drives the provenance-aware secondary action label
@@ -78,9 +79,9 @@ internal struct ReviewScreen: View {
     /// "Rescan" / "Try another photo" / "Edit entry" per the review's source method.
     private var secondaryActionLabel: String {
         switch source {
-        case .camera: String(localized: "tessera_scanner_review_rescan", bundle: .module)
-        case .savedImage: String(localized: "tessera_scanner_review_try_another_photo", bundle: .module)
-        case .manualEntry: String(localized: "tessera_scanner_review_edit_entry", bundle: .module)
+        case .camera: TesseraStrings.string("tessera_scanner_review_rescan", bundle: stringsBundle)
+        case .savedImage: TesseraStrings.string("tessera_scanner_review_try_another_photo", bundle: stringsBundle)
+        case .manualEntry: TesseraStrings.string("tessera_scanner_review_edit_entry", bundle: stringsBundle)
         }
     }
 
@@ -95,7 +96,7 @@ internal struct ReviewScreen: View {
     // The summary + honest observations + disclosure (mockups 03 / 03b).
     private var summaryBody: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(String(localized: "tessera_scanner_review_title", bundle: .module))
+            Text(TesseraStrings.string("tessera_scanner_review_title", bundle: stringsBundle))
                 .font(.title2.weight(.semibold))
                 // The review screen is the decode-landing: it appears the moment an MRZ is read. Announced on
                 // arrival so a screen-reader user hears the outcome ("MRZ read").
@@ -111,7 +112,7 @@ internal struct ReviewScreen: View {
 
                     Divider()
 
-                    Text(String(localized: "tessera_scanner_review_observations_header", bundle: .module))
+                    Text(TesseraStrings.string("tessera_scanner_review_observations_header", bundle: stringsBundle))
                         .font(.subheadline.weight(.semibold))
                     // Mismatches + advisory + provenance ONLY — every passing check moves to the expanded view
                     // (reviewObservations, unfiltered) rather than repeating a wall of ✓ rows here (TES-96).
@@ -120,14 +121,14 @@ internal struct ReviewScreen: View {
                     }
 
                     Button(action: onToggleExpanded) {
-                        Text(String(localized: "tessera_scanner_review_show_all", bundle: .module))
+                        Text(TesseraStrings.string("tessera_scanner_review_show_all", bundle: stringsBundle))
                     }
                     .accessibilityIdentifier("tessera-mrz-review-show-all")
                 }
             }
 
             Button(action: onUse) {
-                Text(String(localized: "tessera_scanner_review_use", bundle: .module))
+                Text(TesseraStrings.string("tessera_scanner_review_use", bundle: stringsBundle))
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
@@ -155,7 +156,7 @@ internal struct ReviewScreen: View {
     private var expandedBody: some View {
         let document = reviewDocument
         return VStack(alignment: .leading, spacing: 16) {
-            Text(String(localized: "tessera_scanner_review_all_fields_title", bundle: .module))
+            Text(TesseraStrings.string("tessera_scanner_review_all_fields_title", bundle: stringsBundle))
                 .font(.title2.weight(.semibold))
                 .accessibilityAddTraits(.isHeader)
 
@@ -165,7 +166,7 @@ internal struct ReviewScreen: View {
 
                     Divider()
 
-                    Text(String(localized: "tessera_scanner_review_observations_header", bundle: .module))
+                    Text(TesseraStrings.string("tessera_scanner_review_observations_header", bundle: stringsBundle))
                         .font(.subheadline.weight(.semibold))
                     // The FULL set — every ✓ match and ‼ mismatch, plus provenance — unlike the summary's
                     // mismatches-only view (TES-96).
@@ -175,7 +176,7 @@ internal struct ReviewScreen: View {
 
                     Divider()
 
-                    Text(String(localized: "tessera_scanner_review_raw_mrz_header", bundle: .module))
+                    Text(TesseraStrings.string("tessera_scanner_review_raw_mrz_header", bundle: stringsBundle))
                         .font(.subheadline.weight(.semibold))
                     // Forced left-to-right regardless of the ambient locale — an MRZ is always printed
                     // left-to-right per ICAO 9303, and RTL would otherwise mirror the visual order of a string
@@ -186,14 +187,14 @@ internal struct ReviewScreen: View {
                     .environment(\.layoutDirection, .leftToRight)
 
                     Button(action: onToggleExpanded) {
-                        Text(String(localized: "tessera_scanner_review_show_less", bundle: .module))
+                        Text(TesseraStrings.string("tessera_scanner_review_show_less", bundle: stringsBundle))
                     }
                     .accessibilityIdentifier("tessera-mrz-review-show-less")
                 }
             }
 
             Button(action: onUse) {
-                Text(String(localized: "tessera_scanner_review_use", bundle: .module))
+                Text(TesseraStrings.string("tessera_scanner_review_use", bundle: stringsBundle))
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
@@ -231,14 +232,14 @@ internal struct ReviewScreen: View {
     private func reviewSummaryRows(_ document: MrzDocument) -> [FieldRow] {
         let fields = document.commonFields
         return [
-            FieldRow(label: String(localized: "tessera_scanner_field_document", bundle: .module),
+            FieldRow(label: TesseraStrings.string("tessera_scanner_field_document", bundle: stringsBundle),
                      value: documentDisplay(fields.documentType)),
-            FieldRow(label: String(localized: "tessera_scanner_field_name", bundle: .module),
+            FieldRow(label: TesseraStrings.string("tessera_scanner_field_name", bundle: stringsBundle),
                      value: nameDisplay(fields)),
-            FieldRow(label: String(localized: "tessera_scanner_field_number", bundle: .module),
+            FieldRow(label: TesseraStrings.string("tessera_scanner_field_number", bundle: stringsBundle),
                      value: withoutTrailingFiller(fields.documentNumber)),
-            FieldRow(label: String(localized: "tessera_scanner_field_expiry", bundle: .module),
-                     value: dateDisplay(fields.dateOfExpiry)),
+            FieldRow(label: TesseraStrings.string("tessera_scanner_field_expiry", bundle: stringsBundle),
+                     value: dateDisplay(fields.dateOfExpiry, bundle: stringsBundle)),
         ]
     }
 
@@ -247,23 +248,23 @@ internal struct ReviewScreen: View {
     private func reviewAllFieldRows(_ document: MrzDocument) -> [FieldRow] {
         let fields = document.commonFields
         var rows: [FieldRow] = [
-            FieldRow(label: String(localized: "tessera_scanner_field_document_type", bundle: .module),
+            FieldRow(label: TesseraStrings.string("tessera_scanner_field_document_type", bundle: stringsBundle),
                      value: documentDisplay(fields.documentType)),
-            FieldRow(label: String(localized: "tessera_scanner_field_issuing_state", bundle: .module),
+            FieldRow(label: TesseraStrings.string("tessera_scanner_field_issuing_state", bundle: stringsBundle),
                      value: countryDisplay(fields.issuingState)),
-            FieldRow(label: String(localized: "tessera_scanner_field_name", bundle: .module),
+            FieldRow(label: TesseraStrings.string("tessera_scanner_field_name", bundle: stringsBundle),
                      value: nameDisplay(fields)),
-            FieldRow(label: String(localized: "tessera_scanner_field_nationality", bundle: .module),
+            FieldRow(label: TesseraStrings.string("tessera_scanner_field_nationality", bundle: stringsBundle),
                      value: countryDisplay(fields.nationality)),
-            FieldRow(label: String(localized: "tessera_scanner_field_date_of_birth", bundle: .module),
-                     value: dateDisplay(fields.dateOfBirth)),
+            FieldRow(label: TesseraStrings.string("tessera_scanner_field_date_of_birth", bundle: stringsBundle),
+                     value: dateDisplay(fields.dateOfBirth, bundle: stringsBundle)),
             // The actual character on the document (rawSex), per the transparency stance — not the derived enum.
-            FieldRow(label: String(localized: "tessera_scanner_field_sex", bundle: .module),
+            FieldRow(label: TesseraStrings.string("tessera_scanner_field_sex", bundle: stringsBundle),
                      value: charDisplay(fields.rawSex)),
-            FieldRow(label: String(localized: "tessera_scanner_field_number", bundle: .module),
+            FieldRow(label: TesseraStrings.string("tessera_scanner_field_number", bundle: stringsBundle),
                      value: withoutTrailingFiller(fields.documentNumber)),
-            FieldRow(label: String(localized: "tessera_scanner_field_expiry", bundle: .module),
-                     value: dateDisplay(fields.dateOfExpiry)),
+            FieldRow(label: TesseraStrings.string("tessera_scanner_field_expiry", bundle: stringsBundle),
+                     value: dateDisplay(fields.dateOfExpiry, bundle: stringsBundle)),
         ]
         // Format-specific optional / personal field, only when the format has one and it is not blank AFTER
         // stripping trailing filler (an all-filler optional field, e.g. "<<<<<", must show no row at all
@@ -273,10 +274,8 @@ internal struct ReviewScreen: View {
         // `if (document is TD3) tessera_scanner_field_optional else tessera_scanner_field_optional_data`.
         let optional = optionalField(document).map(withoutTrailingFiller)
         if let optional, !optional.isEmpty {
-            let labelKey: String.LocalizationValue = String.LocalizationValue(
-                optionalFieldLabelKey(isTD3: document is TD3, forCheckDigit: false)
-            )
-            rows.append(FieldRow(label: String(localized: labelKey, bundle: .module), value: optional))
+            let labelKey = optionalFieldLabelKey(isTD3: document is TD3, forCheckDigit: false)
+            rows.append(FieldRow(label: TesseraStrings.string(labelKey, bundle: stringsBundle), value: optional))
         }
         return rows
     }
@@ -307,7 +306,7 @@ internal struct ReviewScreen: View {
 
         let provenance = ReviewObservation(
             symbol: symbolInfo,
-            text: substituting(String(localized: "tessera_scanner_obs_read_by", bundle: .module),
+            text: substituting(TesseraStrings.string("tessera_scanner_obs_read_by", bundle: stringsBundle),
                                readMethodLabel(parse.metadata.readMethod)),
             tone: .info
         )
@@ -338,27 +337,25 @@ internal struct ReviewScreen: View {
         // data and composite only when the format has one (their MrzCheckDigits value is non-nil). Each is a
         // MATCH unless validationFailures reports a mismatch for it.
         var checkedFields: [(MrzField, String)] = [
-            (.documentNumber, String(localized: "tessera_scanner_check_label_document_number", bundle: .module)),
-            (.dateOfBirth, String(localized: "tessera_scanner_check_label_date_of_birth", bundle: .module)),
-            (.dateOfExpiry, String(localized: "tessera_scanner_check_label_date_of_expiry", bundle: .module)),
+            (.documentNumber, TesseraStrings.string("tessera_scanner_check_label_document_number", bundle: stringsBundle)),
+            (.dateOfBirth, TesseraStrings.string("tessera_scanner_check_label_date_of_birth", bundle: stringsBundle)),
+            (.dateOfExpiry, TesseraStrings.string("tessera_scanner_check_label_date_of_expiry", bundle: stringsBundle)),
         ]
         if fields.checkDigits.optionalData != nil {
             // TD3 reuses the "personal number" field label for this observation too, mirroring the field-row
             // choice above; every other format gets its own neutral check-digit label (Principle 1).
-            let labelKey: String.LocalizationValue = String.LocalizationValue(
-                optionalFieldLabelKey(isTD3: document is TD3, forCheckDigit: true)
-            )
-            checkedFields.append((.optionalData, String(localized: labelKey, bundle: .module)))
+            let labelKey = optionalFieldLabelKey(isTD3: document is TD3, forCheckDigit: true)
+            checkedFields.append((.optionalData, TesseraStrings.string(labelKey, bundle: stringsBundle)))
         }
         if fields.checkDigits.composite != nil {
-            checkedFields.append((.composite, String(localized: "tessera_scanner_check_label_composite", bundle: .module)))
+            checkedFields.append((.composite, TesseraStrings.string("tessera_scanner_check_label_composite", bundle: stringsBundle)))
         }
         for (field, label) in checkedFields {
             let mismatch = mismatches.first { $0.field === field }
             if let mismatch {
                 observations.append(ReviewObservation(
                     symbol: symbolMismatch,
-                    text: substituting(String(localized: "tessera_scanner_obs_check_mismatch", bundle: .module),
+                    text: substituting(TesseraStrings.string("tessera_scanner_obs_check_mismatch", bundle: stringsBundle),
                                        label,
                                        unicharToString(mismatch.observed),
                                        unicharToString(mismatch.expected)),
@@ -367,7 +364,7 @@ internal struct ReviewScreen: View {
             } else {
                 observations.append(ReviewObservation(
                     symbol: symbolMatch,
-                    text: substituting(String(localized: "tessera_scanner_obs_check_match", bundle: .module), label),
+                    text: substituting(TesseraStrings.string("tessera_scanner_obs_check_match", bundle: stringsBundle), label),
                     tone: .matches
                 ))
             }
@@ -377,8 +374,8 @@ internal struct ReviewScreen: View {
         if fields.dateOfExpiry.componentsFormCalendarDate?.boolValue == true {
             observations.append(ReviewObservation(
                 symbol: symbolMatch,
-                text: substituting(String(localized: "tessera_scanner_obs_expiry_well_formed", bundle: .module),
-                                   dateDisplay(fields.dateOfExpiry)),
+                text: substituting(TesseraStrings.string("tessera_scanner_obs_expiry_well_formed", bundle: stringsBundle),
+                                   dateDisplay(fields.dateOfExpiry, bundle: stringsBundle)),
                 tone: .matches
             ))
         }
@@ -387,7 +384,7 @@ internal struct ReviewScreen: View {
         if !mismatches.isEmpty {
             observations.append(ReviewObservation(
                 symbol: symbolInfo,
-                text: String(localized: "tessera_scanner_obs_some_mismatch", bundle: .module),
+                text: TesseraStrings.string("tessera_scanner_obs_some_mismatch", bundle: stringsBundle),
                 tone: .info
             ))
         }
@@ -398,7 +395,7 @@ internal struct ReviewScreen: View {
     // MARK: - Display helpers
 
     private func nameDisplay(_ fields: CommonFields) -> String {
-        substituting(String(localized: "tessera_scanner_name_format", bundle: .module),
+        substituting(TesseraStrings.string("tessera_scanner_name_format", bundle: stringsBundle),
                      fields.primaryIdentifier, fields.secondaryIdentifier)
     }
 
@@ -409,18 +406,18 @@ internal struct ReviewScreen: View {
     private func documentDisplay(_ documentType: Any) -> String {
         let rawCode = (documentType as? String) ?? "\(documentType)"
         guard let entry = DocumentTypeCodeTable.shared.lookup(code: rawCode) else { return rawCode }
-        return substituting(String(localized: "tessera_scanner_document_format", bundle: .module),
+        return substituting(TesseraStrings.string("tessera_scanner_document_format", bundle: stringsBundle),
                             rawCode, categoryLabel(entry.category))
     }
 
     private func categoryLabel(_ category: DocumentCategory) -> String {
         // A Kotlin enum bridges as a class whose entries are singletons, so match by identity (`===`) rather
         // than a Swift `switch` (its cases are static properties, not Swift enum cases).
-        if category === DocumentCategory.passport { return String(localized: "tessera_scanner_category_passport", bundle: .module) }
-        if category === DocumentCategory.identityCard { return String(localized: "tessera_scanner_category_identity_card", bundle: .module) }
-        if category === DocumentCategory.residencePermit { return String(localized: "tessera_scanner_category_residence_permit", bundle: .module) }
-        if category === DocumentCategory.visa { return String(localized: "tessera_scanner_category_visa", bundle: .module) }
-        return String(localized: "tessera_scanner_category_other", bundle: .module)
+        if category === DocumentCategory.passport { return TesseraStrings.string("tessera_scanner_category_passport", bundle: stringsBundle) }
+        if category === DocumentCategory.identityCard { return TesseraStrings.string("tessera_scanner_category_identity_card", bundle: stringsBundle) }
+        if category === DocumentCategory.residencePermit { return TesseraStrings.string("tessera_scanner_category_residence_permit", bundle: stringsBundle) }
+        if category === DocumentCategory.visa { return TesseraStrings.string("tessera_scanner_category_visa", bundle: stringsBundle) }
+        return TesseraStrings.string("tessera_scanner_category_other", bundle: stringsBundle)
     }
 
     /// The country's display name when the code is recognized, else its raw three-letter code. `issuingState` /
@@ -433,11 +430,11 @@ internal struct ReviewScreen: View {
 
     private func readMethodLabel(_ readMethod: ReadMethod) -> String {
         // Kotlin enum entries are class singletons — match by identity (`===`).
-        if readMethod === ReadMethod.preCapturedImage { return String(localized: "tessera_scanner_read_method_photo", bundle: .module) }
-        if readMethod === ReadMethod.manualEntry { return String(localized: "tessera_scanner_read_method_manual", bundle: .module) }
+        if readMethod === ReadMethod.preCapturedImage { return TesseraStrings.string("tessera_scanner_read_method_photo", bundle: stringsBundle) }
+        if readMethod === ReadMethod.manualEntry { return TesseraStrings.string("tessera_scanner_read_method_manual", bundle: stringsBundle) }
         // LIVE_CAMERA and any not-yet-surfaced provenance present as the live-camera label — this review path
         // is reached from the live camera.
-        return String(localized: "tessera_scanner_read_method_live_camera", bundle: .module)
+        return TesseraStrings.string("tessera_scanner_read_method_live_camera", bundle: stringsBundle)
     }
 
 }
@@ -449,10 +446,10 @@ internal struct ReviewScreen: View {
 /// UI never re-derives a century itself; it only renders what the SDK already resolved, and labels the
 /// fallback honestly rather than showing bare two-digit components that could pass for a confident date
 /// (Principle 4). Mirrors the Android `dateDisplay` (`ReviewScreen.kt:748-751`).
-func dateDisplay(_ date: MrzDate) -> String {
+func dateDisplay(_ date: MrzDate, bundle: Bundle?) -> String {
     if let computed = date.computedDate { return computed.description() }
     let raw = "\(date.rawYear)-\(date.rawMonth)-\(date.rawDay)"
-    return substituting(String(localized: "tessera_scanner_date_unresolved_format", bundle: .module), raw)
+    return substituting(TesseraStrings.string("tessera_scanner_date_unresolved_format", bundle: bundle), raw)
 }
 
 /// Strips trailing MRZ filler (`<`) from a parsed field VALUE for display — the fillers are fixed-width
@@ -518,6 +515,7 @@ struct MonoLine: View {
 /// row's accessibility label names the tone in words (Match / Attention / Note) for a screen reader. Mirrors
 /// the Android `ReviewObservationRow`.
 struct ReviewObservationRow: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     let observation: ReviewObservation
     init(_ observation: ReviewObservation) { self.observation = observation }
 
@@ -544,9 +542,9 @@ struct ReviewObservationRow: View {
 
     private var tonePrefix: String {
         switch observation.tone {
-        case .matches: return String(localized: "tessera_scanner_obs_tone_match", bundle: .module)
-        case .mismatch: return String(localized: "tessera_scanner_obs_tone_mismatch", bundle: .module)
-        case .info: return String(localized: "tessera_scanner_obs_tone_info", bundle: .module)
+        case .matches: return TesseraStrings.string("tessera_scanner_obs_tone_match", bundle: stringsBundle)
+        case .mismatch: return TesseraStrings.string("tessera_scanner_obs_tone_mismatch", bundle: stringsBundle)
+        case .info: return TesseraStrings.string("tessera_scanner_obs_tone_info", bundle: stringsBundle)
         }
     }
 }

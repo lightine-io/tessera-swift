@@ -15,7 +15,7 @@ This package vends two library products:
 | Product | What it is |
 |---|---|
 | **`Tessera`** | The headless SDK: MRZ parsing / validation / generation plus the AVFoundation + Apple Vision live-camera scanner, vended as the `Tessera` XCFramework (built from the [main project](https://github.com/lightine-io/tessera) and attached to its GitHub release). |
-| **`TesseraUI`** | *(shipped in `0.5.0`)* The optional default MRZ scanner UI — hand-written SwiftUI layered over the headless `Tessera` APIs. A single entry view (`MrzScannerView`) plus `MrzScannerConfig` and a result callback; live-camera, saved-photo, and manual-entry reading with a review step, localized copy, and VoiceOver support. Its public surface is frozen as of the `0.5.0` tag ([ADR-007](https://lightine.youtrack.cloud/articles/TES-A-37)), lockstep-versioned with `Tessera`. |
+| **`TesseraUI`** | *(shipped in `0.5.0`)* The optional default MRZ scanner UI — hand-written SwiftUI layered over the headless `Tessera` APIs. A single entry view (`MrzScannerView`) plus `MrzScannerConfig` and a result callback; live-camera, saved-photo, and manual-entry reading with a review step, localized copy, and VoiceOver support. A host app can override any of the UI's own strings by setting `MrzScannerConfig.stringsBundle` and defining the same keys in its own `Localizable` table — any key it does not define keeps the module's wording. Its public surface is frozen as of the `0.5.0` tag ([ADR-007](https://lightine.youtrack.cloud/articles/TES-A-37)), lockstep-versioned with `Tessera`. |
 
 Import only what you need — `import Tessera` for the headless SDK, `import TesseraUI` for the default UI (which re-exports the headless types it hands back).
 

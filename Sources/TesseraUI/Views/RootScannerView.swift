@@ -89,12 +89,12 @@ struct RootScannerView: View {
                             .background(.black.opacity(0.45), in: Circle())
                     }
                     .padding(16)
-                    .accessibilityLabel(String(localized: "tessera_scanner_torch", bundle: .module))
+                    .accessibilityLabel(TesseraStrings.string("tessera_scanner_torch", bundle: config.stringsBundle))
                     .accessibilityAddTraits(model.torchOn ? .isSelected : [])
                     .accessibilityValue(
                         model.torchOn
-                            ? String(localized: "tessera_scanner_torch_state_on", bundle: .module)
-                            : String(localized: "tessera_scanner_torch_state_off", bundle: .module)
+                            ? TesseraStrings.string("tessera_scanner_torch_state_on", bundle: config.stringsBundle)
+                            : TesseraStrings.string("tessera_scanner_torch_state_off", bundle: config.stringsBundle)
                     )
                     .accessibilityIdentifier("tessera-mrz-torch")
                 }

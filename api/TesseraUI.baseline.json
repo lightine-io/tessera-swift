@@ -1858,6 +1858,103 @@
       "usr": "s:9TesseraUI16MrzScannerConfigV19onRequestPermissionyyYbcSgvp"
      },
      {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Bundle",
+            "printedName": "Foundation.Bundle",
+            "usr": "c:objc(cs)NSBundle"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Foundation.Bundle?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV13stringsBundleSo8NSBundleCSgvg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV13stringsBundleSo8NSBundleCSgvg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Bundle",
+            "printedName": "Foundation.Bundle",
+            "usr": "c:objc(cs)NSBundle"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Foundation.Bundle?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV13stringsBundleSo8NSBundleCSgvs",
+        "moduleName": "TesseraUI",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV13stringsBundleSo8NSBundleCSgvs"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Bundle",
+          "printedName": "Foundation.Bundle",
+          "usr": "c:objc(cs)NSBundle"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Foundation.Bundle?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declAttributes": [
+       "HasInitialValue",
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI16MrzScannerConfigV13stringsBundleSo8NSBundleCSgvp",
+      "moduleName": "TesseraUI",
+      "name": "stringsBundle",
+      "printedName": "stringsBundle",
+      "usr": "s:9TesseraUI16MrzScannerConfigV13stringsBundleSo8NSBundleCSgvp"
+     },
+     {
       "children": [
        {
         "kind": "TypeNominal",
@@ -1977,16 +2074,31 @@
         "name": "Optional",
         "printedName": "(() -> Swift.Void)?",
         "usr": "s:Sq"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Bundle",
+          "printedName": "Foundation.Bundle",
+          "usr": "c:objc(cs)NSBundle"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Foundation.Bundle?",
+        "usr": "s:Sq"
        }
       ],
       "declKind": "Constructor",
       "init_kind": "Designated",
       "kind": "Constructor",
-      "mangledName": "$s9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR014hapticFeedback5theme19onRequestPermissionACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgATSbAA0cD5ThemeVyyYbcSgtcfc",
+      "mangledName": "$s9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR014hapticFeedback5theme19onRequestPermission13stringsBundleACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgAUSbAA0cD5ThemeVyyYbcSgSo8NSBundleCSgtcfc",
       "moduleName": "TesseraUI",
       "name": "init",
-      "printedName": "init(enabledMethods:reviewMode:showTorchButton:torchOnByDefault:struggleTimeout:scanTimeout:hapticFeedback:theme:onRequestPermission:)",
-      "usr": "s:9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR014hapticFeedback5theme19onRequestPermissionACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgATSbAA0cD5ThemeVyyYbcSgtcfc"
+      "printedName": "init(enabledMethods:reviewMode:showTorchButton:torchOnByDefault:struggleTimeout:scanTimeout:hapticFeedback:theme:onRequestPermission:stringsBundle:)",
+      "usr": "s:9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR014hapticFeedback5theme19onRequestPermission13stringsBundleACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgAUSbAA0cD5ThemeVyyYbcSgSo8NSBundleCSgtcfc"
      }
     ],
     "conformances": [

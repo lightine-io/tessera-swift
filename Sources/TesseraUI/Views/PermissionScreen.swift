@@ -27,6 +27,7 @@ import SwiftUI
 /// is never passed here (the gate shows the live preview instead); guarded defensively as a no-op. Mirrors the
 /// Android `PermissionContent` / `PermissionScaffold`.
 internal struct PermissionScreen: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     let state: PermissionScreenState
     let onGrant: () -> Void
     let onOpenSettings: () -> Void
@@ -40,11 +41,11 @@ internal struct PermissionScreen: View {
         case .needsGrant:
             PermissionScaffold(
                 accessibilityIdentifier: "tessera-mrz-permission-grant",
-                title: String(localized: "tessera_scanner_permission_grant_title", bundle: .module),
-                bodyText: String(localized: "tessera_scanner_permission_grant_body", bundle: .module),
+                title: TesseraStrings.string("tessera_scanner_permission_grant_title", bundle: stringsBundle),
+                bodyText: TesseraStrings.string("tessera_scanner_permission_grant_body", bundle: stringsBundle),
                 // Grant hands the request to the host; without a handler there is nothing to call, so no dead
                 // button is drawn (only the rationale + the manual-entry escape remain).
-                primaryLabel: hasRequestHandler ? String(localized: "tessera_scanner_permission_grant_action", bundle: .module) : nil,
+                primaryLabel: hasRequestHandler ? TesseraStrings.string("tessera_scanner_permission_grant_action", bundle: stringsBundle) : nil,
                 onPrimary: onGrant,
                 onManualEntry: onManualEntry,
                 showManualEntry: showManualEntry
@@ -53,10 +54,10 @@ internal struct PermissionScreen: View {
         case .permanentlyDenied:
             PermissionScaffold(
                 accessibilityIdentifier: "tessera-mrz-permission-denied",
-                title: String(localized: "tessera_scanner_permission_denied_title", bundle: .module),
-                bodyText: String(localized: "tessera_scanner_permission_denied_body", bundle: .module),
+                title: TesseraStrings.string("tessera_scanner_permission_denied_title", bundle: stringsBundle),
+                bodyText: TesseraStrings.string("tessera_scanner_permission_denied_body", bundle: stringsBundle),
                 // Open Settings is the UI's own navigation — always available in this mode.
-                primaryLabel: String(localized: "tessera_scanner_permission_open_settings", bundle: .module),
+                primaryLabel: TesseraStrings.string("tessera_scanner_permission_open_settings", bundle: stringsBundle),
                 onPrimary: onOpenSettings,
                 onManualEntry: onManualEntry,
                 showManualEntry: showManualEntry
@@ -75,6 +76,7 @@ internal struct PermissionScreen: View {
 /// copy, and which callback the primary action fires — everything structural is shared here. Mirrors the
 /// Android private `PermissionScaffold`.
 private struct PermissionScaffold: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     let accessibilityIdentifier: String
     let title: String
     let bodyText: String
@@ -114,7 +116,7 @@ private struct PermissionScaffold: View {
                 Button {
                     onManualEntry()
                 } label: {
-                    Text(String(localized: "tessera_scanner_camera_manual", bundle: .module))
+                    Text(TesseraStrings.string("tessera_scanner_camera_manual", bundle: stringsBundle))
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)

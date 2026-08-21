@@ -35,7 +35,10 @@ public struct MrzScannerView: View {
 
     public var body: some View {
         // The state-machine-driven UI: RootScannerView owns the ScannerModel, dispatches the matching screen
-        // under the shared ScannerScaffold chrome, and applies the theme.
+        // under the shared ScannerScaffold chrome, and applies the theme. The strings-bundle override (TES-139)
+        // is injected here, once, so every descendant screen's ``TesseraStrings/string(_:bundle:)`` call sees
+        // it without config being threaded through each view's initializer.
         RootScannerView(config: config, onResult: onResult)
+            .environment(\.tesseraStringsBundle, config.stringsBundle)
     }
 }

@@ -14,16 +14,17 @@ import Tessera
 /// on-device privacy fact) and a single action that re-opens the picker. Mirrors the Android
 /// `AwaitingSavedImagePickContent`.
 internal struct AwaitingSavedImagePickScreen: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     let onChoosePhoto: () -> Void
 
     var body: some View {
         VStack(spacing: 16) {
             VStack(spacing: 12) {
                 Spacer()
-                Text(String(localized: "tessera_scanner_saved_image_prompt_title", bundle: .module))
+                Text(TesseraStrings.string("tessera_scanner_saved_image_prompt_title", bundle: stringsBundle))
                     .font(.title2.weight(.semibold))
                     .multilineTextAlignment(.center)
-                Text(String(localized: "tessera_scanner_saved_image_prompt_body", bundle: .module))
+                Text(TesseraStrings.string("tessera_scanner_saved_image_prompt_body", bundle: stringsBundle))
                     .font(.body)
                     .multilineTextAlignment(.center)
                 Spacer()
@@ -31,7 +32,7 @@ internal struct AwaitingSavedImagePickScreen: View {
             .frame(maxWidth: .infinity)
 
             Button(action: onChoosePhoto) {
-                Text(String(localized: "tessera_scanner_saved_image_prompt_action", bundle: .module))
+                Text(TesseraStrings.string("tessera_scanner_saved_image_prompt_action", bundle: stringsBundle))
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
@@ -52,9 +53,11 @@ internal struct AwaitingSavedImagePickScreen: View {
 /// Android polite live region; the spinner is decorative and hidden from the accessibility tree. Mirrors the
 /// Android `SavedImageAnalyzingContent`.
 internal struct SavedImageAnalyzingScreen: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
+
     var body: some View {
         VStack(spacing: 16) {
-            Text(String(localized: "tessera_scanner_saved_image_analyzing_title", bundle: .module))
+            Text(TesseraStrings.string("tessera_scanner_saved_image_analyzing_title", bundle: stringsBundle))
                 .font(.title2.weight(.semibold))
                 .accessibilityAddTraits(.updatesFrequently)
 
@@ -62,7 +65,7 @@ internal struct SavedImageAnalyzingScreen: View {
                 .controlSize(.large)
                 .accessibilityHidden(true)
 
-            Text(String(localized: "tessera_scanner_saved_image_analyzing_reading", bundle: .module))
+            Text(TesseraStrings.string("tessera_scanner_saved_image_analyzing_reading", bundle: stringsBundle))
                 .font(.body)
         }
         .multilineTextAlignment(.center)
@@ -85,6 +88,7 @@ internal struct SavedImageAnalyzingScreen: View {
 ///   - onChooseDifferent: re-launch the photo picker.
 ///   - onManualEntry: switch to manual raw-MRZ entry.
 internal struct SavedImageEmptyScreen: View {
+    @Environment(\.tesseraStringsBundle) private var stringsBundle
     let onChooseDifferent: () -> Void
     let onManualEntry: () -> Void
     /// Hidden when the consumer's `enabledMethods` excludes manual entry. Mirrors Android's `showManualEntry`.
@@ -92,22 +96,22 @@ internal struct SavedImageEmptyScreen: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(String(localized: "tessera_scanner_saved_image_empty_title", bundle: .module))
+            Text(TesseraStrings.string("tessera_scanner_saved_image_empty_title", bundle: stringsBundle))
                 .font(.title2.weight(.semibold))
-            Text(String(localized: "tessera_scanner_saved_image_empty_body", bundle: .module))
+            Text(TesseraStrings.string("tessera_scanner_saved_image_empty_body", bundle: stringsBundle))
                 .font(.body)
 
             Spacer()
 
             Button(action: onChooseDifferent) {
-                Text(String(localized: "tessera_scanner_saved_image_choose_different", bundle: .module))
+                Text(TesseraStrings.string("tessera_scanner_saved_image_choose_different", bundle: stringsBundle))
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
 
             if showManualEntry {
                 Button(action: onManualEntry) {
-                    Text(String(localized: "tessera_scanner_saved_image_manual", bundle: .module))
+                    Text(TesseraStrings.string("tessera_scanner_saved_image_manual", bundle: stringsBundle))
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.plain)

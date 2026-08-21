@@ -271,7 +271,7 @@ final class ScannerModel {
     private func postAnnouncement(key: String) {
         UIAccessibility.post(
             notification: .announcement,
-            argument: String(localized: String.LocalizationValue(key), bundle: .module)
+            argument: TesseraStrings.string(key, bundle: config.stringsBundle)
         )
     }
 
