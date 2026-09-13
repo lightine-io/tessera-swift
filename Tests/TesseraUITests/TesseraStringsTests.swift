@@ -49,3 +49,20 @@ struct TesseraStringsTests {
         #expect(!resolved.isEmpty)
     }
 }
+
+/// Coverage for the public seam itself (TES-142 release-gate QA finding): ``MrzScannerConfig/stringsBundle``
+/// is the entry point hosts actually use, so the stored property is pinned directly — defaulting to `nil`
+/// (module strings, unchanged behaviour) and carrying a host-supplied bundle through the defaulted init.
+struct MrzScannerConfigStringsBundleTests {
+    @Test func stringsBundle_defaults_to_nil() {
+        #expect(MrzScannerConfig().stringsBundle == nil)
+    }
+
+    @Test func stringsBundle_is_stored_from_the_init_parameter() {
+        let host = Bundle(for: BundleMarker.self)
+        let config = MrzScannerConfig(stringsBundle: host)
+        #expect(config.stringsBundle === host)
+    }
+
+    private final class BundleMarker {}
+}
