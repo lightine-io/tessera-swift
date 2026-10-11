@@ -516,21 +516,57 @@ struct SummaryRow: View {
     }
 }
 
-/// One MRZ / captured-OCR line: monospace, on its own horizontally-scrollable row so a long line is never
-/// wrapped or truncated (transparency — the consumer sees exactly what was read). Mirrors the Android
-/// `MonoLine`.
+/// The fit ladder `MonoLine` walks, widest look first. Exposed as data so the order is testable without
+/// rendering.
+enum MonoLineFit: CaseIterable {
+    /// Monospaced `.body`, on one line: the roomy look for iPad and other wide columns.
+    case body
+    /// Monospaced `.footnote`, on one line: fits a 44-character TD3 line in a phone column at the default text size.
+    case footnote
+    /// Monospaced `.body` in a horizontal scroll view with visible indicators: the last resort at large
+    /// accessibility text sizes. The only rung with a scroll affordance.
+    case scroll
+
+    /// Tried in order by `ViewThatFits`; `.scroll` is last because it always fits (it scrolls).
+    static let ladder: [MonoLineFit] = [.body, .footnote, .scroll]
+}
+
+/// One MRZ / captured-OCR line: monospace, shown whole on one row. A raw line is never wrapped, truncated, or
+/// altered (transparency - the consumer sees exactly what was read). A 44-character line is wider than a phone
+/// column at `.body`, so `MonoLine` walks `MonoLineFit.ladder`: `.body` if it fits, else `.footnote`, else a
+/// horizontal scroll view whose indicators are visible so clipping is never silent. Mirrors the Android `MonoLine`.
 struct MonoLine: View {
     let text: String
     init(_ text: String) { self.text = text }
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            Text(text)
-                .font(.system(.body, design: .monospaced))
-                .lineLimit(1)
-                .fixedSize(horizontal: true, vertical: false)
+        ViewThatFits(in: .horizontal) {
+            ForEach(MonoLineFit.ladder, id: \.self) { fit in
+                rung(fit)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private func rung(_ fit: MonoLineFit) -> some View {
+        switch fit {
+        case .body:
+            line(.body)
+        case .footnote:
+            line(.footnote)
+        case .scroll:
+            ScrollView(.horizontal, showsIndicators: true) {
+                line(.body)
+            }
+        }
+    }
+
+    private func line(_ style: Font.TextStyle) -> some View {
+        Text(text)
+            .font(.system(style, design: .monospaced))
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
     }
 }
 
