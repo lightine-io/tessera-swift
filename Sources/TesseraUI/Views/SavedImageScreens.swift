@@ -40,6 +40,9 @@ internal struct AwaitingSavedImagePickScreen: View {
         .padding(24)
         .frame(maxHeight: .infinity)
         .contentMaxWidth()
+        // Compact height (iPhone landscape): the whole screen scrolls as one column so the text keeps its
+        // natural height and the actions follow it, instead of the text being squeezed (TES-153).
+        .scrollsInCompactHeight()
         .accessibilityIdentifier("tessera-saved-image-awaiting-pick")
     }
 }
@@ -120,6 +123,9 @@ internal struct SavedImageEmptyScreen: View {
         .padding(24)
         .frame(maxHeight: .infinity)
         .contentMaxWidth()
+        // Compact height (iPhone landscape): the whole screen scrolls as one column so the text keeps its
+        // natural height and the actions follow it, instead of the text being squeezed (TES-153).
+        .scrollsInCompactHeight()
         .accessibilityIdentifier("tessera-saved-image-empty")
     }
 }

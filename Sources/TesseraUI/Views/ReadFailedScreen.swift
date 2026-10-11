@@ -25,7 +25,7 @@ internal struct ReadFailedScreen: View {
     let showManualEntry: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        PinnedActionsLayout {
             Text(TesseraStrings.string("tessera_scanner_read_failed_title", bundle: stringsBundle))
                 .font(.title2.weight(.semibold))
                 // A decode-landing too (OCR text that didn't parse) — announced on arrival so the outcome
@@ -35,23 +35,23 @@ internal struct ReadFailedScreen: View {
             Text(TesseraStrings.string("tessera_scanner_read_failed_body", bundle: stringsBundle))
                 .font(.body)
                 .foregroundStyle(.secondary)
-
-            // The body + captured text scroll; the two actions stay pinned below and always reachable.
-            ScrollView {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(TesseraStrings.string("tessera_scanner_read_failed_captured_header", bundle: stringsBundle))
-                        .font(.subheadline.weight(.semibold))
-                    // Forced left-to-right regardless of the ambient locale — an MRZ is always printed
-                    // left-to-right per ICAO 9303, and RTL would otherwise mirror the visual order of a
-                    // string that must stay verbatim (Principle 5). Mirrors `ReviewScreen`'s own raw-MRZ use.
-                    ForEach(Array(capturedText.lines.enumerated()), id: \.offset) { _, line in
-                        MonoLine(line.text)
-                    }
-                    .environment(\.layoutDirection, .leftToRight)
+        } scrolling: {
+            // The captured text scrolls; the two actions stay pinned below and always reachable. In compact
+            // height (iPhone landscape) the whole screen scrolls as one column instead (TES-153,
+            // `PinnedActionsLayout`).
+            VStack(alignment: .leading, spacing: 4) {
+                Text(TesseraStrings.string("tessera_scanner_read_failed_captured_header", bundle: stringsBundle))
+                    .font(.subheadline.weight(.semibold))
+                // Forced left-to-right regardless of the ambient locale — an MRZ is always printed
+                // left-to-right per ICAO 9303, and RTL would otherwise mirror the visual order of a
+                // string that must stay verbatim (Principle 5). Mirrors `ReviewScreen`'s own raw-MRZ use.
+                ForEach(Array(capturedText.lines.enumerated()), id: \.offset) { _, line in
+                    MonoLine(line.text)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .environment(\.layoutDirection, .leftToRight)
             }
-
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } actions: {
             Button(action: onTryAgain) {
                 Text(TesseraStrings.string("tessera_scanner_read_failed_try_again", bundle: stringsBundle))
                     .frame(maxWidth: .infinity)
@@ -68,9 +68,6 @@ internal struct ReadFailedScreen: View {
                 .accessibilityIdentifier("tessera-mrz-read-failed-manual")
             }
         }
-        .padding(24)
-        .contentMaxWidth()
-        .frame(maxHeight: .infinity)
         .accessibilityIdentifier("tessera-mrz-read-failed")
     }
 }

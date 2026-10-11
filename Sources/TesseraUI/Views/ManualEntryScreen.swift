@@ -33,73 +33,73 @@ internal struct ManualEntryScreen: View {
     let onRead: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        PinnedActionsLayout {
             Text(TesseraStrings.string("tessera_scanner_manual_title", bundle: stringsBundle))
                 .font(.title2.weight(.semibold))
-
-            // The field + observations scroll; the two actions stay pinned below and always reachable —
-            // mirrors the Android split between the scrollable Column and the pinned buttons.
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    // Monospace, multi-line text field bound to the typed text. Uppercase + no autocorrect: an
-                    // MRZ is upper-case A–Z / 0–9 / '<', and autocorrect would fight the user — but this only
-                    // shapes the soft keyboard, it does not rewrite what is already typed (reader, not oracle).
-                    // Forced left-to-right regardless of the ambient locale: an MRZ is always printed
-                    // left-to-right per ICAO 9303, and RTL would mirror a string that must stay verbatim.
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(TesseraStrings.string("tessera_scanner_manual_field_label", bundle: stringsBundle))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        TextEditor(
-                            text: Binding(
-                                get: { text },
-                                set: { onTextChange($0) }
-                            )
+        } scrolling: {
+            // The field + observations scroll; the action stays pinned below and always reachable — mirrors
+            // the Android split between the scrollable Column and the pinned buttons. In compact height
+            // (iPhone landscape) the whole screen scrolls as one column instead, the field near the top, so
+            // keyboard avoidance can bring it into view (TES-153, `PinnedActionsLayout`).
+            VStack(alignment: .leading, spacing: 16) {
+                // Monospace, multi-line text field bound to the typed text. Uppercase + no autocorrect: an
+                // MRZ is upper-case A–Z / 0–9 / '<', and autocorrect would fight the user — but this only
+                // shapes the soft keyboard, it does not rewrite what is already typed (reader, not oracle).
+                // Forced left-to-right regardless of the ambient locale: an MRZ is always printed
+                // left-to-right per ICAO 9303, and RTL would mirror a string that must stay verbatim.
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(TesseraStrings.string("tessera_scanner_manual_field_label", bundle: stringsBundle))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    TextEditor(
+                        text: Binding(
+                            get: { text },
+                            set: { onTextChange($0) }
                         )
-                        .font(.system(.body, design: .monospaced))
-                        .textInputAutocapitalization(.characters)
-                        .autocorrectionDisabled(true)
-                        .keyboardType(.asciiCapable)
-                        .environment(\.layoutDirection, .leftToRight)
-                        .frame(minHeight: 90)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
-                        )
-                        .accessibilityIdentifier("tessera-mrz-manual-raw-field")
-                        .accessibilityLabel(TesseraStrings.string("tessera_scanner_manual_field_label", bundle: stringsBundle))
-                    }
+                    )
+                    .font(.system(.body, design: .monospaced))
+                    .textInputAutocapitalization(.characters)
+                    .autocorrectionDisabled(true)
+                    .keyboardType(.asciiCapable)
+                    .environment(\.layoutDirection, .leftToRight)
+                    .frame(minHeight: 90)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
+                    )
+                    .accessibilityIdentifier("tessera-mrz-manual-raw-field")
+                    .accessibilityLabel(TesseraStrings.string("tessera_scanner_manual_field_label", bundle: stringsBundle))
+                }
 
-                    Divider()
+                Divider()
 
-                    Text(TesseraStrings.string("tessera_scanner_review_observations_header", bundle: stringsBundle))
-                        .font(.subheadline.weight(.semibold))
-                    VStack(alignment: .leading, spacing: 6) {
-                        ForEach(Array(observations.enumerated()), id: \.offset) { _, note in
-                            Label {
-                                Text(note)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            } icon: {
-                                Text("ⓘ").font(.caption).foregroundStyle(.secondary)
-                            }
+                Text(TesseraStrings.string("tessera_scanner_review_observations_header", bundle: stringsBundle))
+                    .font(.subheadline.weight(.semibold))
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(Array(observations.enumerated()), id: \.offset) { _, note in
+                        Label {
+                            Text(note)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        } icon: {
+                            Text("ⓘ").font(.caption).foregroundStyle(.secondary)
                         }
                     }
+                }
 
-                    // The inline parse-failed note, AFTER the observations, right before the action button —
-                    // an error, not a neutral note (mirrors the Android `parseFailed` inline path and its
-                    // `colorScheme.error` styling). The typed text stays, and any edit clears it. Never a jump
-                    // to the read-failed screen — that screen's "blurred or partial" framing mislabels typed
-                    // input.
-                    if parseFailed {
-                        Text(TesseraStrings.string("tessera_scanner_manual_parse_failed", bundle: stringsBundle))
-                            .font(.caption)
-                            .foregroundStyle(.red)
-                            .accessibilityIdentifier("tessera-mrz-manual-parse-failed")
-                    }
+                // The inline parse-failed note, AFTER the observations, right before the action button —
+                // an error, not a neutral note (mirrors the Android `parseFailed` inline path and its
+                // `colorScheme.error` styling). The typed text stays, and any edit clears it. Never a jump
+                // to the read-failed screen — that screen's "blurred or partial" framing mislabels typed
+                // input.
+                if parseFailed {
+                    Text(TesseraStrings.string("tessera_scanner_manual_parse_failed", bundle: stringsBundle))
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                        .accessibilityIdentifier("tessera-mrz-manual-parse-failed")
                 }
             }
-
+        } actions: {
             // Disabled while the field is blank — there is nothing to read, and attempting an empty parse
             // would otherwise report a "couldn't read" as if the input were malformed rather than simply
             // absent (mirrors the Android `enabled = state.text.isNotBlank()`).
@@ -113,9 +113,6 @@ internal struct ManualEntryScreen: View {
             .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             .accessibilityIdentifier("tessera-mrz-manual-read")
         }
-        .padding(24)
-        .contentMaxWidth()
-        .frame(maxHeight: .infinity)
         .accessibilityIdentifier("tessera-mrz-manual-raw")
     }
 
