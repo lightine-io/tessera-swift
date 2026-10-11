@@ -512,14 +512,19 @@ struct SummaryRow: View {
 enum MonoLineFit: CaseIterable {
     /// Monospaced `.body`, on one line: the roomy look for iPad and other wide columns.
     case body
-    /// Monospaced `.footnote`, on one line: fits a 44-character TD3 line in a phone column at the default text size.
+    /// Monospaced `.footnote`, on one line: fits a 44-character TD3 line in a 354pt column (the 402pt-wide
+    /// iPhones) at the default text size.
     case footnote
+    /// Monospaced `.caption`, on one line: fits 44 characters in the 345pt column of the 393pt-wide iPhones.
+    case caption
+    /// Monospaced `.caption2`, on one line: fits 44 characters in the 327pt column of the 375pt-wide iPhones.
+    case caption2
     /// Monospaced `.body` in a horizontal scroll view with visible indicators: the last resort at large
     /// accessibility text sizes. The only rung with a scroll affordance.
     case scroll
 
     /// Tried in order by `ViewThatFits`; `.scroll` is last because it always fits (it scrolls).
-    static let ladder: [MonoLineFit] = [.body, .footnote, .scroll]
+    static let ladder: [MonoLineFit] = [.body, .footnote, .caption, .caption2, .scroll]
 }
 
 /// One MRZ / captured-OCR line: monospace, shown whole on one row. A raw line is never wrapped, truncated, or
@@ -546,6 +551,10 @@ struct MonoLine: View {
             line(.body)
         case .footnote:
             line(.footnote)
+        case .caption:
+            line(.caption)
+        case .caption2:
+            line(.caption2)
         case .scroll:
             ScrollView(.horizontal, showsIndicators: true) {
                 line(.body)
