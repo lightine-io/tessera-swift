@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// The shared chrome — the iOS mirror of the Android `ScannerScaffold`. A top bar whose leading ✕ owns the
 /// global cancel (reachable on every screen), a stable title, and — on the capture / entry screens only, and
@@ -20,26 +21,56 @@ struct ScannerScaffold<Content: View>: View {
     var timeRemaining: Duration? = nil
     @ViewBuilder let content: () -> Content
 
+    /// Whether a docked keyboard (or its hardware-keyboard shortcut bar) covers the bottom of the screen.
+    /// Driven by the keyboard frame notifications: SwiftUI geometry readings could not tell the two apart
+    /// here: on the simulator the body area and a keyboard-ignoring layer measured the same height.
+    @State private var keyboardCoversFooter = false
+
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                if showsMethodSwitcher(currentState) {
-                    MethodSwitcher(
-                        enabledMethods: enabledMethods,
-                        currentState: currentState,
-                        onSelectMethod: onSelectMethod
-                    )
+            ZStack {
+                VStack(spacing: 0) {
+                    if showsMethodSwitcher(currentState) {
+                        MethodSwitcher(
+                            enabledMethods: enabledMethods,
+                            currentState: currentState,
+                            onSelectMethod: onSelectMethod
+                        )
+                    }
+                    content()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                content()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-            // "Powered by Tessera" attribution, shown once on every screen — a quiet, theme-coloured footer
-            // that respects the safe area (`.safeAreaInset` is the SwiftUI idiom for a persistent bottom bar
-            // that never overlaps scrollable content, mirroring the Android Scaffold's `bottomBar`).
-            // Overridable like every `tessera_*` key: a blank resolved string renders nothing at all
-            // (`PoweredByFooter`), so the opt-out actually reclaims the space.
-            .safeAreaInset(edge: .bottom, spacing: 0) {
+                // "Powered by Tessera" attribution, shown once on every screen — a quiet, theme-coloured
+                // footer that respects the safe area. The content reserves the footer's exact height with a
+                // hidden copy in `.safeAreaInset` (the SwiftUI idiom for a persistent bottom bar that never
+                // overlaps scrollable content, mirroring the Android Scaffold's `bottomBar`); the visible
+                // footer is drawn in the layer below. Overridable like every `tessera_*` key: a blank
+                // resolved string renders nothing at all (`PoweredByFooter`), so the opt-out actually
+                // reclaims the space.
+                //
+                // While the keyboard is up the reservation is dropped, so the content still avoids the
+                // keyboard exactly (TES-153) without a blank band above it — the keyboard is part of the
+                // safe area, and an inset would otherwise stack on top of it.
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    if !keyboardCoversFooter {
+                        PoweredByFooter().hidden()
+                    }
+                }
+
+                // The visible footer ignores ONLY the keyboard safe area, so it stays at the physical
+                // bottom of the screen (behind the keyboard) instead of riding on the keyboard's top edge —
+                // matching the Android footer, which stays below the IME (TES-156). The container safe area
+                // (home indicator) is still respected, so with the keyboard down it sits exactly where the
+                // hidden copy reserves space.
                 PoweredByFooter()
+                    .frame(maxHeight: .infinity, alignment: .bottom)
+                    .ignoresSafeArea(.keyboard, edges: .bottom)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) {
+                keyboardCoversFooter = keyboardReachesScreenBottom($0)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+                keyboardCoversFooter = false
             }
             .navigationTitle(TesseraStrings.string("tessera_scanner_title", bundle: stringsBundle))
             .navigationBarTitleDisplayMode(.inline)
@@ -72,8 +103,21 @@ struct ScannerScaffold<Content: View>: View {
     }
 }
 
-/// The "Powered by Tessera" attribution footer, shown once on every screen via the scaffold's safe-area
-/// inset. A quiet, secondary-styled line so it adapts to light / dark and never competes with the content.
+/// Whether the keyboard's end frame in a keyboard-frame notification is on screen AND reaches the bottom
+/// edge — a docked keyboard or a hardware-keyboard shortcut bar, which cover the footer. A floating (iPad)
+/// keyboard does not reach the edge, so the footer stays reserved and visible. The notification's object is
+/// the screen the keyboard is on; without it the frame is treated as on-screen only if it has height.
+@MainActor
+private func keyboardReachesScreenBottom(_ note: Notification) -> Bool {
+    guard let frame = (note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
+          frame.height > 0 else { return false }
+    guard let screen = note.object as? UIScreen else { return true }
+    let bottom = screen.bounds.maxY
+    return frame.minY < bottom && frame.maxY >= bottom - 1
+}
+
+/// The "Powered by Tessera" attribution footer, shown once on every screen at the bottom of the scaffold. A
+/// quiet, secondary-styled line so it adapts to light / dark and never competes with the content.
 /// Overridable like every `tessera_*` key — a consumer can set an empty string to remove it: this renders
 /// nothing at all when the resolved string is blank, so the opt-out actually reclaims the space rather than
 /// leaving a blank, padded band. Mirrors the Android `PoweredByFooter`.
