@@ -95,38 +95,37 @@ internal struct ReviewScreen: View {
 
     // The summary + honest observations + disclosure (mockups 03 / 03b).
     private var summaryBody: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        PinnedActionsLayout {
             Text(TesseraStrings.string("tessera_scanner_review_title", bundle: stringsBundle))
                 .font(.title2.weight(.semibold))
                 // The review screen is the decode-landing: it appears the moment an MRZ is read. Announced on
                 // arrival so a screen-reader user hears the outcome ("MRZ read").
                 .accessibilityAddTraits(.isHeader)
-
+        } scrolling: {
             // The summary + observations + disclosure scroll; the two action buttons stay pinned below so they
-            // are always reachable however long the observation list grows.
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    VStack(spacing: 8) {
-                        ForEach(Array(reviewSummaryRows(reviewDocument).enumerated()), id: \.offset) { SummaryRow($0.element) }
-                    }
-
-                    Divider()
-
-                    Text(TesseraStrings.string("tessera_scanner_review_observations_header", bundle: stringsBundle))
-                        .font(.subheadline.weight(.semibold))
-                    // Mismatches + advisory + provenance ONLY — every passing check moves to the expanded view
-                    // (reviewObservations, unfiltered) rather than repeating a wall of ✓ rows here (TES-96).
-                    VStack(alignment: .leading, spacing: 6) {
-                        ForEach(Array(reviewSummaryObservations.enumerated()), id: \.offset) { ReviewObservationRow($0.element) }
-                    }
-
-                    Button(action: onToggleExpanded) {
-                        Text(TesseraStrings.string("tessera_scanner_review_show_all", bundle: stringsBundle))
-                    }
-                    .accessibilityIdentifier("tessera-mrz-review-show-all")
+            // are always reachable however long the observation list grows. In compact height (iPhone
+            // landscape) the whole screen scrolls as one column instead (TES-153, `PinnedActionsLayout`).
+            VStack(alignment: .leading, spacing: 16) {
+                VStack(spacing: 8) {
+                    ForEach(Array(reviewSummaryRows(reviewDocument).enumerated()), id: \.offset) { SummaryRow($0.element) }
                 }
-            }
 
+                Divider()
+
+                Text(TesseraStrings.string("tessera_scanner_review_observations_header", bundle: stringsBundle))
+                    .font(.subheadline.weight(.semibold))
+                // Mismatches + advisory + provenance ONLY — every passing check moves to the expanded view
+                // (reviewObservations, unfiltered) rather than repeating a wall of ✓ rows here (TES-96).
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(Array(reviewSummaryObservations.enumerated()), id: \.offset) { ReviewObservationRow($0.element) }
+                }
+
+                Button(action: onToggleExpanded) {
+                    Text(TesseraStrings.string("tessera_scanner_review_show_all", bundle: stringsBundle))
+                }
+                .accessibilityIdentifier("tessera-mrz-review-show-all")
+            }
+        } actions: {
             Button(action: onUse) {
                 Text(TesseraStrings.string("tessera_scanner_review_use", bundle: stringsBundle))
                     .frame(maxWidth: .infinity)
@@ -141,9 +140,6 @@ internal struct ReviewScreen: View {
             .buttonStyle(.bordered)
             .accessibilityIdentifier("tessera-mrz-review-rescan")
         }
-        .padding(24)
-        .contentMaxWidth()
-        .frame(maxHeight: .infinity)
         .accessibilityIdentifier("tessera-mrz-review")
     }
 
@@ -155,44 +151,42 @@ internal struct ReviewScreen: View {
     // to the summary.
     private var expandedBody: some View {
         let document = reviewDocument
-        return VStack(alignment: .leading, spacing: 16) {
+        return PinnedActionsLayout {
             Text(TesseraStrings.string("tessera_scanner_review_all_fields_title", bundle: stringsBundle))
                 .font(.title2.weight(.semibold))
                 .accessibilityAddTraits(.isHeader)
+        } scrolling: {
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(Array(reviewAllFieldRows(document).enumerated()), id: \.offset) { SummaryRow($0.element) }
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(Array(reviewAllFieldRows(document).enumerated()), id: \.offset) { SummaryRow($0.element) }
+                Divider()
 
-                    Divider()
-
-                    Text(TesseraStrings.string("tessera_scanner_review_observations_header", bundle: stringsBundle))
-                        .font(.subheadline.weight(.semibold))
-                    // The FULL set — every ✓ match and ‼ mismatch, plus provenance — unlike the summary's
-                    // mismatches-only view (TES-96).
-                    VStack(alignment: .leading, spacing: 6) {
-                        ForEach(Array(reviewObservations.enumerated()), id: \.offset) { ReviewObservationRow($0.element) }
-                    }
-
-                    Divider()
-
-                    Text(TesseraStrings.string("tessera_scanner_review_raw_mrz_header", bundle: stringsBundle))
-                        .font(.subheadline.weight(.semibold))
-                    // Forced left-to-right regardless of the ambient locale — an MRZ is always printed
-                    // left-to-right per ICAO 9303, and RTL would otherwise mirror the visual order of a string
-                    // that must stay verbatim (Principle 5).
-                    ForEach(Array(document.rawLines.enumerated()), id: \.offset) { _, line in
-                        MonoLine(line)
-                    }
-                    .environment(\.layoutDirection, .leftToRight)
-
-                    Button(action: onToggleExpanded) {
-                        Text(TesseraStrings.string("tessera_scanner_review_show_less", bundle: stringsBundle))
-                    }
-                    .accessibilityIdentifier("tessera-mrz-review-show-less")
+                Text(TesseraStrings.string("tessera_scanner_review_observations_header", bundle: stringsBundle))
+                    .font(.subheadline.weight(.semibold))
+                // The FULL set — every ✓ match and ‼ mismatch, plus provenance — unlike the summary's
+                // mismatches-only view (TES-96).
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(Array(reviewObservations.enumerated()), id: \.offset) { ReviewObservationRow($0.element) }
                 }
-            }
 
+                Divider()
+
+                Text(TesseraStrings.string("tessera_scanner_review_raw_mrz_header", bundle: stringsBundle))
+                    .font(.subheadline.weight(.semibold))
+                // Forced left-to-right regardless of the ambient locale — an MRZ is always printed
+                // left-to-right per ICAO 9303, and RTL would otherwise mirror the visual order of a string
+                // that must stay verbatim (Principle 5).
+                ForEach(Array(document.rawLines.enumerated()), id: \.offset) { _, line in
+                    MonoLine(line)
+                }
+                .environment(\.layoutDirection, .leftToRight)
+
+                Button(action: onToggleExpanded) {
+                    Text(TesseraStrings.string("tessera_scanner_review_show_less", bundle: stringsBundle))
+                }
+                .accessibilityIdentifier("tessera-mrz-review-show-less")
+            }
+        } actions: {
             Button(action: onUse) {
                 Text(TesseraStrings.string("tessera_scanner_review_use", bundle: stringsBundle))
                     .frame(maxWidth: .infinity)
@@ -209,9 +203,6 @@ internal struct ReviewScreen: View {
             .buttonStyle(.bordered)
             .accessibilityIdentifier("tessera-mrz-review-rescan")
         }
-        .padding(24)
-        .contentMaxWidth()
-        .frame(maxHeight: .infinity)
         .accessibilityIdentifier("tessera-mrz-review-expanded")
     }
 
