@@ -1,46 +1,84 @@
 # tessera-swift
 
-Swift Package Manager (SPM) distribution of **Tessera** — a vendor-neutral SDK for reading and validating identity-document data (Machine Readable Zones) — for iOS / Swift consumers.
+This repository is the Swift package for Tessera, the open-source SDK that reads, validates, and generates MRZ data. An MRZ (machine-readable zone) is the block of text lines printed at the bottom of a passport or ID card page. The package vends two products: `Tessera`, the XCFramework with the Kotlin core and the headless readers, and `TesseraUI`, the SwiftUI scanner screen. The current release is 0.5.1. The Kotlin source and the releases live in the [main repository](https://github.com/lightine-io/tessera). The SDK reports what it read, and your app decides what to do with it.
 
-> **Current release: `0.5.1`.** The optional SwiftUI default scanner UI (`TesseraUI`), plus headless live-camera, saved-image (pre-captured), and manual-entry MRZ reading (AVFoundation + Apple Vision) and the ICAO Doc 9303 parsing / validation / generation core, vended as the `Tessera` XCFramework.
+## Install
 
-## What this repository is
+In Xcode, choose **File > Add Package Dependencies**. Enter `https://github.com/lightine-io/tessera-swift` and set the dependency rule to **Exact Version** `0.5.1`. Add both products, `Tessera` and `TesseraUI`, to your app target.
 
-Tessera is built from a single Kotlin Multiplatform codebase. JVM and Android consumers get it from Maven Central; **iOS / Swift consumers get it here**, through Swift Package Manager. This repository hosts the `Package.swift` that vends the iOS products, and — from `0.5.0` — the hand-written SwiftUI default UI.
-
-## Products
-
-This package vends two library products:
-
-| Product | What it is |
-|---|---|
-| **`Tessera`** | The headless SDK: MRZ parsing / validation / generation plus the AVFoundation + Apple Vision live-camera scanner, vended as the `Tessera` XCFramework (built from the [main project](https://github.com/lightine-io/tessera) and attached to its GitHub release). |
-| **`TesseraUI`** | *(shipped in `0.5.0`)* The optional default MRZ scanner UI — hand-written SwiftUI layered over the headless `Tessera` APIs. A single entry view (`MrzScannerView`) plus `MrzScannerConfig` and a result callback; live-camera, saved-photo, and manual-entry reading with a review step, localized copy, and VoiceOver support. A host app can override any of the UI's own strings by setting `MrzScannerConfig.stringsBundle` and defining the same keys in its own `Localizable` table — any key it does not define keeps the module's wording. Its public surface is frozen as of the `0.5.0` tag ([ADR-007](https://lightine.youtrack.cloud/articles/TES-A-37)), lockstep-versioned with `Tessera`. |
-
-Import only what you need — `import Tessera` for the headless SDK, `import TesseraUI` for the default UI (which re-exports the headless types it hands back).
-
-## Using it
-
-In Xcode: **File → Add Package Dependencies…**, enter this repository's URL and choose version **`0.5.1`** (or "Up to Next Major"). Then:
+In a `Package.swift`, the same setup looks like this:
 
 ```swift
+.package(url: "https://github.com/lightine-io/tessera-swift", exact: "0.5.1"),
+// In your target's dependencies:
+.product(name: "Tessera", package: "tessera-swift"),
+.product(name: "TesseraUI", package: "tessera-swift"),
+```
+
+## Show the scanner
+
+Import both modules in the file that uses the scanner. `TesseraUI` does not re-export `Tessera`.
+
+```swift
+import AVFoundation
+import SwiftUI
 import Tessera
+import TesseraUI
+
+@main
+struct ScannerApp: App {
+    var body: some Scene {
+        WindowGroup {
+            MrzScannerView(
+                config: MrzScannerConfig(
+                    onRequestPermission: { AVCaptureDevice.requestAccess(for: .video) { _ in } }
+                )
+            ) { result in
+                switch result {
+                case let .confirmed(decoded):
+                    print("Confirmed: \(decoded.parse.metadata.readMethod.name)")
+                case let .cancelled(reason):
+                    print("Closed: \(reason)")
+                }
+                // Your app decides what happens next.
+            }
+        }
+    }
+}
 ```
 
-Or in a `Package.swift`:
+For the full walkthrough, with parsing and the output you should see, read [Read your first MRZ on iOS](https://lightine.youtrack.cloud/articles/TES-A-77). To parse every MRZ format and read the fields, read [MRZ parsing](https://lightine.youtrack.cloud/articles/TES-A-25).
 
-```swift
-dependencies: [
-    .package(url: "https://github.com/lightine-io/tessera-swift", from: "0.5.1"),
-]
+## Requirements
+
+- An iOS 18 or higher deployment target.
+- Xcode 16 or higher.
+- An `NSCameraUsageDescription` entry in your target's Info.plist, or iOS ends the app when it opens the camera:
+
+```xml
+<key>NSCameraUsageDescription</key>
+<string>The scanner reads the machine-readable zone of identity documents.</string>
 ```
 
-Minimum deployment target: **iOS 18**.
+## What is in the package
 
-> **The Swift surface is provisional through the `0.x` line.** How the Kotlin API projects to Swift — notably the camera scanner's result stream and `suspend` functions — may change before `1.0.0` as an idiomatic-Swift adapter is added. The underlying capabilities are stable; the Swift-facing shapes are not yet frozen.
+| Product | What it gives you |
+|---|---|
+| `Tessera` | The Kotlin core as an XCFramework: MRZ parsing, validation, and generation, plus the headless camera, saved-image, and manual-entry readers. |
+| `TesseraUI` | The SwiftUI scanner screen: `MrzScannerView`, `MrzScannerConfig`, and the result it returns. |
 
-## Links
+The Swift form of the `Tessera` API is provisional through 0.x. Swift sees the Kotlin shapes, and they may change before 1.0.0. The `TesseraUI` API is written in Swift.
 
-- **Main project & source:** https://github.com/lightine-io/tessera
-- **Release & XCFramework:** https://github.com/lightine-io/tessera/releases/tag/v0.5.1
-- **License:** [Apache-2.0](LICENSE)
+## Documentation
+
+- [Use the SDK](https://lightine.youtrack.cloud/articles/TES-A-16) - guides and reference for every feature.
+- [Default scanner UI](https://lightine.youtrack.cloud/articles/TES-A-74) - set the reading methods, review step, theme, and text.
+- [Release 0.5.1](https://github.com/lightine-io/tessera/releases/tag/v0.5.1) - the release notes and the XCFramework.
+
+## Contributing
+
+To help build Tessera, read [CONTRIBUTING.md](https://github.com/lightine-io/tessera/blob/main/CONTRIBUTING.md) in the main repository. The [Contribute](https://lightine.youtrack.cloud/articles/TES-A-78) pages cover setup, architecture, testing, and conventions.
+
+## License
+
+Apache License 2.0. See [LICENSE](LICENSE).
