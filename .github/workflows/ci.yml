@@ -38,6 +38,23 @@ jobs:
           sudo xcode-select -s "$XC"
           xcodebuild -version
 
+      - name: Ensure an iOS simulator runtime and device exist
+        run: |
+          # The runner image does not always ship a simulator runtime for the Xcode selected above
+          # (seen with Xcode 26.3 on macos-15: only placeholder destinations). Download it if missing,
+          # then use whatever iPhone is available instead of a hard-coded name.
+          if ! xcrun simctl list devices available | grep -q "iPhone"; then
+            sudo xcodebuild -downloadPlatform iOS
+          fi
+          DEV=$(xcrun simctl list devices available | grep -m1 -oE "iPhone[^(]*" | sed 's/ *$//')
+          if [ -z "$DEV" ]; then
+            RT=$(xcrun simctl list runtimes | grep -m1 -oE "com.apple.CoreSimulator.SimRuntime.iOS-[0-9-]+")
+            xcrun simctl create "CI iPhone" "${SIMULATOR}" "$RT"
+            DEV="CI iPhone"
+          fi
+          echo "Using simulator: $DEV"
+          echo "CI_SIMULATOR=$DEV" >> "$GITHUB_ENV"
+
       - name: Resolve package dependencies
         run: xcodebuild -resolvePackageDependencies -scheme TesseraUI
 
@@ -52,7 +69,7 @@ jobs:
         run: |
           xcodebuild test \
             -scheme Tessera-Package \
-            -destination "platform=iOS Simulator,name=${SIMULATOR}" \
+            -destination "platform=iOS Simulator,name=${CI_SIMULATOR:-$SIMULATOR}" \
             -skipPackagePluginValidation
 
       - name: Public-API guard (ADR-007 freeze)
