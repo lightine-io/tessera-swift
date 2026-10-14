@@ -3,15 +3,21 @@ name: CI
 # Builds, tests, and API-guards the TesseraUI SwiftUI product. String Catalogs and SwiftUI do not compile
 # under `swift build`, so everything runs through xcodebuild against an iOS Simulator (ADR-026 §4/§5).
 #
-# The ADR-025 automated release PR (which bumps the Tessera XCFramework url/checksum) must require these
-# jobs as status checks, so a UI-breaking XCFramework change fails the release instead of shipping a broken
-# tag. Wiring the required checks is a one-time branch-protection setting on this repo.
+# Not a required check today: the "protect main" ruleset has no status-check rule, and the main
+# repository's release workflow merges its Package.swift pin PR without waiting for this workflow.
+# Making it a gate needs both a ruleset change here and a wait-for-checks step in release.yml
+# (tracked as an issue; see the main repository's .claude/skills/release-gate/SKILL.md, gate 9).
+#
+# Every action is pinned to a full commit SHA with a version comment, as in the main repository.
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+
+permissions:
+  contents: read
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -26,7 +32,10 @@ jobs:
       XCODE_VERSION: "26.6"
       SIMULATOR: "iPhone 17"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: No real document data (MRZ guard)
+        run: bash scripts/private-content-scan.sh --mrz-only
 
       - name: Select Xcode (latest ${{ env.XCODE_VERSION }}.x on the runner)
         run: |
