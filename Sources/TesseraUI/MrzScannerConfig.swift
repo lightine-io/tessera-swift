@@ -36,6 +36,10 @@ public enum ScanMethod: Sendable, Hashable {
 
 /// Sets whether the scanner screen shows a review step after a read.
 ///
+/// The same in both modes: a saved photo that fails to parse shows the read-failed screen, and a photo
+/// with no MRZ shows "No MRZ found in this photo". Typed input that fails to parse stays on the manual
+/// screen with a note. The live camera skips a frame that fails to parse and keeps looking.
+///
 /// - Since: 0.5.0
 public enum ReviewMode: Sendable, Hashable {
     /// Shows the parsed fields and observations, and the user accepts or rescans.
@@ -44,8 +48,6 @@ public enum ReviewMode: Sendable, Hashable {
     case review
 
     /// Returns the decoded result at once, with no review step.
-    ///
-    /// A read that fails to parse still shows the read-failed screen.
     case instantReturn
 }
 
