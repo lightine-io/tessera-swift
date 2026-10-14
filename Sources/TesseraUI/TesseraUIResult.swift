@@ -2,37 +2,38 @@ import Tessera
 
 // The result surface, the iOS analogue of the Android module's `MrzScannerResult`. Frozen at the 0.5.0 tag.
 
-/// Why the scanner UI dismissed without a confirmed result. Mirrors the Android `DismissReason`.
+/// Tells why the scanner screen closed without a confirmed reading.
+///
+/// The close button is the only way to `.userDismissed`. The screen sets no swipe-down handling.
+///
+/// - Since: 0.5.0
 public enum DismissReason: Sendable, Hashable {
-    /// The user dismissed the scanner (the ✕/back affordance).
+    /// The user pressed the close button.
+    ///
+    /// This includes closing the "camera is in use" notice.
     case userDismissed
 
-    /// ``MrzScannerConfig/scanTimeout`` elapsed with no decode.
+    /// ``MrzScannerConfig/scanTimeout`` ran out, on whichever screen was showing.
     case timedOut
 
-    /// The camera could not be started (a terminal capture error) and the user closed the flow from that
-    /// screen. The recoverable camera-in-use notice is NOT this — closing from it is ``userDismissed``.
+    /// The camera could not start and the user closed that error screen.
     case cameraUnavailable
 
-    /// The camera permission was not granted and the user closed the flow from a permission screen (grant
-    /// or permanently-denied) rather than granting it or continuing another way.
+    /// The user closed a camera permission screen without granting access.
     case permissionDenied
 }
 
-/// The outcome the scanner UI hands back to the host. The iOS analogue of the Android
-/// `MrzScannerResult` (`Confirmed` / `Cancelled`).
+/// The result `MrzScannerView` passes to its callback.
 ///
-/// - ``confirmed(_:)`` carries the decoded MRZ verbatim — the same `MrzScanResult.Decoded` the headless
-///   SDK produces (full `ParseResult`, recognized text, and scan quality). Reader, not oracle: the UI
-///   reports what was read; it makes no trust decision.
-/// - ``cancelled(_:)`` carries the reason the UI closed without a confirmed result.
+/// Not `Sendable`: `.confirmed` holds a Kotlin object. Keep the decoded value on the main actor.
 ///
-/// Not `Sendable`: ``confirmed(_:)`` wraps the SDK's `MrzScanResult.Decoded`, a Kotlin/Native-exported
-/// reference type that is not `Sendable`. The result is delivered on the main actor via ``MrzScannerView``.
+/// - Since: 0.5.0
 public enum TesseraUIResult {
-    /// The user confirmed a decoded MRZ. Carries the SDK's own `MrzScanResult.Decoded`.
+    /// A decoded MRZ whose parse is a success or partial success.
+    ///
+    /// It is never a failure. A photo read inside the screen carries no capture metadata. The value holds document data.
     case confirmed(MrzScanResultDecoded)
 
-    /// The UI closed without a confirmed result; see ``DismissReason``.
+    /// The screen closed without a confirmed reading; see ``DismissReason``.
     case cancelled(DismissReason)
 }
