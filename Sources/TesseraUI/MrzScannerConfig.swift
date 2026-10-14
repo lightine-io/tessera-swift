@@ -11,34 +11,53 @@ import SwiftUI
 // Reader, not oracle (Principle 1): nothing here lets the UI make a trust decision about a document. The
 // knobs govern which methods appear, the review step, appearance, timing, and the permission hand-off.
 
-/// A reading method the default scanner UI can offer. A consumer restricts the UI to a subset via
-/// ``MrzScannerConfig/enabledMethods``; the method switcher shows only the enabled ones.
+/// A way to read an MRZ that the scanner screen can offer.
+///
+/// Turn methods on with ``MrzScannerConfig/enabledMethods``.
+///
+/// - Since: 0.5.0
 public enum ScanMethod: Sendable, Hashable {
-    /// Live camera capture (the default primary method).
+    /// Reads from the live camera.
+    ///
+    /// On by default.
     case camera
 
-    /// Pick an existing photo and decode its MRZ. **Opt-in — not enabled by default** (saved-image reading
-    /// is opt-in because a saved image carries more risk than a live capture, ADR-023 / KB TES-A-62).
-    /// Adding it to ``MrzScannerConfig/enabledMethods`` is the consumer's acknowledgement of that risk;
-    /// there is no separate acknowledgement screen.
+    /// Reads from a photo the user picks.
+    ///
+    /// Off by default. Adding it to ``MrzScannerConfig/enabledMethods`` accepts the higher risk of a saved image.
+    /// A photo read inside the screen carries no capture metadata.
     case savedImage
 
-    /// Type the MRZ by hand — the accessible fallback.
+    /// Reads an MRZ the user types.
+    ///
+    /// On by default. Typed input that fails to parse stays on the manual screen, with the text kept.
     case manualEntry
 }
 
-/// What the screen does the moment the reader decodes an MRZ.
+/// Sets whether the scanner screen shows a review step after a read.
+///
+/// The same in both modes: a saved photo that fails to parse shows the read-failed screen, and a photo
+/// with no MRZ shows "No MRZ found in this photo". Typed input that fails to parse stays on the manual
+/// screen with a note. The live camera skips a frame that fails to parse and keeps looking.
+///
+/// - Since: 0.5.0
 public enum ReviewMode: Sendable, Hashable {
-    /// Show the review screen (parsed fields + observations); the user accepts or rescans. The default.
+    /// Shows the parsed fields and observations, and the user accepts or rescans.
+    ///
+    /// The default.
     case review
 
-    /// Return the decoded result immediately, with no review step.
+    /// Returns the decoded result at once, with no review step.
     case instantReturn
 }
 
-/// The dark/light disposition of the module's own theme (it never reads the host app's theme).
+/// Sets whether the scanner screen uses light or dark appearance.
+///
+/// - Since: 0.5.0
 public enum DarkMode: Sendable, Hashable {
-    /// Follow the system setting. The default.
+    /// Follows the color scheme the screen inherits, normally the system setting.
+    ///
+    /// The default.
     case auto
 
     /// Always dark.
@@ -48,79 +67,114 @@ public enum DarkMode: Sendable, Hashable {
     case off
 }
 
-/// The theming seam — the *bounded* surface a consumer can brand without reskinning. The module keeps its
-/// own base theme (ADR-026); these options tint it and set the light/dark disposition, they do not hand
-/// the consumer the whole palette.
+/// The brand color and light or dark mode of the scanner screen.
+///
+/// Tints the screen's own theme. It does not reskin it.
+///
+/// - Since: 0.5.0
 public struct MrzScannerTheme: Sendable {
-    /// An optional accent. When set it tints the theme's primary/accent color; `nil` (the default) keeps
-    /// the module's baseline accent.
+    /// The accent color applied with `.tint`.
+    ///
+    /// Default: `nil`, which sets no tint.
     public var brandColor: Color?
 
-    /// Auto (default) / on / off.
+    /// Whether the screen is light, dark, or follows the system.
+    ///
+    /// Default: `.auto`.
     public var darkMode: DarkMode
 
+    /// Creates a theme.
+    ///
+    /// - Parameters:
+    ///   - brandColor: The accent color. Default: `nil`.
+    ///   - darkMode: The light or dark setting. Default: `.auto`.
     public init(brandColor: Color? = nil, darkMode: DarkMode = .auto) {
         self.brandColor = brandColor
         self.darkMode = darkMode
     }
 }
 
-/// Consumer configuration for ``MrzScannerView`` — the one place a host app tunes the default UI without
-/// forking it. Every option freezes at the 0.5.0 tag under ADR-007.
+/// The settings for ``MrzScannerView``.
 ///
-/// ```swift
-/// let config = MrzScannerConfig(
-///     enabledMethods: [.camera, .manualEntry],
-///     theme: MrzScannerTheme(brandColor: .teal)
-/// )
-/// ```
+/// Every property has a default, so `MrzScannerConfig()` is valid.
+/// Not configurable: lenient line matching, OCR limited to the MRZ band, the live preview,
+/// 2 agreeing frames, and no telemetry events.
+///
+/// - Since: 0.5.0
 public struct MrzScannerConfig: Sendable {
-    /// Which reading methods the UI offers. **Default: camera + manual entry.** Saved-image is opt-in
-    /// (off by default) per scope (KB TES-A-62) — adding ``ScanMethod/savedImage`` is the consumer's
-    /// acknowledgement of the higher saved-image risk (ADR-023). The switcher shows only enabled methods.
+    /// The reading methods the screen offers.
+    ///
+    /// Default: `[.camera, .manualEntry]`. Add `.savedImage` to opt in to photo reading.
+    /// The method switcher shows only when two or more methods are enabled.
     public var enabledMethods: Set<ScanMethod>
 
-    /// Review (default) vs instant-return once an MRZ decodes.
+    /// Whether a read goes to a review step.
+    ///
+    /// Default: `.review`.
     public var reviewMode: ReviewMode
 
-    /// Show the torch toggle over the live preview (default `true`).
+    /// Shows the torch button over the live preview.
+    ///
+    /// Default: `true`. The button appears only on a device with a torch.
     public var showTorchButton: Bool
 
-    /// Start with the torch on (default `false`).
+    /// Turns the torch on once the camera opens.
+    ///
+    /// Default: `false`.
     public var torchOnByDefault: Bool
 
-    /// How long with no decode before the "still looking / type it instead" hint appears (default 10s).
-    /// `nil` never shows the hint — the "never struggle" option, mirroring ``scanTimeout``'s `nil` convention
-    /// (Swift's `Duration` has no infinity sentinel, so absence is expressed as `nil`, not a magic value).
+    /// Sets the scan time with no read before the "still looking" hint.
+    ///
+    /// Default: `.seconds(10)`. Counted from when the preview is live. The hint shows only after OCR has read some text.
+    /// `nil` never shows the hint.
     public var struggleTimeout: Duration?
 
-    /// Total time before the scanner gives up and reports ``TesseraUIResult/cancelled(_:)`` with
-    /// ``DismissReason/timedOut``. `nil` (the default) never times out.
+    /// Sets the deadline for the whole session, across every screen.
+    ///
+    /// Default: `nil`. At expiry the screen reports `.cancelled(.timedOut)`. A finite value shows a countdown.
+    /// The clock pauses while the app is not active and continues where it stopped.
+    /// A camera held by another app does not pause it. `nil` never times out.
     public var scanTimeout: Duration?
 
-    /// Fire a short confirming haptic the moment a live-camera read is accepted (default `true`) — the
-    /// hands-free "it scanned" cue. Honours the device's system haptic setting. Camera path only
-    /// (manual/saved-image get their own interaction feedback). Mirrors the Android `hapticFeedback`.
+    /// Plays a short haptic when a live camera read is accepted.
+    ///
+    /// Default: `true`. Camera path only. Follows the system haptic setting.
     public var hapticFeedback: Bool
 
-    /// The bounded theming seam; see ``MrzScannerTheme``.
+    /// The accent color and light or dark mode.
+    ///
+    /// Default: `MrzScannerTheme()`.
     public var theme: MrzScannerTheme
 
-    /// Invoked when the UI needs the camera permission it does not hold — the host requests it (the SDK
-    /// never requests a permission itself). `nil` (default) means the host owns it entirely.
+    /// Called when the user taps "Grant access" on the permission screen.
+    ///
+    /// Default: `nil`. The screen reads the camera permission and never requests it. With `nil` the screen has no
+    /// grant button and your app owns the request. The closure must be `@Sendable`.
+    /// iOS shows its permission dialog once; after a denial the screen offers Settings.
     public var onRequestPermission: (@Sendable () -> Void)?
 
-    /// The host's string-override seam (TES-139) — the iOS counterpart to Android's resource-merge override.
-    /// `nil` (the default) renders the module's own bundled strings, unchanged.
+    /// A bundle with your own `Localizable` strings.
     ///
-    /// To override one or more of the module's strings, set this to a bundle that defines an entry — under
-    /// the **same key**, in a **`Localizable` table** (`Localizable.strings` or `Localizable.xcstrings`,
-    /// standard Xcode string-catalog mechanics) — for each key to change; typically `Bundle.main`. Every key
-    /// not defined there falls back to the module's own catalog (`Resources/Localizable.xcstrings`), so a
-    /// host only needs to override the handful of keys it actually wants to change. See ``TesseraStrings``
-    /// for the full lookup contract.
+    /// Default: `nil`, which uses the screen's strings. Each `tessera_scanner_*` key is looked up in this bundle first, then in the screen's catalog.
+    /// The keys `tessera_scanner_grant_permission` and `tessera_scanner_permission_rationale` are in
+    /// the catalog but never read; overriding them changes nothing.
+    ///
+    /// - Since: 0.5.1
     public var stringsBundle: Bundle?
 
+    /// Creates a configuration.
+    ///
+    /// - Parameters:
+    ///   - enabledMethods: The reading methods to offer. Default: `[.camera, .manualEntry]`.
+    ///   - reviewMode: Review step or instant return. Default: `.review`.
+    ///   - showTorchButton: Show the torch button. Default: `true`.
+    ///   - torchOnByDefault: Start with the torch on. Default: `false`.
+    ///   - struggleTimeout: Time before the "still looking" hint. Default: `.seconds(10)`; `nil` never.
+    ///   - scanTimeout: Deadline for the whole session. Default: `nil`, which never times out.
+    ///   - hapticFeedback: Haptic on an accepted live read. Default: `true`.
+    ///   - theme: Accent color and light or dark mode. Default: `MrzScannerTheme()`.
+    ///   - onRequestPermission: Called to request the camera permission. Default: `nil`.
+    ///   - stringsBundle: Bundle with string overrides. Default: `nil`. Since 0.5.1.
     public init(
         enabledMethods: Set<ScanMethod> = [.camera, .manualEntry],
         reviewMode: ReviewMode = .review,

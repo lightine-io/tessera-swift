@@ -8,3 +8,8 @@ DerivedData/
 # macOS
 .DS_Store
 .local-xcframework/
+
+# Local AI-session files (never committed)
+.claude/private-content-terms.local
+.claude/settings.local.json
+.handoffs/
