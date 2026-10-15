@@ -7,9 +7,9 @@ Principles, process, and documentation rules live in the main repository's `CLAU
 
 ## Safety invariants
 
-- No credentials or secrets in commits. Nothing checks this here: GitHub secret
-  scanning and push protection are off in this repository (unlike the main one), so
-  look before you commit.
+- No credentials or secrets in commits. GitHub secret scanning and push protection
+  check this server-side, as in the main repository. Dependabot alerts and security
+  updates, and private vulnerability reporting, are on too.
 - No private content (private terms; organization names, standards bodies ICAO and
   ISO/IEC excepted) in commits or `gh` text: local hooks only (`.claude/settings.json`),
   with the terms in the gitignored `.claude/private-content-terms.local` (copy the main
