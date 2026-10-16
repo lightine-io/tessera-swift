@@ -13,3 +13,6 @@ DerivedData/
 .claude/private-content-terms.local
 .claude/settings.local.json
 .handoffs/
+
+# Claude Code work copies of this repo (git worktrees), never committed
+.claude/worktrees/
