@@ -161,6 +161,14 @@ final class ScannerModel {
         self.state = initialState(enabledMethods: config.enabledMethods)
     }
 
+    /// The sink the app registered with `TelemetrySinkRegistry` (the no-op sink when none is). Read when each
+    /// scanner or reader is built, exactly as the Android screen does through its scanner's default argument,
+    /// so `mrz.camera.frame` events reach the app's sink on both platforms (TES-196). Kotlin default arguments
+    /// are not visible from Swift, so the lookup has to be spelled out here.
+    static func registeredTelemetrySink() -> any TelemetrySink {
+        TelemetrySinkRegistry.shared.current
+    }
+
     // MARK: - Lifecycle
 
     /// Starts the flow for the current initial state. Idempotent per entered method. Called by the root view
@@ -444,7 +452,7 @@ final class ScannerModel {
             tolerant: false,
             metadataReader: nil,
             metadataPolicy: CaptureMetadataPolicy.none,
-            telemetry: NoOpTelemetrySink(),
+            telemetry: Self.registeredTelemetrySink(),
             // @Sendable so the closure does NOT inherit this model's main-actor isolation: the K/N analyzer
             // invokes it on its background analysis thread — and only on a SUCCESSFUL decode (it timestamps
             // the decode), which is why the isolation trap stayed latent until the first photo actually
@@ -620,7 +628,7 @@ final class ScannerModel {
             // their fixed width so the MRZ band is never detected. Whitespace is never meaningful in an MRZ,
             // so stripping it is safe.
             mode: ParsingMode.lenient,
-            telemetry: NoOpTelemetrySink(),
+            telemetry: Self.registeredTelemetrySink(),
             cameraPosition: 1 // AVCaptureDevicePositionBack
         )
         scanner.enablePreview()
