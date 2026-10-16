@@ -31,6 +31,9 @@ internal struct ManualEntryScreen: View {
     let parseFailed: Bool
     let onTextChange: (String) -> Void
     let onRead: () -> Void
+    // Whether the MRZ field has keyboard focus. Dismissing the keyboard only clears this; it never calls
+    // `onTextChange` or `onRead` (TES-154: "Read this" stays the only trigger, the typed text is untouched).
+    @FocusState private var fieldFocused: Bool
 
     var body: some View {
         PinnedActionsLayout {
@@ -67,6 +70,7 @@ internal struct ManualEntryScreen: View {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
                     )
+                    .focused($fieldFocused)
                     .accessibilityIdentifier("tessera-mrz-manual-raw-field")
                     .accessibilityLabel(TesseraStrings.string("tessera_scanner_manual_field_label", bundle: stringsBundle))
                 }
@@ -112,6 +116,23 @@ internal struct ManualEntryScreen: View {
             .buttonStyle(.borderedProminent)
             .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             .accessibilityIdentifier("tessera-mrz-manual-read")
+        }
+        // Keyboard dismissal (TES-154). Scrolling dismisses it interactively; a tap anywhere outside the field
+        // dismisses it (a simultaneous gesture, so buttons and the field itself keep working); and the keyboard
+        // carries a Done button. None of these touch the typed text or start a read.
+        .scrollDismissesKeyboard(.interactively)
+        .simultaneousGesture(TapGesture().onEnded { fieldFocused = false })
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button {
+                    fieldFocused = false
+                } label: {
+                    Text(TesseraStrings.string("tessera_scanner_done", bundle: stringsBundle))
+                }
+                .accessibilityLabel(TesseraStrings.string("tessera_scanner_done", bundle: stringsBundle))
+                .accessibilityIdentifier("tessera-mrz-manual-keyboard-done")
+            }
         }
         .accessibilityIdentifier("tessera-mrz-manual-raw")
     }

@@ -201,6 +201,16 @@
         }
       }
     },
+    "tessera_scanner_done": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        }
+      }
+    },
     "tessera_scanner_explainer_action": {
       "localizations": {
         "en": {

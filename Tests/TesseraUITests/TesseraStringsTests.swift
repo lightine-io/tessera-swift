@@ -48,6 +48,16 @@ struct TesseraStringsTests {
         #expect(resolved != Self.realModuleKey)
         #expect(!resolved.isEmpty)
     }
+
+    /// TES-154: the manual-entry keyboard's Done button label is a catalog key, so a host can override it.
+    @Test func keyboardDoneKeyResolvesToItsEnglishText() {
+        #expect(TesseraStrings.string("tessera_scanner_done", bundle: nil) == "Done")
+    }
+
+    @Test func keyboardDoneKeyCanBeOverriddenByAHost() {
+        let host = FakeHostBundle(overrides: ["tessera_scanner_done": "Fertig"])
+        #expect(TesseraStrings.string("tessera_scanner_done", bundle: host) == "Fertig")
+    }
 }
 
 /// Coverage for the public seam itself (TES-142 release-gate QA finding): ``MrzScannerConfig/stringsBundle``
