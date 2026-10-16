@@ -164,8 +164,8 @@ struct ScannerDecisionsTests {
     /// ConsensusVerdictConfirmed` / `is ConsensusVerdictGathering` dispatch) is host-testable directly:
     /// below `threshold` agreeing frames it reports `Gathering` (the "hold steady" cue), and at `threshold`
     /// it confirms exactly once.
-    @Test func consensusGathersThenConfirmsAcrossAgreeingFrames() {
-        let consensus = MrzDecodeConsensus(threshold: 2)
+    @Test func consensusGathersThenConfirmsAcrossAgreeingFrames() throws {
+        let consensus = try MrzDecodeConsensus(threshold: 2)
         let decoded = assembleManualDecoded(text: Self.icaoTD3)
 
         guard let gathering = consensus.offer(decoded: decoded) as? ConsensusVerdictGathering else {
@@ -184,8 +184,8 @@ struct ScannerDecisionsTests {
 
     /// `reset()` clears the tally — the iOS mirror of ``ScannerModel/resetLiveSessionGates()`` re-arming the
     /// gate on a fresh live session, so a prior session's votes never carry over.
-    @Test func consensusResetClearsThePriorTally() {
-        let consensus = MrzDecodeConsensus(threshold: 2)
+    @Test func consensusResetClearsThePriorTally() throws {
+        let consensus = try MrzDecodeConsensus(threshold: 2)
         let decoded = assembleManualDecoded(text: Self.icaoTD3)
         _ = consensus.offer(decoded: decoded) // one vote cast
         consensus.reset()

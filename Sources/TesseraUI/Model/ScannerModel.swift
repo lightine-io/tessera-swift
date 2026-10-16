@@ -80,7 +80,9 @@ final class ScannerModel {
     /// alongside ``decodeRouted`` whenever a fresh live session begins (``selectMethod(_:)``,
     /// ``rescan()``). Saved-image / manual entry are one-shot and route without this gate. Mirrors the
     /// Android `consensus` (`remember(config.consensusReads) { MrzDecodeConsensus(...) }`).
-    private var consensus = MrzDecodeConsensus(threshold: ScannerModel.consensusReads)
+    // `try!`: the constructor throws only for a threshold below 1 (TES-198), and `consensusReads` is a
+    // fixed constant of at least 1.
+    private var consensus = try! MrzDecodeConsensus(threshold: ScannerModel.consensusReads)
 
     /// How many agreeing frames the live consensus gate requires before a reading is confirmed. Hardcoded to
     /// mirror `MrzDecodeConsensus.DEFAULT_THRESHOLD` (mrz-camera-core) — unlike the Android `MrzScannerConfig`,
