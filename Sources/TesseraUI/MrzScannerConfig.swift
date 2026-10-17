@@ -147,7 +147,7 @@ public struct MrzScannerConfig: Sendable {
     /// Default: `MrzScannerTheme()`.
     public var theme: MrzScannerTheme
 
-    /// Called when the user taps "Grant access" on the permission screen.
+    /// Called when the user taps "Continue" on the permission screen.
     ///
     /// Default: `nil`. The screen reads the camera permission and never requests it. With `nil` the screen has no
     /// grant button and your app owns the request. The closure must be `@Sendable`.

@@ -457,13 +457,13 @@ internal struct ReviewScreen: View {
 // MARK: - Free display helpers (shared)
 
 /// The computed calendar date when the SDK inferred one (ISO `YYYY-MM-DD` via `LocalDate.description`), else
-/// the raw YYMMDD components labeled explicitly as unresolved (`94-06-23 (year not resolved)`) — TES-94. The
-/// UI never re-derives a century itself; it only renders what the SDK already resolved, and labels the
-/// fallback honestly rather than showing bare two-digit components that could pass for a confident date
-/// (Principle 4). Mirrors the Android `dateDisplay` (`ReviewScreen.kt:748-751`).
+/// the raw YYMMDD components shown day first, as printed (`23 06 94`) - TES-94, TES-112. The UI never
+/// re-derives a century itself; it only renders what the SDK already resolved, and shows just the printed
+/// parts rather than anything that could pass for a confident date (Principle 4). Mirrors the Android
+/// `dateDisplay`.
 func dateDisplay(_ date: MrzDate, bundle: Bundle?) -> String {
     if let computed = date.computedDate { return computed.description() }
-    let raw = "\(date.rawYear)-\(date.rawMonth)-\(date.rawDay)"
+    let raw = "\(date.rawDay) \(date.rawMonth) \(date.rawYear)"
     return substituting(TesseraStrings.string("tessera_scanner_date_unresolved_format", bundle: bundle), raw)
 }
 

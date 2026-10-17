@@ -556,7 +556,7 @@ final class ScannerModel {
         )
     }
 
-    /// The permission screen's primary "Grant access" action: hand the request to the host (the SDK never
+    /// The permission screen's primary "Continue" action: hand the request to the host (the SDK never
     /// requests a permission itself). Marks that we've asked so a later denial reaches the permanent-denial
     /// face on the next foreground re-check. No-op-safe when the host supplied no handler (the screen hides
     /// the button in that case).

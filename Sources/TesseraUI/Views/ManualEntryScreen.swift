@@ -18,7 +18,7 @@ import SwiftUI
 ///
 /// - Parameters:
 ///   - text: the in-progress typed MRZ text (the model's hoisted draft — it survives method switches).
-///   - parseFailed: whether the last "Read this" failed to parse; shown as an inline error note, after the
+///   - parseFailed: whether the last "Read" failed to parse; shown as an inline error note, after the
 ///     observations, right before the action button. Any edit clears it (the model resets the flag on
 ///     ``onTextChange``).
 ///   - onTextChange: called with the new text on every edit.
@@ -32,7 +32,7 @@ internal struct ManualEntryScreen: View {
     let onTextChange: (String) -> Void
     let onRead: () -> Void
     // Whether the MRZ field has keyboard focus. Dismissing the keyboard only clears this; it never calls
-    // `onTextChange` or `onRead` (TES-154: "Read this" stays the only trigger, the typed text is untouched).
+    // `onTextChange` or `onRead` (TES-154: "Read" stays the only trigger, the typed text is untouched).
     @FocusState private var fieldFocused: Bool
 
     var body: some View {
