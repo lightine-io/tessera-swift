@@ -92,6 +92,7 @@ xcrun --sdk iphonesimulator swift-api-digester -dump-sdk \
   -o "$CURRENT" \
   -I "$PRODUCTS" -F "$PRODUCTS" -F "$PRODUCTS/PackageFrameworks" \
   -target "$TARGET_TRIPLE" -sdk "$SDK" \
+  -avoid-location \
   -abort-on-module-fail
 
 if [[ "${1:-}" == "--update" ]]; then

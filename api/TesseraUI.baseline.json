@@ -2720,6 +2720,80 @@
     "name": "TesseraUIResult",
     "printedName": "TesseraUIResult",
     "usr": "s:9TesseraUI0A8UIResultO"
+   },
+   {
+    "children": [
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "MrzScanResult",
+            "printedName": "any Tessera.MrzScanResult",
+            "usr": "c:objc(pl)TesseraMrzScanResult"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "AsyncStream",
+          "printedName": "_Concurrency.AsyncStream<any Tessera.MrzScanResult>",
+          "usr": "s:ScS"
+         }
+        ],
+        "declKind": "Accessor",
+        "genericSig": "<Self where Self : Tessera.MrzCameraScanner>",
+        "isFromExtension": true,
+        "kind": "Accessor",
+        "mangledName": "$sSo23TesseraMrzCameraScannerP0A2UIE12resultStreamScSySo0aB10ScanResult_pGvg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:So23TesseraMrzCameraScannerP0A2UIE12resultStreamScSySo0aB10ScanResult_pGvg"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "MrzScanResult",
+          "printedName": "any Tessera.MrzScanResult",
+          "usr": "c:objc(pl)TesseraMrzScanResult"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "AsyncStream",
+        "printedName": "_Concurrency.AsyncStream<any Tessera.MrzScanResult>",
+        "usr": "s:ScS"
+       }
+      ],
+      "declKind": "Var",
+      "isFromExtension": true,
+      "kind": "Var",
+      "mangledName": "$sSo23TesseraMrzCameraScannerP0A2UIE12resultStreamScSySo0aB10ScanResult_pGvp",
+      "moduleName": "TesseraUI",
+      "name": "resultStream",
+      "printedName": "resultStream",
+      "usr": "s:So23TesseraMrzCameraScannerP0A2UIE12resultStreamScSySo0aB10ScanResult_pGvp"
+     }
+    ],
+    "conformances": [],
+    "declAttributes": [
+     "Dynamic",
+     "ObjC"
+    ],
+    "declKind": "Protocol",
+    "genericSig": "<Self : AnyObject>",
+    "isExternal": true,
+    "kind": "TypeDecl",
+    "moduleName": "Tessera",
+    "name": "MrzCameraScanner",
+    "objc_name": "TesseraMrzCameraScanner",
+    "printedName": "MrzCameraScanner",
+    "usr": "c:objc(pl)TesseraMrzCameraScanner"
    }
   ],
   "json_format_version": 8,
