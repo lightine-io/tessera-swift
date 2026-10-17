@@ -3,10 +3,9 @@ name: CI
 # Builds, tests, and API-guards the TesseraUI SwiftUI product. String Catalogs and SwiftUI do not compile
 # under `swift build`, so everything runs through xcodebuild against an iOS Simulator (ADR-026 §4/§5).
 #
-# Not a required check today: the "protect main" ruleset has no status-check rule, and the main
-# repository's release workflow merges its Package.swift pin PR without waiting for this workflow.
-# Making it a gate needs both a ruleset change here and a wait-for-checks step in release.yml
-# (tracked as an issue; see the main repository's .claude/skills/release-gate/SKILL.md, gate 9).
+# Not a required check in this repository: the "protect main" ruleset has no status-check rule. The
+# main repository's release workflow does wait for this check on the Package.swift pin PR (since
+# lightine-io/tessera#286; see its .claude/skills/release-gate/SKILL.md, gates 9 and 10).
 #
 # Every action is pinned to a full commit SHA with a version comment, as in the main repository.
 
@@ -25,44 +24,38 @@ concurrency:
 
 jobs:
   build-test-apiguard:
-    runs-on: macos-15
+    runs-on: macos-26
     env:
-      # The swift-api-digester baseline is Swift/Xcode-version sensitive. Pin the toolchain that generated
-      # api/TesseraUI.baseline.json; bump this and regenerate the baseline together.
-      XCODE_VERSION: "26.6"
+      # Xcode is pinned exactly, on the macos-26 image (which lists Xcode_26.4.1.app and an iOS 26.4
+      # simulator runtime with iPhone 17; https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md).
+      # The Kotlin Multiplatform compatibility table lists Xcode 26.4 for Kotlin 2.4.20-2.4.21
+      # (https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html), and the
+      # main repository builds the Tessera XCFramework with the same Xcode. The swift-api-digester baseline
+      # is also Xcode-version sensitive: bump XCODE_VERSION and regenerate api/TesseraUI.baseline.json together.
+      XCODE_VERSION: "26.4.1"
       SIMULATOR: "iPhone 17"
+      SIMULATOR_OS: "26.4"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: No real document data (MRZ guard)
         run: bash scripts/private-content-scan.sh --mrz-only
 
-      - name: Select Xcode (latest ${{ env.XCODE_VERSION }}.x on the runner)
+      - name: Select Xcode ${{ env.XCODE_VERSION }}
         run: |
-          # The runner's Xcode may be Xcode_26.6.app or Xcode_26.6.0.app etc.; pick the newest matching the
-          # pinned major.minor rather than hard-coding a full path (which broke: no /Applications/Xcode_26.6.app).
-          XC=$(ls -d /Applications/Xcode_${XCODE_VERSION}*.app 2>/dev/null | sort -V | tail -1)
-          if [ -z "$XC" ]; then XC=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -1); fi
-          echo "Selecting $XC"
+          XC="/Applications/Xcode_${XCODE_VERSION}.app"
+          if [ ! -d "$XC" ]; then
+            echo "::error::$XC is missing on this runner image; no fallback to another Xcode."
+            exit 1
+          fi
           sudo xcode-select -s "$XC"
           xcodebuild -version
 
-      - name: Ensure an iOS simulator runtime and device exist
+      - name: Check the iOS simulator exists
         run: |
-          # The runner image does not always ship a simulator runtime for the Xcode selected above
-          # (seen with Xcode 26.3 on macos-15: only placeholder destinations). Download it if missing,
-          # then use whatever iPhone is available instead of a hard-coded name.
-          if ! xcrun simctl list devices available | grep -q "iPhone"; then
-            sudo xcodebuild -downloadPlatform iOS
-          fi
-          DEV=$(xcrun simctl list devices available | grep -m1 -oE "iPhone[^(]*" | sed 's/ *$//')
-          if [ -z "$DEV" ]; then
-            RT=$(xcrun simctl list runtimes | grep -m1 -oE "com.apple.CoreSimulator.SimRuntime.iOS-[0-9-]+")
-            xcrun simctl create "CI iPhone" "${SIMULATOR}" "$RT"
-            DEV="CI iPhone"
-          fi
-          echo "Using simulator: $DEV"
-          echo "CI_SIMULATOR=$DEV" >> "$GITHUB_ENV"
+          # The image ships the iOS 26.4 runtime with iPhone 17 for this Xcode; fail loudly if it does not
+          # (no runtime download, no other device).
+          xcrun simctl list devices available "iOS ${SIMULATOR_OS}" | grep -F "${SIMULATOR} ("
 
       - name: Resolve package dependencies
         run: xcodebuild -resolvePackageDependencies -scheme TesseraUI
@@ -78,7 +71,7 @@ jobs:
         run: |
           xcodebuild test \
             -scheme Tessera-Package \
-            -destination "platform=iOS Simulator,name=${CI_SIMULATOR:-$SIMULATOR}" \
+            -destination "platform=iOS Simulator,name=${SIMULATOR},OS=${SIMULATOR_OS}" \
             -skipPackagePluginValidation
 
       - name: Public-API guard (ADR-007 freeze)
