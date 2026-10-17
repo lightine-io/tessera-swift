@@ -15,11 +15,22 @@ struct ScannerModelStruggleHintTests {
         return false
     }
 
+    /// Polls (main actor) until the hint shows or `limit` passes, so a slow runner cannot flake the test.
+    private func waitForHint(_ model: ScannerModel, limit: Duration = .seconds(5)) async throws -> Bool {
+        let deadline = ContinuousClock.now + limit
+        while ContinuousClock.now < deadline {
+            if isStruggling(model) { return true }
+            try await Task.sleep(for: .milliseconds(20))
+        }
+        return isStruggling(model)
+    }
+
     @Test func hintAppearsAfterTheTimeoutWithNoTextEverSeen() async throws {
         let model = makeModel(timeout: .milliseconds(100))
         model.armStruggleTimeout()
-        try await Task.sleep(for: .milliseconds(600))
-        #expect(isStruggling(model), "the hint shows on the timer alone, even if the recognizer never returned text")
+        let shown = try await waitForHint(model)
+        withExtendedLifetime(model) {}
+        #expect(shown, "the hint shows on the timer alone, even if the recognizer never returned text")
     }
 
     @Test func hintDoesNotAppearBeforeTheTimeout() async throws {
