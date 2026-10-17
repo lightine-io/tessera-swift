@@ -55,7 +55,8 @@ jobs:
         run: |
           # The image ships the iOS 26.4.1 runtime (OS=26.4.1, not 26.4) with iPhone 17 for this Xcode; fail loudly if it does not
           # (no runtime download, no other device).
-          xcrun simctl list devices available "iOS ${SIMULATOR_OS}" | grep -F "${SIMULATOR} ("
+          # simctl names the runtime "iOS 26.4" while devices report OS 26.4.1, so search by major.minor.
+          xcrun simctl list devices available "iOS ${SIMULATOR_OS%.*}" | grep -F "${SIMULATOR} ("
 
       - name: Resolve package dependencies
         run: xcodebuild -resolvePackageDependencies -scheme TesseraUI
