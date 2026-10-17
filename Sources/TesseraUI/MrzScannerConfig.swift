@@ -99,6 +99,7 @@ public struct MrzScannerTheme: Sendable {
 /// Every property has a default, so `MrzScannerConfig()` is valid.
 /// Not configurable: lenient line matching, OCR limited to the MRZ band, the live preview,
 /// 2 agreeing frames, and no telemetry events.
+/// The configuration is read when the scanner opens; changes while it is open apply the next time it opens.
 ///
 /// - Since: 0.5.0
 public struct MrzScannerConfig: Sendable {

@@ -10,15 +10,24 @@ struct RootScannerView: View {
     @State private var model: ScannerModel
     @Environment(\.scenePhase) private var scenePhase
 
+    // The configuration is fixed per presentation (TES-155): SwiftUI keeps the first model for as long as this
+    // view keeps its identity and ignores the `config` of a later init, so every read below goes through the
+    // model. Reading the latest `config` here instead would mix two configurations on one open screen (the
+    // switcher from the new one, the flow from the old one). A new presentation is a new identity, so it gets a
+    // new model with the config it opens with. The model's init only stores values; building one that SwiftUI
+    // then discards is cheap.
     init(config: MrzScannerConfig, onResult: @escaping (TesseraUIResult) -> Void) {
         _model = State(initialValue: ScannerModel(config: config, onResult: onResult))
-        self.config = config
     }
 
-    private let config: MrzScannerConfig
+    /// The configuration this presentation opened with.
+    private var config: MrzScannerConfig { model.config }
+
+    @Environment(\.scannerRenderProbe) private var renderProbe
 
     var body: some View {
         @Bindable var model = model
+        let _ = renderProbe?.report(ScannerRender(switcherMethods: config.enabledMethods, model: model))
         ScannerScaffold(
             enabledMethods: config.enabledMethods,
             currentState: model.state,
@@ -57,6 +66,9 @@ struct RootScannerView: View {
         }
         .onDisappear { model.onDisappear() }
         .accessibilityIdentifier("tessera-mrz-scanner-root")
+        // The strings-bundle override (TES-139), injected once so every screen's
+        // ``TesseraStrings/string(_:bundle:)`` call sees it. From the model, like the rest of the config.
+        .environment(\.tesseraStringsBundle, config.stringsBundle)
     }
 
     @ViewBuilder
@@ -175,4 +187,25 @@ struct RootScannerView: View {
             )
         }
     }
+}
+
+/// What one render of ``RootScannerView`` used, reported to ``EnvironmentValues/scannerRenderProbe``. Test-only.
+struct ScannerRender {
+    /// The methods handed to the switcher.
+    let switcherMethods: Set<ScanMethod>
+    /// The model of this presentation.
+    let model: ScannerModel
+}
+
+/// A host-test seam: told about each render of ``RootScannerView`` with the configuration it rendered with.
+/// A class, so the environment compares it by identity and a test creates it once.
+@MainActor
+final class ScannerRenderProbe {
+    let report: (ScannerRender) -> Void
+    init(_ report: @escaping (ScannerRender) -> Void) { self.report = report }
+}
+
+extension EnvironmentValues {
+    /// The render probe; `nil` (the default) outside tests.
+    @Entry var scannerRenderProbe: ScannerRenderProbe? = nil
 }

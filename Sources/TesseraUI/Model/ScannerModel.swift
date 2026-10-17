@@ -55,7 +55,8 @@ final class ScannerModel {
         currentCaptureDevice()?.hasTorch ?? false
     }
 
-    private let config: MrzScannerConfig
+    /// The configuration this presentation runs with, fixed when the model is created (TES-155).
+    let config: MrzScannerConfig
     private let onResult: (TesseraUIResult) -> Void
 
     /// The live scanner, created lazily when the camera path first runs (so a camera-disabled config never
