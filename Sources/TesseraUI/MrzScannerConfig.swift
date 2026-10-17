@@ -126,7 +126,7 @@ public struct MrzScannerConfig: Sendable {
 
     /// Sets the scan time with no read before the "still looking" hint.
     ///
-    /// Default: `.seconds(10)`. Counted from when the preview is live. The hint shows only after OCR has read some text.
+    /// Default: `.seconds(10)`. Counted from when the preview is live. The hint shows when the time is up, whatever the camera sees.
     /// `nil` never shows the hint.
     public var struggleTimeout: Duration?
 

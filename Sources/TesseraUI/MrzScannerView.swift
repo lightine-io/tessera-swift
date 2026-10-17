@@ -6,7 +6,8 @@ import Tessera
 /// Reports one ``TesseraUIResult`` through `onResult`. The screen does not remove itself; remove it in the callback.
 /// Present it with `fullScreenCover`: the close button is the only way to `.cancelled(.userDismissed)`.
 /// Reads the camera permission and never requests it; see ``MrzScannerConfig/onRequestPermission``.
-/// Not configurable: lenient line matching, 2 agreeing frames, and no telemetry events.
+/// Not configurable: lenient line matching and 2 agreeing frames. Telemetry goes to the sink registered with
+/// `TelemetrySinkRegistry`, read when the scanner opens.
 /// The configuration is read when the scanner opens; changes while it is open apply the next time it opens.
 ///
 /// - Since: 0.5.0
