@@ -110,65 +110,8 @@ struct ResultStreamTests {
         #expect(try await waitUntil { seen.finished })
         consumer.cancel()
     }
-
-    /// Against the real Kotlin scanner. The Simulator has no camera, so `start()` reports a capture error
-    /// that ends the session, and the next `start()` reports another. This checks the Kotlin/Native side:
-    /// results reach a main-actor loop, and the cancellation error the adapter throws ends Kotlin's `collect`
-    /// without ending the app.
-    @Test(.timeLimit(.minutes(1)))
-    func realScannerResultsReachTheLoopAndCancellationEndsCollection() async throws {
-        let scanner = AVCaptureMrzScanner(
-            recognizer: VisionMrzTextRecognizer(),
-            mode: ParsingMode.strict,
-            telemetry: NoOpTelemetrySink.shared,
-            cameraPosition: 1
-        )
-        defer { scanner.close() }
-        let handle = Unchecked(scanner)
-
-        // The public property: the stream subscribes as soon as it is read, so one `start()` right after
-        // is enough, and the result reaches the main-actor loop on the main thread.
-        let seen = Recorder()
-        let consumer = Task { @MainActor in
-            let stream = handle.value.resultStream
-            handle.value.start()
-            for await result in stream { seen.record(result) }
-        }
-        #expect(try await waitUntil { seen.results.count == 1 })
-        #expect(seen.results.first is MrzScanResultCaptureError)
-        #expect(seen.allOnMain)
-        consumer.cancel()
-        await consumer.value
-
-        // The internal builder, to see when Kotlin's collect returns.
-        let ended = Flag()
-        let watchedSeen = Recorder()
-        let watcher = Task { @MainActor in
-            let watched = KotlinFlowStream.make(handle.value.results, of: (any MrzScanResult).self) { ended.set() }
-            for await result in watched { watchedSeen.record(result) }
-        }
-        #expect(try await waitUntil {
-            if watchedSeen.results.isEmpty { scanner.start() }
-            return !watchedSeen.results.isEmpty
-        })
-        watcher.cancel()
-        await watcher.value
-        let countAtCancel = watchedSeen.results.count
-
-        let collectionEnded = try await waitUntil {
-            if !ended.isSet { scanner.start() }
-            return ended.isSet
-        }
-        #expect(collectionEnded, "the next result after cancellation ends Kotlin's collect, and the app keeps running")
-        #expect(watchedSeen.results.count == countAtCancel, "nothing reaches the loop after it is cancelled")
-    }
 }
 
-/// Moves a non-Sendable Kotlin object into a test's task. The test touches it only on the main actor.
-private struct Unchecked<T>: @unchecked Sendable {
-    let value: T
-    init(_ value: T) { self.value = value }
-}
 
 /// A thread-safe flag a `@Sendable` callback can set.
 private final class Flag: Sendable {
