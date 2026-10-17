@@ -34,7 +34,7 @@ jobs:
       # is also Xcode-version sensitive: bump XCODE_VERSION and regenerate api/TesseraUI.baseline.json together.
       XCODE_VERSION: "26.4.1"
       SIMULATOR: "iPhone 17"
-      SIMULATOR_OS: "26.4"
+      SIMULATOR_OS: "26.4.1"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -53,7 +53,7 @@ jobs:
 
       - name: Check the iOS simulator exists
         run: |
-          # The image ships the iOS 26.4 runtime with iPhone 17 for this Xcode; fail loudly if it does not
+          # The image ships the iOS 26.4.1 runtime (OS=26.4.1, not 26.4) with iPhone 17 for this Xcode; fail loudly if it does not
           # (no runtime download, no other device).
           xcrun simctl list devices available "iOS ${SIMULATOR_OS}" | grep -F "${SIMULATOR} ("
 
