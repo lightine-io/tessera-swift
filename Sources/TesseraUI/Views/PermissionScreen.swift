@@ -17,7 +17,7 @@ import SwiftUI
 /// The adaptive camera-permission screen. Renders one of two faces from ``state``:
 ///
 ///  * ``PermissionScreenState/needsGrant`` → mockup 04: title "Camera permission needed", the on-device
-///    privacy body, a primary "Grant access" that fires ``onGrant`` — but ONLY when ``hasRequestHandler`` is
+///    privacy body, a primary "Continue" that fires ``onGrant`` — but ONLY when ``hasRequestHandler`` is
 ///    true; if the host supplied no permission handler, no dead Grant button is drawn, leaving just the
 ///    rationale and the manual-entry escape.
 ///  * ``PermissionScreenState/permanentlyDenied`` → mockup 04b: title "Camera access is off", the Settings +
