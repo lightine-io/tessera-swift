@@ -2,7 +2,7 @@ import Foundation
 import Tessera
 
 // The pure, camera-free, SwiftUI-free decision layer — the iOS mirror of the Android module's decision
-// functions (`routeDecode`, `reduceCameraResult`, `struggleGateAdvance`, `permissionScreenState`,
+// functions (`routeDecode`, `reduceCameraResult`, `permissionScreenState`,
 // `mapSavedImageResult`, `initialState`, `switcherMethods`, `showsMethodSwitcher`, `assembleManualDecoded`).
 // Each is behaviour-preserving with its Android counterpart so both platforms make the same choices, and each
 // is a free function (or a small value type) with no UI or camera dependency, host-unit-testable off-device.
@@ -65,9 +65,8 @@ enum CameraFlowEffect {
     /// A transient per-frame miss (`NoMrzFound` / `OcrFailed`) — keep scanning, no routing of its own.
     /// `sawText` is TES-97's "did OCR return any text at all on this frame" signal
     /// (`quality.recognizedLineCount > 0`): `false` for a frame with nothing recognisable in view, `true` for
-    /// a frame where OCR saw text that just did not form an MRZ shape. ``ScannerModel`` folds this across the
-    /// session (``struggleGateAdvance(sawTextEver:sawText:)``) to decide whether the struggle timeout is
-    /// allowed to show the struggling overlay at all. Mirrors the Android `StayScanning(sawText)`.
+    /// a frame where OCR saw text that just did not form an MRZ shape. ``ScannerModel`` no longer gates the
+    /// struggle hint on it (TES-151: the hint shows on the timer alone). Mirrors the Android `StayScanning(sawText)`.
     case stayScanning(sawText: Bool)
 }
 
@@ -101,17 +100,6 @@ func reduceCameraResult(_ result: MrzScanResult) -> CameraFlowEffect {
     default:
         return .stayScanning(sawText: false)
     }
-}
-
-/// Folds one `.stayScanning` effect into whether OCR has returned text at least once this scanning session
-/// (TES-97) — an OR-fold: `sawTextEver` stays `true` once any frame carried text, regardless of later
-/// text-free frames (a document that briefly leaves frame should not un-arm struggling). This is the gate
-/// ``ScannerModel`` checks before showing the struggling overlay: without it, a struggle timeout with nothing
-/// ever in view would show "try more light or move the document farther away" — misleading advice when there
-/// was never anything to read in the first place. Pure so the "ANY, not the latest frame" semantics is
-/// host-testable without a timer or camera. Mirrors the Android `struggleGateAdvance`.
-func struggleGateAdvance(sawTextEver: Bool, sawText: Bool) -> Bool {
-    sawTextEver || sawText
 }
 
 // MARK: - Permission screen state
