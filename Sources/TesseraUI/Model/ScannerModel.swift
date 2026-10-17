@@ -98,16 +98,10 @@ final class ScannerModel {
     private var lastGatheringAt: Date?
     private let gatheringCueLinger: TimeInterval = 0.6
 
-    /// TES-97 mirror: whether OCR has returned text for at least one frame during this scanning session — the
-    /// gate for entering `struggling` (something is in view but unparseable) rather than staying on the plain
-    /// framing guide (nothing has been in view at all, so "try more light or move farther away" would be
-    /// misleading). Reset alongside ``decodeRouted`` whenever a fresh live session begins.
-    private var sawTextEver = false
-
-    /// TES-97 mirror: whether the configured struggle timeout has already elapsed for this session. Split
-    /// from ``sawTextEver`` so a frame that only starts carrying text AFTER the timer already fired still
-    /// flips the UI to struggling the moment it arrives (see the `.stayScanning` branch in
-    /// ``onCameraResult(_:)``), rather than requiring text to have appeared before the timer.
+    /// TES-151: whether the configured struggle timeout has already elapsed for this session. If the timer
+    /// fires while the scanning state is not showing (a camera-in-use notice, say), the next qualifying frame
+    /// flips the UI to struggling the moment scanning resumes (see the `.stayScanning` branch in
+    /// ``onCameraResult(_:)``).
     private var struggleTimeoutElapsed = false
 
     /// Guards ``armStruggleTimeout()`` so it fires once per live session, the first time the preview session
@@ -361,11 +355,10 @@ final class ScannerModel {
     /// Clears the one-shot decode latch and the live-session gates (consensus tally, struggle-gate latches,
     /// the struggle-timer arm latch) — called whenever a fresh live session begins (``selectMethod(_:)``,
     /// ``rescan()``), mirroring the Android flow's paired resets of `decodeRouted` / `consensus` /
-    /// `sawTextEver` / `struggleTimeoutElapsed`.
+    /// `struggleTimeoutElapsed`.
     private func resetLiveSessionGates() {
         decodeRouted = false
         consensus.reset()
-        sawTextEver = false
         struggleTimeoutElapsed = false
         struggleTimeoutArmed = false
     }
@@ -664,15 +657,16 @@ final class ScannerModel {
         scanner.start()
     }
 
-    /// After the configured struggle timeout with no decode, marks the timeout elapsed and — if OCR has
-    /// already seen text at least once this session (``sawTextEver``) — flips the scanning state to
-    /// `struggling`. The camera keeps running, so a decode arriving later still routes; a non-finite timeout
-    /// means "never struggle", so the timer does not arm. A later qualifying frame after the timer still flips
-    /// it on retroactively (see the `.stayScanning` branch in ``onCameraResult(_:)``). Armed once per live
+    /// After the configured struggle timeout with no decode, marks the timeout elapsed and flips the scanning
+    /// state to `struggling` on the timer alone (TES-151: no text has to have been seen, so a covered lens or
+    /// an empty wall gets the hint too). The camera keeps running, so a decode arriving later still routes; a
+    /// nil timeout means "never struggle", so the timer does not arm. If the scanning state is not showing
+    /// when the timer fires, the next frame flips it (see the `.stayScanning` branch in
+    /// ``onCameraResult(_:)``). Armed once per live
     /// session the first time the preview goes live (``deliverPreviewSession(_:)``, TES-97 item 6) — not at
     /// scan-intent — so camera-boot time is never counted against the budget. Mirrors the Android struggle
     /// `LaunchedEffect` / `onStruggling`.
-    private func armStruggleTimeout() {
+    func armStruggleTimeout() {
         struggleTask?.cancel()
         // A nil struggleTimeout means "never struggle".
         guard let timeout = config.struggleTimeout else { return }
@@ -683,7 +677,7 @@ final class ScannerModel {
             await MainActor.run {
                 guard let self else { return }
                 self.struggleTimeoutElapsed = true
-                guard case let .scanning(struggling, gathering) = self.state, !struggling, self.sawTextEver else { return }
+                guard case let .scanning(struggling, gathering) = self.state, !struggling else { return }
                 self.state = .scanning(struggling: true, gathering: gathering)
                 self.postAnnouncement(key: "tessera_scanner_struggling_hint")
             }
@@ -830,11 +824,7 @@ final class ScannerModel {
         case .goCameraUnavailable:
             state = .cameraUnavailable
             postAnnouncement(for: .cameraUnavailable)
-        case let .stayScanning(sawText):
-            // TES-97: fold whether OCR has returned text at least once this session — the gate for whether the
-            // struggle timeout is allowed to show struggling at all (see armStruggleTimeout()).
-            sawTextEver = struggleGateAdvance(sawTextEver: sawTextEver, sawText: sawText)
-
+        case .stayScanning:
             // A transient miss. If a recoverable camera-in-use notice is showing, a clean frame proves the
             // camera reconnected — return to scanning.
             if case .cameraInUse = state {
@@ -850,9 +840,9 @@ final class ScannerModel {
                Date().timeIntervalSince(lastGathering) > gatheringCueLinger {
                 newGathering = false
             }
-            // TES-97: the struggle timeout already elapsed, but nothing carried text until just now — this
-            // qualifying frame arriving late still flips the UI to struggling retroactively.
-            if !newStruggling, struggleTimeoutElapsed, sawTextEver {
+            // TES-151: the struggle timeout already elapsed while scanning was not showing — this frame, on
+            // return to scanning, flips the UI to struggling.
+            if !newStruggling, struggleTimeoutElapsed {
                 newStruggling = true
             }
             if newStruggling != struggling || newGathering != gathering {

@@ -96,17 +96,6 @@ struct ScannerDecisionsTests {
         #expect(!showsMethodSwitcher(.permissionNeeded))
     }
 
-    // MARK: struggleGateAdvance — TES-97 struggle-gate fold
-
-    /// An OR-fold: once any frame carried text, `sawTextEver` stays `true` regardless of later text-free
-    /// frames (a document that briefly leaves frame must not un-arm the struggling overlay).
-    @Test func struggleGateAdvanceIsAnOrFoldThatNeverUnLatches() {
-        #expect(struggleGateAdvance(sawTextEver: false, sawText: false) == false)
-        #expect(struggleGateAdvance(sawTextEver: false, sawText: true) == true)
-        #expect(struggleGateAdvance(sawTextEver: true, sawText: false) == true)
-        #expect(struggleGateAdvance(sawTextEver: true, sawText: true) == true)
-    }
-
     // MARK: reduceCameraResult — TES-97 sawText propagation
 
     /// `stayScanning`'s `sawText` mirrors `quality.recognizedLineCount > 0` for both the transient-miss
