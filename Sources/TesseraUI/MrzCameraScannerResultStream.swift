@@ -40,7 +40,7 @@ extension MrzCameraScanner {
     /// next result. While the scanner is stopped, that idle collection holds no camera resources and is
     /// released with the scanner.
     ///
-    /// - Since: 0.5.2
+    /// - Since: 0.5.3
     public var resultStream: AsyncStream<any MrzScanResult> {
         KotlinFlowStream.make(results, of: (any MrzScanResult).self)
     }
