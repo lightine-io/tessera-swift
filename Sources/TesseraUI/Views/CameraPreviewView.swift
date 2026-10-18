@@ -3,33 +3,33 @@ import SwiftUI
 import UIKit
 
 /// The live preview. The scanner (`AVCaptureMrzScanner`) owns the camera session and lifecycle; this view
-/// only draws and observes — the iOS analogue of the Android `CameraPreview`/`CameraXViewfinder`. It attaches
+/// only draws and observes - the iOS analogue of the Android `CameraPreview`/`CameraXViewfinder`. It attaches
 /// an `AVCaptureVideoPreviewLayer` to the running `AVCaptureSession` the scanner publishes on `previewSession`.
 ///
 /// While the session is `nil`, the camera and on-device text reader are still warming up (mockup 01b): the
 /// ``InitializingContent`` state shows rather than a blank dark box that reads as frozen. It auto-swaps to the
-/// live viewfinder the moment the session arrives — the session's nullness *is* the initializing signal
+/// live viewfinder the moment the session arrives - the session's nullness *is* the initializing signal
 /// (there is no separate flow state for it), mirroring how the Android preview keys the initializing state on
 /// a null surface.
 struct CameraPreviewView: View {
     /// The running `AVCaptureSession` to draw, or `nil` while the scanner is still warming up / torn down.
     let session: AVCaptureSession?
-    /// Whether the "hold steady" gathering cue should show in the single guidance region — takes precedence
+    /// Whether the "hold steady" gathering cue should show in the single guidance region - takes precedence
     /// over `struggling`. Defaults to `false` so chrome-focused call sites don't need to thread it.
     var gathering: Bool = false
     /// Whether the "still looking / type it instead" struggling hint should show in the single guidance
-    /// region — shown only when `gathering` is `false`. Defaults to `false`.
+    /// region - shown only when `gathering` is `false`. Defaults to `false`.
     var struggling: Bool = false
     /// The struggling hint's "type it instead" escape into manual entry. Defaults to a no-op so
     /// chrome-focused call sites don't need to thread it.
     var onManualEntry: () -> Void = {}
-    /// Whether that escape is offered at all — mirrors the Android `showManualEntry` gating. Defaults to
+    /// Whether that escape is offered at all - mirrors the Android `showManualEntry` gating. Defaults to
     /// `true`.
     var showManualEntry: Bool = true
     /// Reports the guide box's on-screen region converted into AVFoundation's metadata-output space
-    /// (normalized against the unrotated capture buffer, top-left origin — what
+    /// (normalized against the unrotated capture buffer, top-left origin - what
     /// `metadataOutputRectOfInterest(for:)` returns), whenever layout resolves or changes. The model feeds
-    /// it to the recognizer so OCR reads exactly the band the user sees — the iOS mirror of Android's
+    /// it to the recognizer so OCR reads exactly the band the user sees - the iOS mirror of Android's
     /// ViewPort WYSIWYG alignment (an aspect-fill preview crops the frame and the guide sits low, so the
     /// on-screen band is NOT a centred fraction of the buffer). Defaults to a no-op so chrome-focused call
     /// sites don't need to thread it.
@@ -87,14 +87,14 @@ struct CameraPreviewView: View {
     }
 }
 
-/// The MRZ framing guide overlaid on the live preview (mockup 01) — a ~70%-black scrim covering the whole
+/// The MRZ framing guide overlaid on the live preview (mockup 01) - a ~70%-black scrim covering the whole
 /// preview with the guide window punched out (even-odd fill), a dashed rounded frame on the window, and ONE
 /// guidance message below it (``guidanceMessage(gathering:struggling:)``): the "hold steady" gathering cue,
-/// the "still looking" struggle hint, or the plain framing hint — never more than one at a time. The window
-/// is horizontally inset, a fixed band height, and vertically CENTRED — the shared geometry Android's
+/// the "still looking" struggle hint, or the plain framing hint - never more than one at a time. The window
+/// is horizontally inset, a fixed band height, and vertically CENTRED - the shared geometry Android's
 /// overlay derives everything from (`MrzScannerScreen.kt` `MrzGuideOverlay`), so the scrim, frame, and
 /// guidance can never drift apart, and the OCR band + focus region follow the window wherever layout puts
-/// it (the WYSIWYG plumbing reports its real frame). Purely advisory — it never gates capture. The scrim
+/// it (the WYSIWYG plumbing reports its real frame). Purely advisory - it never gates capture. The scrim
 /// and frame are decorative (hidden from assistive tech); the guidance message carries the meaning.
 private struct MrzGuideOverlay: View {
     @Environment(\.tesseraStringsBundle) private var stringsBundle
@@ -155,7 +155,7 @@ private struct MrzGuideOverlay: View {
         }
     }
 
-    /// The full-cover rect plus the guide window's rounded rect — filled even-odd, the window is punched
+    /// The full-cover rect plus the guide window's rounded rect - filled even-odd, the window is punched
     /// out of the scrim (the SwiftUI mirror of Android's `PathFillType.EvenOdd` scrim path).
     private struct CutoutScrimShape: Shape {
         let window: CGRect
@@ -169,7 +169,7 @@ private struct MrzGuideOverlay: View {
         }
     }
 
-    /// The ONE guidance message, in its translucent dark rounded region — gathering beats struggling beats
+    /// The ONE guidance message, in its translucent dark rounded region - gathering beats struggling beats
     /// the plain framing hint (the pure ``guidanceMessage(gathering:struggling:)`` decision).
     @ViewBuilder
     private var guidanceRegion: some View {
@@ -225,7 +225,7 @@ private struct PreviewLayerView: UIViewRepresentable {
 /// A `UIView` whose `layerClass` is `AVCaptureVideoPreviewLayer`, so the view's own layer renders the camera
 /// feed directly. It also owns the guide-region conversion: only this view holds the preview layer, and only
 /// `metadataOutputRectOfInterest(for:)` knows how the layer's `videoGravity` crop and the connection's
-/// rotation map on-screen points to buffer coordinates — so the conversion happens here, re-run on layout
+/// rotation map on-screen points to buffer coordinates - so the conversion happens here, re-run on layout
 /// and re-checked until the layer's connection exists (before that the conversion has no camera geometry to
 /// use and returns garbage).
 private final class PreviewUIView: UIView {
@@ -248,7 +248,7 @@ private final class PreviewUIView: UIView {
     /// Re-converts once the capture session actually STARTS RUNNING. A conversion made while the
     /// connection's geometry is still settling returns garbage (device-verified TES-132: a dead-centre
     /// window converted to a focus point at x≈0.07), and the change-dedupe would then pin that stale rect
-    /// forever — layout alone is not a reliable retrigger because session start does not necessarily
+    /// forever - layout alone is not a reliable retrigger because session start does not necessarily
     /// relayout the hosting view. The stored rect is invalidated so the fresh conversion always re-fires.
     // nonisolated(unsafe): deinit is nonisolated in Swift 6 and only reads the token to unregister it; the
     // view is main-actor-bound, so there is no concurrent access in practice.

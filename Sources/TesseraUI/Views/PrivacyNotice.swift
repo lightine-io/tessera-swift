@@ -12,7 +12,7 @@ import SwiftUI
 // controller of whatever it returns.
 
 /// The top-bar privacy affordance: a compact "ⓘ Privacy" button that opens ``PrivacyNoticeDialog``. Owns the
-/// dialog's open/closed state locally (a self-contained disclosure — no flow state involved), so
+/// dialog's open/closed state locally (a self-contained disclosure - no flow state involved), so
 /// ``ScannerScaffold`` can drop it into the trailing toolbar with no plumbing. Mirrors the Android
 /// `PrivacyNoticeAction`.
 struct PrivacyNoticeAction: View {

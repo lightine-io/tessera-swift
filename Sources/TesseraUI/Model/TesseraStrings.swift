@@ -12,19 +12,19 @@ import SwiftUI
 /// ## Override contract
 /// A host app opts in by setting ``MrzScannerConfig/stringsBundle`` to its own bundle (typically
 /// `Bundle.main`). To override a string, the host defines an entry for the **same key** the module uses (see
-/// `Resources/Localizable.xcstrings` for the full catalog) in its own **`Localizable` table** — either a
+/// `Resources/Localizable.xcstrings` for the full catalog) in its own **`Localizable` table** - either a
 /// `Localizable.strings` file or a `Localizable.xcstrings` catalog, standard Xcode string-catalog mechanics,
 /// looked up the same way `NSLocalizedString` / `Bundle.localizedString(forKey:value:table:)` would. Any key
 /// the host does not define falls through to the module's own bundled string, so a host only ever needs to
-/// override the handful of keys it actually wants to change — this is additive, not a full replacement of the
+/// override the handful of keys it actually wants to change - this is additive, not a full replacement of the
 /// catalog.
 enum TesseraStrings {
     /// Looks `key` up in `bundle` (the host's ``MrzScannerConfig/stringsBundle``) first; if that bundle has
-    /// no entry for it — or `bundle` is `nil`, the default — falls back to the module's own `.module` catalog.
+    /// no entry for it - or `bundle` is `nil`, the default - falls back to the module's own `.module` catalog.
     ///
     /// `Bundle.localizedString(forKey:value:table:)` returns `key` itself, unchanged, when the table has no
     /// entry for it; that is the framework's documented "miss" signal, and is how a real override (whose
-    /// value happens to equal its key) is distinguished from no override at all — an edge case not worth
+    /// value happens to equal its key) is distinguished from no override at all - an edge case not worth
     /// guarding against since a key and its display value are never expected to collide in practice.
     static func string(_ key: String, bundle: Bundle?) -> String {
         if let bundle {

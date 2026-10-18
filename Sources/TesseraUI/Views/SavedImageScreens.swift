@@ -10,7 +10,7 @@ import Tessera
 // MARK: - Awaiting pick
 
 /// The await-saved-image-pick prompt. Shown when the saved-image method is the entry point and the picker
-/// was dismissed with no photo — so the screen is never left blank. Neutral copy ("Choose a photo" + the
+/// was dismissed with no photo - so the screen is never left blank. Neutral copy ("Choose a photo" + the
 /// on-device privacy fact) and a single action that re-opens the picker. Mirrors the Android
 /// `AwaitingSavedImagePickContent`.
 internal struct AwaitingSavedImagePickScreen: View {
@@ -49,9 +49,9 @@ internal struct AwaitingSavedImagePickScreen: View {
 
 // MARK: - Analyzing
 
-/// The "analyzing photo" screen (mockup 07c) — shown while the picked photo is being read on-device. A
+/// The "analyzing photo" screen (mockup 07c) - shown while the picked photo is being read on-device. A
 /// loading indicator over a title and neutral sub-text. The on-device privacy fact is stated once, globally,
-/// via the shared chrome's ``PrivacyNoticeAction`` — not repeated per screen. The title is announced to
+/// via the shared chrome's ``PrivacyNoticeAction`` - not repeated per screen. The title is announced to
 /// VoiceOver on arrival (this screen is reached via an auto-transition, not a user tap), mirroring the
 /// Android polite live region; the spinner is decorative and hidden from the accessibility tree. Mirrors the
 /// Android `SavedImageAnalyzingContent`.
@@ -81,10 +81,10 @@ internal struct SavedImageAnalyzingScreen: View {
 
 // MARK: - Empty
 
-/// The "no MRZ found in this photo" screen (mockup 07b). Stated honestly — the MRZ *couldn't be located*, not
-/// that the document is "invalid" — with a neutral hint about why, and two escapes: pick a different photo
+/// The "no MRZ found in this photo" screen (mockup 07b). Stated honestly - the MRZ *couldn't be located*, not
+/// that the document is "invalid" - with a neutral hint about why, and two escapes: pick a different photo
 /// (primary) or type the details by hand (secondary). The on-device privacy fact is stated once, globally,
-/// via the shared chrome's ``PrivacyNoticeAction`` — not repeated per screen. Mirrors the Android
+/// via the shared chrome's ``PrivacyNoticeAction`` - not repeated per screen. Mirrors the Android
 /// `SavedImageEmptyContent`.
 ///
 /// - Parameters:

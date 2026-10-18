@@ -17,8 +17,8 @@ import SwiftUI
 /// The adaptive camera-permission screen. Renders one of two faces from ``state``:
 ///
 ///  * ``PermissionScreenState/needsGrant`` → mockup 04: title "Camera permission needed", the on-device
-///    privacy body, a primary "Continue" that fires ``onGrant`` — but ONLY when ``hasRequestHandler`` is
-///    true; if the host supplied no permission handler, no dead Grant button is drawn, leaving just the
+///    privacy body, a primary "Continue" that fires ``onGrant`` - but ONLY when ``hasRequestHandler`` is
+///    true; if the host supplied no permission handler, no dead Grant button is drawn, leaving only the
 ///    rationale and the manual-entry escape.
 ///  * ``PermissionScreenState/permanentlyDenied`` → mockup 04b: title "Camera access is off", the Settings +
 ///    privacy body, a primary "Open Settings" that fires ``onOpenSettings`` (always available in this mode).
@@ -71,9 +71,9 @@ internal struct PermissionScreen: View {
 }
 
 /// The shared layout of both permission faces (mockups 04 / 04b): a centred title + body, a primary action
-/// pinned at the bottom (omitted when ``primaryLabel`` is `nil` — the no-handler Grant case), and the secondary
+/// pinned at the bottom (omitted when ``primaryLabel`` is `nil` - the no-handler Grant case), and the secondary
 /// "Enter details manually" escape beneath it. The two faces differ only in their accessibility identifier,
-/// copy, and which callback the primary action fires — everything structural is shared here. Mirrors the
+/// copy, and which callback the primary action fires - everything structural is shared here. Mirrors the
 /// Android private `PermissionScaffold`.
 private struct PermissionScaffold: View {
     @Environment(\.tesseraStringsBundle) private var stringsBundle

@@ -16,7 +16,7 @@ func pinsActions(verticalSizeClass: UserInterfaceSizeClass?) -> Bool {
 }
 
 /// The shared title / scrolling body / actions layout of the content screens (manual entry, review, read
-/// failed). Regular height: `header` on top, `scrolling` in its own `ScrollView`, `actions` pinned below —
+/// failed). Regular height: `header` on top, `scrolling` in its own `ScrollView`, `actions` pinned below -
 /// exactly the pre-TES-153 layout. Compact height: one `ScrollView` holding `header`, `scrolling` and
 /// `actions` in that order (see ``pinsActions(verticalSizeClass:)``). Both keep the 24pt padding, the
 /// ``ContentMaxWidth`` cap and the leading-aligned 16pt column; `header` and `actions` may hold several views

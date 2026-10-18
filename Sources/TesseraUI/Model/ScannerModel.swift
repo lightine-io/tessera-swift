@@ -5,7 +5,7 @@ import SwiftUI
 import Tessera
 import UIKit
 
-/// The scanner flow's state driver — the iOS mirror of the Android `ScannerFlow` composable's wiring. It
+/// The scanner flow's state driver - the iOS mirror of the Android `ScannerFlow` composable's wiring. It
 /// owns the `AVCaptureMrzScanner`, collects its per-frame `results` stream, applies the pure
 /// ``reduceCameraResult(_:)`` → ``routeDecode(_:reviewMode:)`` decisions to ``state``, and exposes the
 /// scanner's published `AVCaptureSession` for ``CameraPreviewView``. The root view (``RootScannerView``)
@@ -14,7 +14,7 @@ import UIKit
 ///
 /// Everything is on the main actor: SwiftUI observation and the `AVCaptureMrzScanner` results are marshalled
 /// here, matching how the Android flow runs on the composition thread. Reports back exactly once through
-/// ``onResult`` — either a confirmed decode the user accepted or a cancellation.
+/// ``onResult`` - either a confirmed decode the user accepted or a cancellation.
 @MainActor
 @Observable
 final class ScannerModel {
@@ -30,14 +30,14 @@ final class ScannerModel {
     var photoPickerPresented = false
     var pickedItem: PhotosPickerItem?
 
-    /// Whether the host has been handed a camera-permission request in this flow — the iOS analogue of the
+    /// Whether the host has been handed a camera-permission request in this flow - the iOS analogue of the
     /// Android `hasAsked`. On iOS a status of anything other than `.notDetermined` also means the user has
     /// been asked, so the permanent-denial face is reached without a separate rationale signal.
     private var hasAskedPermission = false
 
     /// The trigger for the accepted-read confirm haptic (TES-134): bumped exactly when the live-camera
     /// consensus gate confirms a read, observed by the root view's `.sensoryFeedback` (which gates on
-    /// ``MrzScannerConfig/hapticFeedback``). A counter — not a Bool — so back-to-back sessions retrigger.
+    /// ``MrzScannerConfig/hapticFeedback``). A counter - not a Bool - so back-to-back sessions retrigger.
     private(set) var confirmedReadHaptic = 0
 
     /// Whether the torch is currently on (reflected by the torch button). K/N does not expose the AVFoundation
@@ -46,10 +46,10 @@ final class ScannerModel {
     // Applies `torchOnByDefault` once per session, so it is not re-forced on every preview-session update.
     private var torchDefaultApplied = false
 
-    /// Whether the currently bound camera device has a flash/torch unit at all — the gate the torch button's
+    /// Whether the currently bound camera device has a flash/torch unit at all - the gate the torch button's
     /// visibility checks (TES-84 mirror of the Android `scanner.hasTorch()`). `AVCaptureMrzScanner` (the K/N
     /// scanner) exposes no `hasTorch`/`torch` seam of its own, so this is derived here from the published
-    /// ``previewSession``'s bound video device — the same seam ``setTorch(_:)`` already reads. `false` while
+    /// ``previewSession``'s bound video device - the same seam ``setTorch(_:)`` already reads. `false` while
     /// no session is live (nothing to check yet).
     var hasTorch: Bool {
         currentCaptureDevice()?.hasTorch ?? false
@@ -72,7 +72,7 @@ final class ScannerModel {
 
     /// A one-shot latch: once a decode has routed on (to review / read-failed / straight back), later decoded
     /// frames from the still-running stream must not re-fire. Kept as model state (not inside the collector)
-    /// so it survives the state transitions the collector drives — e.g. a camera-in-use → scanning resume.
+    /// so it survives the state transitions the collector drives - e.g. a camera-in-use → scanning resume.
     private var decodeRouted = false
 
     /// Frame-agreement gate over the live decode stream (TES-91 mirror): a decode routes on only once
@@ -86,7 +86,7 @@ final class ScannerModel {
     private var consensus = try! MrzDecodeConsensus(threshold: ScannerModel.consensusReads)
 
     /// How many agreeing frames the live consensus gate requires before a reading is confirmed. Hardcoded to
-    /// mirror `MrzDecodeConsensus.DEFAULT_THRESHOLD` (mrz-camera-core) — unlike the Android `MrzScannerConfig`,
+    /// mirror `MrzDecodeConsensus.DEFAULT_THRESHOLD` (mrz-camera-core) - unlike the Android `MrzScannerConfig`,
     /// this iOS `MrzScannerConfig` has no `consensusReads` extension point yet, so there is nothing to plumb a
     /// consumer override through; add one here if/when the config gains that knob.
     private static let consensusReads: Int32 = 2
@@ -105,19 +105,19 @@ final class ScannerModel {
     private var struggleTimeoutElapsed = false
 
     /// Guards ``armStruggleTimeout()`` so it fires once per live session, the first time the preview session
-    /// goes live (mirrors the Android `awaitCameraActiveThenTimeout` gate) rather than at scan-intent —
+    /// goes live (mirrors the Android `awaitCameraActiveThenTimeout` gate) rather than at scan-intent -
     /// camera-boot time must not count against the struggle budget.
     private var struggleTimeoutArmed = false
 
     /// TES-93 mirror: the in-progress manual-entry text, hoisted here (survives the flow's lifetime) rather
-    /// than living only inside `ScannerState.manualRaw` — which a naive `selectMethod` / `rescan` would
+    /// than living only inside `ScannerState.manualRaw` - which a naive `selectMethod` / `rescan` would
     /// rebuild from scratch (an empty `.manualRaw`), silently discarding whatever the user had typed on a
     /// Manual→other→Manual round trip.
     private var manualDraft = ""
 
     /// TES-137 mirror of the Android `MANUAL_ENTRY_MAX_CHARS`: a hard ceiling on the manual-entry draft's
     /// length, in characters. A real MRZ is at most 3 lines of 44 characters (132 chars) plus a little
-    /// whitespace — 1024 is generously above that so a legitimate typed or pasted MRZ is never truncated,
+    /// whitespace - 1024 is generously above that so a legitimate typed or pasted MRZ is never truncated,
     /// while an arbitrarily large paste is bounded before it reaches ``manualDraft`` / ``ScannerState``.
     /// Truncated, never rejected (reader, not oracle): a 1024-character draft is already not a readable MRZ
     /// regardless of where the excess came from.
@@ -131,10 +131,10 @@ final class ScannerModel {
     private(set) var timeRemaining: Duration?
 
     /// The pure accumulator behind the deadline (see ``DeadlineClock``); `nil` when `config.scanTimeout` is
-    /// `nil` — the deadline never arms.
+    /// `nil` - the deadline never arms.
     private var deadlineClock: DeadlineClock?
 
-    /// The monotonic clock the deadline measures active elapsed time against — never wall-clock `Date` (a
+    /// The monotonic clock the deadline measures active elapsed time against - never wall-clock `Date` (a
     /// clock change, DST, or NTP correction must never perturb the deadline). Mirrors the Android
     /// `SystemClock.elapsedRealtime()`.
     private let deadlineTickClock = ContinuousClock()
@@ -145,7 +145,7 @@ final class ScannerModel {
 
     private var deadlineTask: Task<Void, Never>?
 
-    /// Whether the app is currently foreground — the deadline advances only while this is `true`. Defaults to
+    /// Whether the app is currently foreground - the deadline advances only while this is `true`. Defaults to
     /// `true` (the scanner only ever appears while the app is already active); ``setForeground(_:)`` keeps it
     /// current as the scene phase changes.
     private var deadlineForeground = true
@@ -173,7 +173,7 @@ final class ScannerModel {
         beginSession()
     }
 
-    /// Tears the flow down — stops and closes the scanner and cancels the collectors, including the
+    /// Tears the flow down - stops and closes the scanner and cancels the collectors, including the
     /// session-level deadline tick loop. Called on disappear.
     func onDisappear() {
         teardownScanner()
@@ -190,9 +190,9 @@ final class ScannerModel {
     // data of its own. Revisit only on real field reports of lost long manual entries, privacy-first.
 
     /// Starts the session-level scan-timeout deadline (TES-124) exactly once, independent of which screen or
-    /// reading method is showing — called from ``onAppear()``, so it starts the moment the scanner UI appears
+    /// reading method is showing - called from ``onAppear()``, so it starts the moment the scanner UI appears
     /// and survives every later method switch, review, or manual-entry detour. A `nil` `config.scanTimeout`
-    /// never arms (``timeRemaining`` stays `nil`, so the countdown chip never shows — Swift's `Duration` has
+    /// never arms (``timeRemaining`` stays `nil`, so the countdown chip never shows - Swift's `Duration` has
     /// no infinity sentinel, so `nil` plays the role the Android `Duration.INFINITE` does). Idempotent: a
     /// second call (e.g. a re-fired `.onAppear`) is a no-op once a deadline is already running.
     private func beginSession() {
@@ -203,10 +203,10 @@ final class ScannerModel {
     }
 
     /// Forwards a scene-phase change from the root view's `@Environment(\.scenePhase)`. The deadline advances
-    /// only while foreground — the iOS mirror of the Android session deadline's `Lifecycle.State.RESUMED`
+    /// only while foreground - the iOS mirror of the Android session deadline's `Lifecycle.State.RESUMED`
     /// gate (`repeatOnLifecycle`): time spent backgrounded or on the lock screen does not count, and the
     /// deadline resumes from the accumulated elapsed time rather than restarting (TES-126). Camera-interrupted
-    /// ("in use") time still counts — that is a foreground state; only backgrounding pauses the clock, since
+    /// ("in use") time still counts - that is a foreground state; only backgrounding pauses the clock, since
     /// the pause is lifecycle-driven only, exactly like Android, never camera-driven.
     func setForeground(_ foreground: Bool) {
         guard deadlineForeground != foreground else { return }
@@ -240,7 +240,7 @@ final class ScannerModel {
 
     /// One deadline tick: advances the accumulator by the REAL elapsed time since the last tick
     /// (drift-corrected by the monotonic clock, mirroring the Android tick's `now - lastTick`), refreshes
-    /// ``timeRemaining`` for the countdown chip, and — the first time the accumulator reaches the total —
+    /// ``timeRemaining`` for the countdown chip, and - the first time the accumulator reaches the total -
     /// ends the flow as `Cancelled(timedOut)` on whatever screen the user is currently on, exactly like the
     /// Android `onElapsed`.
     private func tickDeadline() {
@@ -260,7 +260,7 @@ final class ScannerModel {
     // MARK: - VoiceOver announce-on-arrival (TES-58)
 
     /// Posts a VoiceOver announcement for `state`'s arrival, if it carries one (``announcementKey(for:)`` in
-    /// ScannerDecisions.swift) — the iOS mirror of the Android live regions (`liveRegion =
+    /// ScannerDecisions.swift) - the iOS mirror of the Android live regions (`liveRegion =
     /// Assertive`/`Polite`). `UIAccessibility.announcement` has no polite/assertive tier, so both groups are
     /// posted identically here, immediately on arrival.
     private func postAnnouncement(for state: ScannerState) {
@@ -268,10 +268,10 @@ final class ScannerModel {
         postAnnouncement(key: key)
     }
 
-    /// Posts a plain-text VoiceOver announcement for a localization `key` directly — used for the
+    /// Posts a plain-text VoiceOver announcement for a localization `key` directly - used for the
     /// struggling/gathering overlays, a rising-edge flag on `.scanning` rather than a distinct
     /// ``ScannerState`` case, so they can't go through ``postAnnouncement(for:)``'s state-keyed mapping. Every
-    /// call site guards this to fire once, on the transition into the overlay — never on every recompute of
+    /// call site guards this to fire once, on the transition into the overlay - never on every recompute of
     /// an already-showing one, mirroring the Android `StrugglingHint`/`GatheringHint` polite live regions.
     private func postAnnouncement(key: String) {
         UIAccessibility.post(
@@ -285,14 +285,14 @@ final class ScannerModel {
     /// The global cancel (the top bar's ✕). Reports WHY the flow ended based on what the user was looking
     /// at when they closed (TES-115, the Android `dismissReasonFor` mirror): the terminal
     /// camera-unavailable screen → ``DismissReason/cameraUnavailable``, either permission screen →
-    /// ``DismissReason/permissionDenied``, anything else — including the recoverable in-use notice —
+    /// ``DismissReason/permissionDenied``, anything else - including the recoverable in-use notice -
     /// ``DismissReason/userDismissed``. The decision is the pure ``dismissReason(for:)``.
     func cancel() {
         onResult(.cancelled(dismissReason(for: state)))
     }
 
     /// Whether the manual-entry escape (offered from the struggling hint, both camera-status notices, and the
-    /// permission gate) should be shown at all — `false` when the consumer's `enabledMethods` excludes
+    /// permission gate) should be shown at all - `false` when the consumer's `enabledMethods` excludes
     /// `.manualEntry`, so a camera-only config never routes the user into a screen they cannot reach any other
     /// way. Mirrors the Android `showManualEntry`.
     var showManualEntry: Bool {
@@ -300,7 +300,7 @@ final class ScannerModel {
     }
 
     /// Switching reading method from the switcher: camera → scanning, photo → the await-pick launcher state,
-    /// type → manual raw (prefilled from the hoisted ``manualDraft``, TES-93 — a Manual→other→Manual round
+    /// type → manual raw (prefilled from the hoisted ``manualDraft``, TES-93 - a Manual→other→Manual round
     /// trip must not silently discard what the user already typed). Re-arms the decode latch and the live
     /// consensus / struggle-gate state so a fresh method starts clean. Mirrors the Android `onSelectMethod`.
     func selectMethod(_ method: ScanMethod) {
@@ -317,10 +317,10 @@ final class ScannerModel {
 
     // MARK: - Per-screen hooks
 
-    /// Rescanning / trying again: returns to whichever method produced the current outcome screen — the iOS
+    /// Rescanning / trying again: returns to whichever method produced the current outcome screen - the iOS
     /// mirror of the Android `returnToSource` (from a review, TES-92/TES-96) and the read-failed
     /// `ReadFailedContent.onTryAgain` (hardcoded to re-open the photo picker, since read-failed is only ever
-    /// reached via saved-image — a live-camera parse failure never routes while the consensus gate is waiting
+    /// reached via saved-image - a live-camera parse failure never routes while the consensus gate is waiting
     /// for a clean frame, and manual entry now stays inline on a parse failure, see ``readManual(text:)``).
     /// Re-arms the decode latch and the live consensus / struggle-gate state so a fresh camera session starts
     /// clean.
@@ -336,9 +336,9 @@ final class ScannerModel {
         }
     }
 
-    /// Returns to whichever reading method produced a ``ScannerState/review(decoded:expanded:source:)`` —
+    /// Returns to whichever reading method produced a ``ScannerState/review(decoded:expanded:source:)`` -
     /// camera → the live preview, saved-image → re-open the picker, manual → the entry screen, PREFILLED with
-    /// the lines that were actually submitted for this review (TES-93 — editing a manual-provenance reading
+    /// the lines that were actually submitted for this review (TES-93 - editing a manual-provenance reading
     /// should not start from a blank field). Mirrors the Android `returnToSource`.
     private func returnToSource(_ source: ScanMethod, decoded: MrzScanResultDecoded) {
         switch source {
@@ -353,7 +353,7 @@ final class ScannerModel {
     }
 
     /// Clears the one-shot decode latch and the live-session gates (consensus tally, struggle-gate latches,
-    /// the struggle-timer arm latch) — called whenever a fresh live session begins (``selectMethod(_:)``,
+    /// the struggle-timer arm latch) - called whenever a fresh live session begins (``selectMethod(_:)``,
     /// ``rescan()``), mirroring the Android flow's paired resets of `decodeRouted` / `consensus` /
     /// `struggleTimeoutElapsed`.
     private func resetLiveSessionGates() {
@@ -368,9 +368,9 @@ final class ScannerModel {
         transition(to: .manualRaw(text: manualDraft, parseFailed: false))
     }
 
-    /// Bind the in-progress manual text (called on every edit) — mirrored into the hoisted ``manualDraft``
+    /// Bind the in-progress manual text (called on every edit) - mirrored into the hoisted ``manualDraft``
     /// (TES-93) and clears a prior parse-failed note (the input the user is fixing is no longer "failed").
-    /// TES-137: truncated to ``manualEntryMaxChars`` before it reaches ``manualDraft`` / ``ScannerState`` —
+    /// TES-137: truncated to ``manualEntryMaxChars`` before it reaches ``manualDraft`` / ``ScannerState`` -
     /// bounds a large paste at the source, mirroring the Android `MANUAL_ENTRY_MAX_CHARS` cap.
     func updateManualText(_ text: String) {
         let bounded = String(text.prefix(Self.manualEntryMaxChars))
@@ -380,7 +380,7 @@ final class ScannerModel {
 
     /// Assemble a `Decoded` from the typed text (pure, host-tested; format auto-detected). A success /
     /// partial-success routes to review (or straight back under instant-return) exactly as a camera decode
-    /// does. A parse failure stays HERE with an inline note — the typed text is preserved and there is no jump
+    /// does. A parse failure stays HERE with an inline note - the typed text is preserved and there is no jump
     /// to the camera/photo-flavoured read-failed screen. Mirrors the Android manual-entry `onRead`.
     func readManual(text: String) {
         let decoded = assembleManualDecoded(text: text)
@@ -409,10 +409,10 @@ final class ScannerModel {
 
     /// Reads the picked photo through the `SavedImageMrzReader` in single-read mode, entirely on-device, then
     /// applies the pure ``mapSavedImageResult(_:)``: a single decode → routed exactly as a camera decode;
-    /// nothing readable → the empty screen. Single read, like the live camera (TES-86/TES-91) — no tolerant
+    /// nothing readable → the empty screen. Single read, like the live camera (TES-86/TES-91) - no tolerant
     /// candidate enumeration and no "choose the reading" screen; if OCR misread an ambiguous glyph, the
     /// review's check-digit observations surface it and the user rescans, the same safety net the camera has.
-    /// Saved-image reading is opt-in and off by default — reaching here means the consumer enabled
+    /// Saved-image reading is opt-in and off by default - reaching here means the consumer enabled
     /// ``ScanMethod/savedImage``, which IS the acknowledgement (ADR-023), so the acknowledgement is
     /// constructed here with no separate screen.
     private func readPickedPhoto(_ item: PhotosPickerItem) async {
@@ -497,7 +497,7 @@ final class ScannerModel {
         state = .review(decoded: decoded, expanded: !expanded, source: source)
     }
 
-    /// Confirm the reviewed decode — hand it back to the host.
+    /// Confirm the reviewed decode - hand it back to the host.
     func confirmReview() {
         guard case let .review(decoded, _, _) = state else { return }
         onResult(.confirmed(decoded))
@@ -506,7 +506,7 @@ final class ScannerModel {
     // MARK: - State transitions
 
     /// Moves to a new state and runs its entry side effects (start/stop scanner, launch picker, arm the
-    /// struggle timer). Centralised so every transition — switcher, rescan, decode routing — goes through the
+    /// struggle timer). Centralised so every transition - switcher, rescan, decode routing - goes through the
     /// same entry wiring, mirroring how the Android flow reacts to `uiState` changes.
     private func transition(to newState: ScannerState) {
         state = newState
@@ -565,7 +565,7 @@ final class ScannerModel {
         config.onRequestPermission?()
     }
 
-    /// Opens this app's Settings page so the user can turn Camera on after a denial — UI navigation, not a
+    /// Opens this app's Settings page so the user can turn Camera on after a denial - UI navigation, not a
     /// permission request (within the permission boundary).
     func openSettings() {
         guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
@@ -595,8 +595,8 @@ final class ScannerModel {
 
     /// Starts (or keeps running) the live scanner for the scanning state. Constructs the scanner with preview
     /// armed on first use and begins collecting `results` and `previewSession`. The struggle timeout is armed
-    /// separately, once the preview actually goes live (see ``deliverPreviewSession(_:)`` — TES-97 item 6),
-    /// not here at scan-intent. The session-level scan deadline is NOT armed here either — unlike the old
+    /// separately, once the preview actually goes live (see ``deliverPreviewSession(_:)`` - TES-97 item 6),
+    /// not here at scan-intent. The session-level scan deadline is NOT armed here either - unlike the old
     /// camera-scoped timer this replaced, it lives at the whole-flow level (``beginSession()``, called once
     /// from ``onAppear()``) and runs independently of whether the camera is even the active method.
     private func startScanningIfNeeded() {
@@ -663,8 +663,8 @@ final class ScannerModel {
     /// nil timeout means "never struggle", so the timer does not arm. If the scanning state is not showing
     /// when the timer fires, the next frame flips it (see the `.stayScanning` branch in
     /// ``onCameraResult(_:)``). Armed once per live
-    /// session the first time the preview goes live (``deliverPreviewSession(_:)``, TES-97 item 6) — not at
-    /// scan-intent — so camera-boot time is never counted against the budget. Mirrors the Android struggle
+    /// session the first time the preview goes live (``deliverPreviewSession(_:)``, TES-97 item 6) - not at
+    /// scan-intent - so camera-boot time is never counted against the budget. Mirrors the Android struggle
     /// `LaunchedEffect` / `onStruggling`.
     func armStruggleTimeout() {
         struggleTask?.cancel()
@@ -707,10 +707,10 @@ final class ScannerModel {
         recognizer = nil
     }
 
-    /// Retargets the OCR band to the guide's real on-screen region — called by the viewfinder whenever its
+    /// Retargets the OCR band to the guide's real on-screen region - called by the viewfinder whenever its
     /// layout resolves or changes, with the guide rect already converted by AVFoundation's own
     /// `metadataOutputRectOfInterest(for:)` (so `metadataRect` is normalized against the unrotated capture
-    /// buffer, top-left origin — the recognizer maps it into Vision's space internally). No-op when the
+    /// buffer, top-left origin - the recognizer maps it into Vision's space internally). No-op when the
     /// live scanner is not running (nothing to retarget; a later start re-reports on layout).
     func updateMrzGuideRegion(metadataRect: CGRect) {
         recognizer?.restrictToMrzBand(
@@ -731,7 +731,7 @@ final class ScannerModel {
     }
 
     /// Main-actor delivery of one collected result. The value is non-Sendable (a K/N reference type), so it
-    /// crosses from the collect loop wrapped in an ``UnsafeTransfer`` — safe because the collector produces
+    /// crosses from the collect loop wrapped in an ``UnsafeTransfer`` - safe because the collector produces
     /// one value at a time and never touches it again after handing it over (a single-owner transfer).
     private func deliverCameraResult(_ result: UnsafeTransfer<MrzScanResult>) {
         onCameraResult(result.value)
@@ -785,16 +785,16 @@ final class ScannerModel {
             .device
     }
 
-    /// The continuous state reducer over the scanner's result stream — the iOS mirror of the Android
+    /// The continuous state reducer over the scanner's result stream - the iOS mirror of the Android
     /// `onCameraResult`. Every per-frame result runs through the pure ``reduceCameraResult(_:)`` and the
     /// resulting effect is applied here. Repeated decoded frames are guarded by the ``decodeRouted`` latch
     /// (route only the first). A camera-in-use notice self-resumes: any later non-error result flips the flow
     /// back to scanning, so no retry is needed.
     ///
-    /// A decoded frame is a transient bad frame if it did not parse (blurred/garbled OCR) — live camera keeps
+    /// A decoded frame is a transient bad frame if it did not parse (blurred/garbled OCR) - live camera keeps
     /// scanning and waits for a clean frame rather than committing to read-failed on one bad read (TES-86); a
     /// parseable frame is offered to the consensus gate (``consensus``) rather than routed on sight, so a
-    /// transient misread the MRZ has no check digit for cannot win on one frame — Gathering keeps scanning
+    /// transient misread the MRZ has no check digit for cannot win on one frame - Gathering keeps scanning
     /// (surfacing the "hold steady" cue), Confirmed routes once (the latch stops repeats). Mirrors the Android
     /// `onCameraResult`'s consensus wiring (TES-91).
     private func onCameraResult(_ result: MrzScanResult) {
@@ -855,7 +855,7 @@ final class ScannerModel {
         }
     }
 
-    /// Routes a decode to the matching state via ``routeDecode(_:reviewMode:)`` — shared by the camera path,
+    /// Routes a decode to the matching state via ``routeDecode(_:reviewMode:)`` - shared by the camera path,
     /// manual entry, and saved-image, all of which produce a `Decoded` that follows the identical routing.
     /// `source` is carried onto ``ScannerState/review(decoded:expanded:source:)`` so a rescan/edit-entry
     /// returns to the method that produced it (TES-92/TES-93/TES-96). Mirrors the Android `routeDecoded` /
@@ -876,7 +876,7 @@ final class ScannerModel {
 
 /// A single-owner transfer box for moving a non-Sendable value across an isolation boundary when the value is
 /// produced, handed over, and never touched again by the sender (the K/N collect loop yields one value at a
-/// time). `@unchecked Sendable` because that ownership discipline — not the type — makes the move safe.
+/// time). `@unchecked Sendable` because that ownership discipline - not the type - makes the move safe.
 private struct UnsafeTransfer<T>: @unchecked Sendable {
     let value: T
     init(_ value: T) { self.value = value }
