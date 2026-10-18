@@ -13,17 +13,17 @@ import SwiftUI
 
 /// The manual raw-MRZ entry screen. The user types the 1–3 MRZ lines (newline-separated) into a monospace
 /// field; live neutral observations state each line's character count; a parse failure stays inline on this
-/// screen (the typed text preserved — no jump to the camera-flavoured read-failed screen); and the primary
+/// screen (the typed text preserved - no jump to the camera-flavoured read-failed screen); and the primary
 /// action hands the typed text back through ``onRead``.
 ///
 /// - Parameters:
-///   - text: the in-progress typed MRZ text (the model's hoisted draft — it survives method switches).
+///   - text: the in-progress typed MRZ text (the model's hoisted draft - it survives method switches).
 ///   - parseFailed: whether the last "Read" failed to parse; shown as an inline error note, after the
 ///     observations, right before the action button. Any edit clears it (the model resets the flag on
 ///     ``onTextChange``).
 ///   - onTextChange: called with the new text on every edit.
 ///   - onRead: called when the user taps the read action (format auto-detected). Disabled while the trimmed
-///     text is empty — there is nothing to read, and there is no per-screen cancel here (mirrors Android:
+///     text is empty - there is nothing to read, and there is no per-screen cancel here (mirrors Android:
 ///     the top-bar ✕ is the only escape, so this screen offers no separate "Cancel" button).
 internal struct ManualEntryScreen: View {
     @Environment(\.tesseraStringsBundle) private var stringsBundle
@@ -137,7 +137,7 @@ internal struct ManualEntryScreen: View {
         .accessibilityIdentifier("tessera-mrz-manual-raw")
     }
 
-    /// The live, neutral observation strings — one plain character count per typed line ("Line 2: 28
+    /// The live, neutral observation strings - one plain character count per typed line ("Line 2: 28
     /// characters"), grammatical for a count of one. No expected-length deltas: reading auto-detects the
     /// format, so no single expected length is known, and a delta would be a verdict in disguise (Principle 1).
     /// Mirrors the Android `manualObservations` plural resource.

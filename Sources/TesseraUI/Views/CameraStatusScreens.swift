@@ -21,7 +21,7 @@ import SwiftUI
 /// The camera-in-use screen (mockup 05). Shown when another app holds the camera. This is **recoverable**:
 /// the scanner keeps its session bound underneath and the platform camera framework auto-resumes the stream
 /// once the other holder releases it, so the flow returns to scanning on its own. There is therefore **no
-/// retry action** — only ``onManualEntry``, the escape into manual entry for a user who would rather not
+/// retry action** - only ``onManualEntry``, the escape into manual entry for a user who would rather not
 /// wait. The "Reconnecting…" indicator states the recoverable status in words. Mirrors the Android
 /// `CameraInUseContent`.
 internal struct CameraInUseScreen: View {
@@ -67,7 +67,7 @@ internal struct CameraInUseScreen: View {
 }
 
 /// The camera-unavailable screen (mockup 05b). Shown when the camera cannot be started for a non-recoverable
-/// reason. This is **terminal**: there is no auto-recovery and no retry — the only forward path is
+/// reason. This is **terminal**: there is no auto-recovery and no retry - the only forward path is
 /// ``onManualEntry``, typing the details by hand. Mirrors the Android `CameraUnavailableContent`.
 internal struct CameraUnavailableScreen: View {
     @Environment(\.tesseraStringsBundle) private var stringsBundle
@@ -109,7 +109,7 @@ internal struct CameraUnavailableScreen: View {
 
 /// The "Reconnecting…" indicator on the camera-in-use screen: a pulsing dot beside the reconnecting label.
 /// The label carries the meaning; the pulse is purely decorative (the recoverable status is stated in the
-/// text, so nothing is lost with reduce-motion on — SwiftUI's `.repeatForever` animation already honours the
+/// text, so nothing is lost with reduce-motion on - SwiftUI's `.repeatForever` animation already honours the
 /// platform's reduce-motion setting via `UIAccessibility.isReduceMotionEnabled`, mirroring the Android
 /// `animationsEnabled()` gate). Mirrors the Android `ReconnectingIndicator`.
 private struct ReconnectingIndicator: View {
@@ -137,8 +137,8 @@ private struct ReconnectingIndicator: View {
     }
 }
 
-/// The struggling hint overlaid on the live preview (mockup 02): a neutral advisory line ("still looking —
-/// try more light or move closer") and a "Type it instead" affordance into manual entry. Advisory only — it
+/// The struggling hint overlaid on the live preview (mockup 02): a neutral advisory line ("still looking -
+/// try more light or move closer") and a "Type it instead" affordance into manual entry. Advisory only - it
 /// never states an error or a verdict, and the camera keeps scanning underneath (a decode arriving after the
 /// hint still routes normally). ``onManualEntry`` switches to manual raw entry. Mirrors the Android
 /// `StrugglingHint`.
@@ -171,12 +171,12 @@ internal struct StrugglingHint: View {
 }
 
 /// The "hold steady" gathering cue overlaid on the live preview while the frame-agreement consensus gate
-/// (``MrzDecodeConsensus``) confirms a read across several frames. Gives the consensus wait visible feedback
-/// — a small activity indicator plus "Hold steady…" — so a multi-frame confirmation reads as active progress
-/// rather than lag. Advisory only — it states no error and no verdict (Principle 1); the camera keeps
+/// (``MrzDecodeConsensus``) confirms a read across several frames. Gives the consensus wait visible feedback -
+/// a small activity indicator plus "Hold steady…" - so a multi-frame confirmation reads as active progress
+/// rather than lag. Advisory only - it states no error and no verdict (Principle 1); the camera keeps
 /// scanning underneath and a confirmed read routes on normally. Takes render precedence over
-/// ``StrugglingHint`` in the single live-preview guidance region (``guidanceMessage(gathering:struggling:)``)
-/// — getting a decode at all is better news than "still looking". Mirrors the Android `GatheringHint`.
+/// ``StrugglingHint`` in the single live-preview guidance region (``guidanceMessage(gathering:struggling:)``) -
+/// getting a decode at all is better news than "still looking". Mirrors the Android `GatheringHint`.
 internal struct GatheringHint: View {
     @Environment(\.tesseraStringsBundle) private var stringsBundle
 

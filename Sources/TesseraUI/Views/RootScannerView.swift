@@ -1,7 +1,7 @@
 import PhotosUI
 import SwiftUI
 
-/// The per-state screen dispatch — the iOS mirror of the Android `ScannerBody`. An exhaustive `switch` over
+/// The per-state screen dispatch - the iOS mirror of the Android `ScannerBody`. An exhaustive `switch` over
 /// ``ScannerState``, rendered inside the ``ScannerScaffold`` (so the shared top bar + method switcher sit
 /// above it). Each leaf screen is its own SwiftUI view; this view owns the ``ScannerModel`` and routes its
 /// callbacks. The saved-image photo picker and the foreground permission re-check are attached here (they

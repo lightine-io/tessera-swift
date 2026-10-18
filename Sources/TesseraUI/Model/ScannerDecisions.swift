@@ -35,7 +35,7 @@ enum DecodeRoute {
 /// ``DecodeRoute/showReadFailed(capturedText:)`` regardless of mode; otherwise ``ReviewMode/instantReturn``
 /// routes to ``DecodeRoute/returnConfirmed(decoded:)`` and ``ReviewMode/review`` to
 /// ``DecodeRoute/showReview(decoded:)``. A `ParseResultPartialSuccess` (check-digit mismatch) is a
-/// non-failure and follows the same path as `ParseResultSuccess` — the UI never treats a mismatch as a
+/// non-failure and follows the same path as `ParseResultSuccess` - the UI never treats a mismatch as a
 /// failure or diverts it (Principle 1). Mirrors the Android `routeDecode`.
 func routeDecode(_ decoded: MrzScanResultDecoded, reviewMode: ReviewMode) -> DecodeRoute {
     if decoded.parse is ParseResult.Failure {
@@ -49,7 +49,7 @@ func routeDecode(_ decoded: MrzScanResultDecoded, reviewMode: ReviewMode) -> Dec
 
 // MARK: - Camera result reduction
 
-/// What one scanner result means for the flow state — the pure decision ``reduceCameraResult(_:)`` returns,
+/// What one scanner result means for the flow state - the pure decision ``reduceCameraResult(_:)`` returns,
 /// applied by ``ScannerModel``. Mirrors the Android `CameraFlowEffect`.
 enum CameraFlowEffect {
     /// A decode is available; route it exactly as ``routeDecode(_:reviewMode:)`` decides (then the one-shot
@@ -62,10 +62,10 @@ enum CameraFlowEffect {
     /// The camera cannot be started (terminal). Show the unavailable notice; no auto-recovery, no retry.
     case goCameraUnavailable
 
-    /// A transient per-frame miss (`NoMrzFound` / `OcrFailed`) — keep scanning, no routing of its own.
+    /// A transient per-frame miss (`NoMrzFound` / `OcrFailed`) - keep scanning, no routing of its own.
     /// `sawText` is TES-97's "did OCR return any text at all on this frame" signal
     /// (`quality.recognizedLineCount > 0`): `false` for a frame with nothing recognisable in view, `true` for
-    /// a frame where OCR saw text that just did not form an MRZ shape. ``ScannerModel`` no longer gates the
+    /// a frame where OCR saw text that did not form an MRZ shape. ``ScannerModel`` no longer gates the
     /// struggle hint on it (TES-151: the hint shows on the timer alone). Mirrors the Android `StayScanning(sawText)`.
     case stayScanning(sawText: Bool)
 }
@@ -73,9 +73,9 @@ enum CameraFlowEffect {
 /// The flow-state decision for one `MrzScanResult` off the scanner's stream, decided purely from the result
 /// kind. A `CaptureError` carrying `CameraInUse` is recoverable (the caller lets it self-resume); one
 /// carrying `CameraUnavailable` is terminal; `OcrFailed` and a `NoMrzFound` keep scanning, carrying whether
-/// this frame's `quality.recognizedLineCount` was non-zero (TES-97 — "OCR saw text" vs "nothing in view at
+/// this frame's `quality.recognizedLineCount` was non-zero (TES-97 - "OCR saw text" vs "nothing in view at
 /// all"). `PermissionDenied` is not mapped to a distinct effect: the model's own permission gate owns the
-/// permission path before the stream starts, so a permission-denied capture error simply keeps scanning.
+/// permission path before the stream starts, so a permission-denied capture error keeps scanning.
 /// Mirrors the Android `reduceCameraResult`.
 func reduceCameraResult(_ result: MrzScanResult) -> CameraFlowEffect {
     switch result {
@@ -104,23 +104,23 @@ func reduceCameraResult(_ result: MrzScanResult) -> CameraFlowEffect {
 
 // MARK: - Permission screen state
 
-/// Which face of the adaptive permission screen to show — the single decision the camera gate dispatches on.
+/// Which face of the adaptive permission screen to show - the single decision the camera gate dispatches on.
 /// Mirrors the Android `PermissionScreenState`.
 enum PermissionScreenState {
-    /// The camera permission is held — the gate shows the live preview, not this screen.
+    /// The camera permission is held - the gate shows the live preview, not this screen.
     case granted
 
-    /// The permission is not held and a request can still succeed (never asked, or denied once) — mockup 04.
+    /// The permission is not held and a request can still succeed (never asked, or denied once) - mockup 04.
     case needsGrant
 
-    /// The permission is permanently denied ("don't ask again") — only the OS settings can grant it (mockup 04b).
+    /// The permission is permanently denied ("don't ask again") - only the OS settings can grant it (mockup 04b).
     case permanentlyDenied
 }
 
 /// The adaptive permission decision, decided purely from the read-only signals the gate holds:
-///  * `granted` — the permission is already held → ``PermissionScreenState/granted``;
-///  * `hasAsked` — whether a request has been handed out in this flow (the user tapped Grant at least once);
-///  * `showRationale` — whether the platform would still show a rationale/dialog.
+///  * `granted` - the permission is already held → ``PermissionScreenState/granted``;
+///  * `hasAsked` - whether a request has been handed out in this flow (the user tapped Grant at least once);
+///  * `showRationale` - whether the platform would still show a rationale/dialog.
 ///
 /// Once the host has been asked and the platform still won't show a rationale, the dialog won't appear again
 /// → ``PermissionScreenState/permanentlyDenied``. Otherwise a request can still succeed →
@@ -139,11 +139,11 @@ func permissionScreenState(granted: Bool, hasAsked: Bool, showRationale: Bool) -
 
 // MARK: - Dismiss reason (TES-115)
 
-/// The ``DismissReason`` the global cancel (the top bar's ✕) carries — decided purely from what the user
+/// The ``DismissReason`` the global cancel (the top bar's ✕) carries - decided purely from what the user
 /// was looking at when they closed (the Android `dismissReasonFor` mirror): the terminal
 /// camera-unavailable screen → ``DismissReason/cameraUnavailable``; either permission screen →
-/// ``DismissReason/permissionDenied``; anything else — including the recoverable in-use notice, which is
-/// not terminal — ``DismissReason/userDismissed``. Reports what happened, decides nothing beyond it:
+/// ``DismissReason/permissionDenied``; anything else - including the recoverable in-use notice, which is
+/// not terminal - ``DismissReason/userDismissed``. Reports what happened, decides nothing beyond it:
 /// whether an unusable camera or an ungranted permission matters is the host's call.
 func dismissReason(for state: ScannerState) -> DismissReason {
     switch state {
@@ -155,22 +155,22 @@ func dismissReason(for state: ScannerState) -> DismissReason {
 
 // MARK: - Saved-image outcome mapping
 
-/// What a `SavedImageScanResult` means for the flow, decided purely from the result — the saved-image sibling
+/// What a `SavedImageScanResult` means for the flow, decided purely from the result - the saved-image sibling
 /// of ``DecodeRoute``. Mirrors the Android `SavedImageOutcome`.
 enum SavedImageOutcome {
-    /// The primary read decoded an MRZ — route it exactly as a camera decode would, through
+    /// The primary read decoded an MRZ - route it exactly as a camera decode would, through
     /// ``routeDecode(_:reviewMode:)`` (so a parse failure still shows the read-failed screen, a success goes
     /// to review, etc.).
     case singleDecode(decoded: MrzScanResultDecoded)
 
-    /// No MRZ was found in the photo (or the capture step failed) — the empty screen (mockup 07b).
+    /// No MRZ was found in the photo (or the capture step failed) - the empty screen (mockup 07b).
     case empty
 }
 
 /// Maps a `SavedImageScanResult` to the flow outcome: a `Decoded` primary scan →
 /// ``SavedImageOutcome/singleDecode(decoded:)``; else → ``SavedImageOutcome/empty``. The reader is used in
 /// single-read mode (`tolerant: false`, see `ScannerModel.readPickedPhoto`), so `result.candidates` is always
-/// empty here — this mapping only ever sees the primary scan (there is no candidates outcome; a picked photo
+/// empty here - this mapping only ever sees the primary scan (there is no candidates outcome; a picked photo
 /// either decodes or reads as empty, mirroring the Android saved-image flow, TES-86/TES-91). Mirrors the
 /// Android `mapSavedImageResult`.
 func mapSavedImageResult(_ result: SavedImageScanResult) -> SavedImageOutcome {
@@ -182,7 +182,7 @@ func mapSavedImageResult(_ result: SavedImageScanResult) -> SavedImageOutcome {
 
 // MARK: - Start state & method switcher
 
-/// Where the flow starts, derived purely from the consumer's enabled methods. Preference order — camera first
+/// Where the flow starts, derived purely from the consumer's enabled methods. Preference order - camera first
 /// (the default primary method), then manual entry (the always-available fallback), then saved image; an
 /// empty set is treated as camera defensively. Mirrors the Android `initialState`.
 func initialState(enabledMethods: Set<ScanMethod>) -> ScannerState {
@@ -198,13 +198,13 @@ func initialState(enabledMethods: Set<ScanMethod>) -> ScannerState {
     return .scanning(struggling: false, gathering: false)
 }
 
-/// The reading methods the switcher offers, decided purely from the enabled set — only the enabled ones, in
+/// The reading methods the switcher offers, decided purely from the enabled set - only the enabled ones, in
 /// the fixed display order camera, photo, type. Mirrors the Android `switcherMethods`.
 func switcherMethods(enabledMethods: Set<ScanMethod>) -> [ScanMethod] {
     [.camera, .savedImage, .manualEntry].filter { enabledMethods.contains($0) }
 }
 
-/// Whether the current ``ScannerState`` is a capture / entry screen — the only screens the method switcher
+/// Whether the current ``ScannerState`` is a capture / entry screen - the only screens the method switcher
 /// appears on (scanning, manual raw, and the saved-image entry points). It is deliberately NOT shown on
 /// outcome / gate screens, where switching method mid-outcome would be a confusing detour. Mirrors the
 /// Android `showsMethodSwitcher`.
@@ -274,13 +274,13 @@ func assembleManualDecoded(
 
 // MARK: - Session scan deadline (TES-124/125/126)
 
-/// The session-level scan-timeout deadline's pure accumulator — the iOS mirror of the Android
+/// The session-level scan-timeout deadline's pure accumulator - the iOS mirror of the Android
 /// `rememberScanDeadline`'s accumulation math, extracted as a value type so the drift-corrected
 /// advance-and-fire logic is host-testable without a real clock, timer, or scene-phase observer.
 /// ``ScannerModel`` owns one instance and feeds it the REAL elapsed *active* time between ticks (measured
-/// against a monotonic `ContinuousClock`, never wall-clock `Date` — a clock change, DST, or NTP correction
+/// against a monotonic `ContinuousClock`, never wall-clock `Date` - a clock change, DST, or NTP correction
 /// must never perturb the deadline). Pausing/resuming while backgrounded needs no special-case here: the
-/// caller simply stops calling ``advance(by:)`` while backgrounded, and the accumulated total already carries
+/// caller stops calling ``advance(by:)`` while backgrounded, and the accumulated total already carries
 /// the pause forward, exactly like the Android `repeatOnLifecycle(RESUMED)` gate resuming from the saved
 /// `accumulatedMs` rather than restarting.
 struct DeadlineClock {
@@ -297,13 +297,13 @@ struct DeadlineClock {
         self.total = total
     }
 
-    /// The time left, clamped to `[0, total]` — what the countdown chip shows (via ``formatCountdown(_:)``).
+    /// The time left, clamped to `[0, total]` - what the countdown chip shows (via ``formatCountdown(_:)``).
     var remaining: Duration {
         max(.zero, total - accumulated)
     }
 
     /// Advances the accumulator by `elapsed` (clamped so it never exceeds `total`). Returns `true` exactly
-    /// once — on the call that first reaches the total — so the caller fires its one-shot "give up" effect
+    /// once - on the call that first reaches the total - so the caller fires its one-shot "give up" effect
     /// only once, never on a later tick. A no-op (always returns `false`) once already fired.
     @discardableResult
     mutating func advance(by elapsed: Duration) -> Bool {
@@ -315,11 +315,11 @@ struct DeadlineClock {
     }
 }
 
-/// Formats a countdown `Duration` as `M:SS` (minutes:seconds, seconds zero-padded) — the shape the
+/// Formats a countdown `Duration` as `M:SS` (minutes:seconds, seconds zero-padded) - the shape the
 /// scan-countdown chip shows. Seconds are rounded **up** so the chip reads `0:01` through the final second
-/// and only shows `0:00` at true expiry; a negative input (should not occur — the caller clamps at zero, via
+/// and only shows `0:00` at true expiry; a negative input (should not occur - the caller clamps at zero, via
 /// ``DeadlineClock/remaining``) also clamps to `0:00`. Minutes are not capped at two digits (a multi-minute
-/// host `scanTimeout` renders e.g. `10:00`). Digits only — no `String(format:)`, matching the module's
+/// host `scanTimeout` renders e.g. `10:00`). Digits only - no `String(format:)`, matching the module's
 /// established positional-substitution style (see `Localization.swift`) rather than a locale-sensitive
 /// formatter. Pure, so it is host-tested. Mirrors the Android `formatCountdown`.
 func formatCountdown(_ remaining: Duration) -> String {
@@ -336,13 +336,13 @@ func formatCountdown(_ remaining: Duration) -> String {
 // MARK: - VoiceOver announce-on-arrival (TES-58)
 
 /// The VoiceOver announcement key to post when the flow transitions INTO `state`, or `nil` when the state
-/// carries none — the iOS mirror of the Android live-region placements across `ReviewScreen.kt`
+/// carries none - the iOS mirror of the Android live-region placements across `ReviewScreen.kt`
 /// (`ReviewContent`/`ReadFailedContent`), `CameraStatusScreen.kt` (`CameraInUseContent`/
 /// `CameraUnavailableContent`), and `SavedImageScreen.kt` (`SavedImageAnalyzingContent`/
 /// `SavedImageEmptyContent`). Android splits these into ASSERTIVE (review, read-failed, camera-unavailable,
-/// saved-image-empty — decode/terminal landings the user must hear right away) and POLITE (camera-in-use,
-/// saved-image-analyzing — auto-transitions with no urgency). `UIAccessibility`'s `.announcement` notification
-/// has no polite/assertive tier, so both groups are posted identically by the caller — a plain announcement,
+/// saved-image-empty - decode/terminal landings the user must hear right away) and POLITE (camera-in-use,
+/// saved-image-analyzing - auto-transitions with no urgency). `UIAccessibility`'s `.announcement` notification
+/// has no polite/assertive tier, so both groups are posted identically by the caller - a plain announcement,
 /// immediately on arrival.
 ///
 /// Every other state carries no announcement of its own here: the struggling/gathering scanning overlays are
@@ -373,7 +373,7 @@ func announcementKey(for state: ScannerState) -> String? {
 /// Which `tessera_scanner_field_optional*` / `tessera_scanner_check_label_optional_data` localization key
 /// names the format-specific optional/personal-data field: TD3 carries ICAO's real "personal number" concept
 /// (the SAME label reused for both the field row and its check-digit observation); every other format's MRZ
-/// optional data has no such meaning, so it gets a neutral label instead — and the field row and the
+/// optional data has no such meaning, so it gets a neutral label instead - and the field row and the
 /// check-digit observation use two DIFFERENT neutral keys there (`forCheckDigit` selects which), matching the
 /// Android source's own two distinct resources for the same non-TD3 concept. Pure so the choice is
 /// host-testable without a document. Mirrors the Android `reviewAllFieldRows` / `parseObservations`
@@ -385,21 +385,21 @@ func optionalFieldLabelKey(isTD3: Bool, forCheckDigit: Bool) -> String {
 
 // MARK: - Single live-preview guidance message (TES-95/TES-129)
 
-/// The ONE guidance message the live-preview overlay shows below the framing-guide box — the iOS mirror of
+/// The ONE guidance message the live-preview overlay shows below the framing-guide box - the iOS mirror of
 /// the Android `MrzGuideOverlay`'s single guidance region (`MrzScannerScreen.kt:1595-1694`). Exactly one of
 /// these ever renders at a time.
 enum GuidanceMessage: Equatable {
-    /// The frame-agreement consensus gate is confirming a read across several frames — "Hold steady…".
+    /// The frame-agreement consensus gate is confirming a read across several frames - "Hold steady…".
     case gathering
 
-    /// No decode for a while — the "still looking / type it instead" nudge.
+    /// No decode for a while - the "still looking / type it instead" nudge.
     case struggling
 
-    /// Nothing else to show — the plain "line up the document" framing hint.
+    /// Nothing else to show - the plain "line up the document" framing hint.
     case framingHint
 }
 
-/// The guidance-message precedence: `gathering` beats `struggling` beats the plain framing hint — getting a
+/// The guidance-message precedence: `gathering` beats `struggling` beats the plain framing hint - getting a
 /// decode at all (gathering) is better news than "still looking" (struggling), and either supersedes the
 /// baseline hint. Pure so the precedence itself is host-testable with no view or camera. Mirrors the Android
 /// `MrzGuideOverlay`'s `when { gathering -> ...; struggling -> ...; else -> ... }`.
@@ -413,7 +413,7 @@ func guidanceMessage(gathering: Bool, struggling: Bool) -> GuidanceMessage {
 
 /// The current instant as a Kotlin `Instant`, for the date-window inference the manual reader does. The K/N
 /// framework does not export `Clock.System.now()` (it is marked unavailable), so the moment is taken from
-/// Swift's `Date` and rebuilt via the `Instant.Companion.fromEpochMilliseconds` factory — the same wall-clock
+/// Swift's `Date` and rebuilt via the `Instant.Companion.fromEpochMilliseconds` factory - the same wall-clock
 /// "now" the Android path gets from `Clock.System.now()`.
 func nowInstant() -> KotlinInstant {
     KotlinInstant.companion.fromEpochMilliseconds(

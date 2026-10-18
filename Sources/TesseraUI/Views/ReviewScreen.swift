@@ -18,13 +18,13 @@ import Tessera
 enum ObservationTone {
     /// A recorded value agrees with what the SDK computes (rendered ✓, tinted).
     case matches
-    /// A recorded value disagrees with what the SDK computes (rendered ‼). Not "wrong" — just stated.
+    /// A recorded value disagrees with what the SDK computes (rendered ‼). Not "wrong" - only stated.
     case mismatch
     /// Neutral, informational (rendered ⓘ, muted): provenance, advisories, quality.
     case info
 }
 
-/// One stated observation about a reading — a symbol, its text, and its tone. The meaning lives in `text` and
+/// One stated observation about a reading - a symbol, its text, and its tone. The meaning lives in `text` and
 /// in the tone's spoken prefix (see ``ReviewObservationRow``), never in colour alone, so it survives for a
 /// screen-reader user (non-colour a11y). Mirrors the Android `ReviewObservation`.
 struct ReviewObservation {
@@ -35,7 +35,7 @@ struct ReviewObservation {
 
 /// One key/value summary row: `label` on the start, monospace `value` on the end. Mirrors the Android
 /// `FieldRow`. Deliberately NOT `Identifiable`: rows are rebuilt per body evaluation, so any stored id
-/// would be fresh each time — the `ForEach`es render by stable position (`\.offset`) instead.
+/// would be fresh each time - the `ForEach`es render by stable position (`\.offset`) instead.
 struct FieldRow {
     let label: String
     let value: String
@@ -63,14 +63,14 @@ internal struct ReviewScreen: View {
     @Environment(\.tesseraStringsBundle) private var stringsBundle
     let decoded: MrzScanResultDecoded
     let expanded: Bool
-    /// Which reading method produced this review — drives the provenance-aware secondary action label
+    /// Which reading method produced this review - drives the provenance-aware secondary action label
     /// ("Rescan" / "Try another photo" / "Edit entry"), mirroring the Android `secondaryActionLabel`.
     let source: ScanMethod
     let onToggleExpanded: () -> Void
     let onUse: () -> Void
     let onRescan: () -> Void
 
-    /// The collapsed summary's observation set: mismatches + the advisory + provenance ONLY — every passing
+    /// The collapsed summary's observation set: mismatches + the advisory + provenance ONLY - every passing
     /// ✓ check moves to the expanded view (TES-96). Mirrors the Android `reviewSummaryObservations`.
     private var reviewSummaryObservations: [ReviewObservation] {
         reviewObservations.filter { $0.tone != .matches }
@@ -234,7 +234,7 @@ internal struct ReviewScreen: View {
         ]
     }
 
-    /// The full parsed field set (mockup 03c) — common fields plus a format-specific optional field. Mirrors
+    /// The full parsed field set (mockup 03c) - common fields plus a format-specific optional field. Mirrors
     /// the Android `reviewAllFieldRows`.
     private func reviewAllFieldRows(_ document: MrzDocument) -> [FieldRow] {
         let fields = document.commonFields
@@ -309,7 +309,7 @@ internal struct ReviewScreen: View {
         return observations
     }
 
-    /// The honest per-check observation set for one parse verdict — check digits, expiry well-formedness, and a
+    /// The honest per-check observation set for one parse verdict - check digits, expiry well-formedness, and a
     /// neutral advisory when anything did not match. Mirrors the Android `parseObservations`.
     private func parseObservations(_ parse: ParseResult) -> [ReviewObservation] {
         let document: MrzDocument
@@ -390,14 +390,14 @@ internal struct ReviewScreen: View {
                      fields.primaryIdentifier, fields.secondaryIdentifier)
     }
 
-    /// "P — passport" from the raw type code and the recognized category; the raw code alone when neither an
+    /// "P - passport" from the raw type code and the recognized category; the raw code alone when neither an
     /// exact `DocumentTypeCodeTable` match nor the ICAO reserved-leading-character fallback recognizes it.
     /// Mirrors the Android `documentDisplay`, which sources this from mrz-core's `DocumentType.broadCategory`
     /// (TES-99). `documentType` is a Kotlin `@JvmInline` value class over its `rawCode` string, so K/N erases
-    /// it to that `String` — and, unlike `DocumentTypeCodeTable.lookup(code:)`, `broadCategory` itself is not
+    /// it to that `String` - and, unlike `DocumentTypeCodeTable.lookup(code:)`, `broadCategory` itself is not
     /// exported across the ObjC boundary at all (confirmed empirically: no selector for it in
     /// `Tessera.xcframework`'s generated header, only KDoc cross-reference comments). `firstLetterCategory`
-    /// below re-implements broadCategory's fallback half locally — the same reserved-leading-character rule
+    /// below re-implements broadCategory's fallback half locally - the same reserved-leading-character rule
     /// documented on the Kotlin side (ICAO Doc 9303 Part 4 §4.4 for P/V, Parts 5/6 for A/C/I); it defines
     /// nothing new, it mirrors a published standard rule already re-derived once via the table lookup.
     private func documentDisplay(_ documentType: Any) -> String {
@@ -408,11 +408,11 @@ internal struct ReviewScreen: View {
                             rawCode, categoryLabel(category))
     }
 
-    /// The `DocumentCategory` implied by just the first character of `rawCode`, per ICAO Doc 9303 Part 4 §4.4
-    /// (`P`/`V`) and Parts 5/6 (`A`/`C`/`I`) — the same rule `DocumentTypeCodeTable`'s own KDoc documents.
+    /// The `DocumentCategory` implied by only the first character of `rawCode`, per ICAO Doc 9303 Part 4 §4.4
+    /// (`P`/`V`) and Parts 5/6 (`A`/`C`/`I`) - the same rule `DocumentTypeCodeTable`'s own KDoc documents.
     /// `nil` when `rawCode` is empty or its first character is not one of those. Case-insensitive. Mirrors
     /// mrz-core's private `firstLetterCategory`, which backs `DocumentType.broadCategory` (TES-99). `static`
-    /// (internal, not private) so the Testing target can pin it directly — a pure function, no `self` needed.
+    /// (internal, not private) so the Testing target can pin it directly - a pure function, no `self` needed.
     /// `nonisolated` because `ReviewScreen` is a `View` (implicitly `@MainActor`) but this mapping touches no
     /// UI state, and Swift Testing's `@Test` functions run off the main actor by default.
     nonisolated static func firstLetterCategory(_ rawCode: String) -> DocumentCategory? {
@@ -458,7 +458,7 @@ internal struct ReviewScreen: View {
 
 /// The computed calendar date when the SDK inferred one (ISO `YYYY-MM-DD` via `LocalDate.description`), else
 /// the raw YYMMDD components shown day first, as printed (`23 06 94`) - TES-94, TES-112. The UI never
-/// re-derives a century itself; it only renders what the SDK already resolved, and shows just the printed
+/// re-derives a century itself; it only renders what the SDK already resolved, and shows only the printed
 /// parts rather than anything that could pass for a confident date (Principle 4). Mirrors the Android
 /// `dateDisplay`.
 func dateDisplay(_ date: MrzDate, bundle: Bundle?) -> String {
@@ -467,7 +467,7 @@ func dateDisplay(_ date: MrzDate, bundle: Bundle?) -> String {
     return substituting(TesseraStrings.string("tessera_scanner_date_unresolved_format", bundle: bundle), raw)
 }
 
-/// Strips trailing MRZ filler (`<`) from a parsed field VALUE for display — the fillers are fixed-width
+/// Strips trailing MRZ filler (`<`) from a parsed field VALUE for display - the fillers are fixed-width
 /// padding, not data, so `L898902C<` reads as `L898902C`. Display-only: the raw MRZ section still renders
 /// every character verbatim, so transparency is preserved (Principle 5). Mirrors the Android
 /// `String.withoutTrailingFiller`.
@@ -484,7 +484,7 @@ func unicharToString(_ value: unichar) -> String {
     return String(Character(scalar))
 }
 
-/// The raw glyph on the document, shown verbatim (the transparency stance) — mirrors `rawSex.toString()`.
+/// The raw glyph on the document, shown verbatim (the transparency stance) - mirrors `rawSex.toString()`.
 func charDisplay(_ value: unichar) -> String { unicharToString(value) }
 
 

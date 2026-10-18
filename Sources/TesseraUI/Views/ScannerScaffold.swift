@@ -1,9 +1,9 @@
 import SwiftUI
 import UIKit
 
-/// The shared chrome — the iOS mirror of the Android `ScannerScaffold`. A top bar whose leading ✕ owns the
-/// global cancel (reachable on every screen), a stable title, and — on the capture / entry screens only, and
-/// only when at least two methods are enabled — the method switcher beneath the bar. The screen content
+/// The shared chrome - the iOS mirror of the Android `ScannerScaffold`. A top bar whose leading ✕ owns the
+/// global cancel (reachable on every screen), a stable title, and - on the capture / entry screens only, and
+/// only when at least two methods are enabled - the method switcher beneath the bar. The screen content
 /// renders in the body underneath, so each screen keeps its own scroll / pinned-button behaviour.
 ///
 /// Reader, not oracle (Principle 1): the switcher only chooses *how* to read (which method), never what a
@@ -104,7 +104,7 @@ struct ScannerScaffold<Content: View>: View {
 }
 
 /// Whether the keyboard's end frame in a keyboard-frame notification is on screen AND reaches the bottom
-/// edge — a docked keyboard or a hardware-keyboard shortcut bar, which cover the footer. A floating (iPad)
+/// edge - a docked keyboard or a hardware-keyboard shortcut bar, which cover the footer. A floating (iPad)
 /// keyboard does not reach the edge, so the footer stays reserved and visible. The notification's object is
 /// the screen the keyboard is on; without it the frame is treated as on-screen only if it has height.
 @MainActor
@@ -118,7 +118,7 @@ private func keyboardReachesScreenBottom(_ note: Notification) -> Bool {
 
 /// The "Powered by Tessera" attribution footer, shown once on every screen at the bottom of the scaffold. A
 /// quiet, secondary-styled line so it adapts to light / dark and never competes with the content.
-/// Overridable like every `tessera_*` key — a consumer can set an empty string to remove it: this renders
+/// Overridable like every `tessera_*` key - a consumer can set an empty string to remove it: this renders
 /// nothing at all when the resolved string is blank, so the opt-out actually reclaims the space rather than
 /// leaving a blank, padded band. Mirrors the Android `PoweredByFooter`.
 private struct PoweredByFooter: View {
@@ -140,9 +140,9 @@ private struct PoweredByFooter: View {
 }
 
 /// The scan-timeout countdown chip (TES-125): a small pill in the top bar showing the time left as `M:SS`
-/// while a finite `scanTimeout` runs, present on every screen — the iOS mirror of the Android
+/// while a finite `scanTimeout` runs, present on every screen - the iOS mirror of the Android
 /// `ScanCountdownChip`. The visible `M:SS` uses monospaced digits so it doesn't jitter as it counts down; a
-/// spoken accessibility label gives VoiceOver the meaning. Deliberately NOT `.updatesFrequently` — a
+/// spoken accessibility label gives VoiceOver the meaning. Deliberately NOT `.updatesFrequently` - a
 /// per-second VoiceOver announcement would spam VoiceOver, so it is read on focus only, matching the Android
 /// chip's non-live-region semantics (`liveRegion` is intentionally absent there too).
 private struct ScanCountdownChip: View {
@@ -165,7 +165,7 @@ private struct ScanCountdownChip: View {
 }
 
 /// The segmented method switcher (mirrors the Android `MethodSwitcher`): one segment per enabled reading
-/// method — Camera / Photo / Type, in that fixed order — with the method matching the current state selected.
+/// method - Camera / Photo / Type, in that fixed order - with the method matching the current state selected.
 /// When fewer than two methods are enabled there is nothing to switch between, so the whole row is hidden.
 private struct MethodSwitcher: View {
     @Environment(\.tesseraStringsBundle) private var stringsBundle

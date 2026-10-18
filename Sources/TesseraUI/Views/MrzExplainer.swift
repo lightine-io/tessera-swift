@@ -11,7 +11,7 @@ import SwiftUI
 // with the system font, and the specimen text is the ICAO Doc 9303 published example — never real data.
 
 /// The ICAO Doc 9303 published TD3 specimen (fictional UTOPIA / ERIKSSON ANNA MARIA). Synthetic by
-/// definition — this is the standards body's own example, never a real document. Hard-coded in the drawing,
+/// definition - this is the standards body's own example, never a real document. Hard-coded in the drawing,
 /// not overridable copy: it illustrates the MRZ's *shape*, so translating it would make no sense. Mirrors the
 /// Android `SPECIMEN_LINE_1` / `SPECIMEN_LINE_2`.
 private let explainerSpecimenLine1 = "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<"
@@ -78,10 +78,10 @@ struct MrzExplainerDialog: View {
     }
 }
 
-/// A modest stylised document (a passport data page): a type label, a couple of faint detail bars, and —
-/// highlighted — the MRZ band along the bottom. It conveys *where* the zone sits, with the zone caption
+/// A modest stylised document (a passport data page): a type label, a couple of faint detail bars, and -
+/// highlighted - the MRZ band along the bottom. It conveys *where* the zone sits, with the zone caption
 /// stating *what* it says. Drawn from theme colours so it adapts to light / dark. Mirrors the Android
-/// `DocumentGraphic` (kept modest — no separate magnified zoom panel).
+/// `DocumentGraphic` (kept modest - no separate magnified zoom panel).
 private struct ExplainerDocumentGraphic: View {
     @Environment(\.tesseraStringsBundle) private var stringsBundle
 
@@ -125,7 +125,7 @@ private struct ExplainerDocumentGraphic: View {
     }
 }
 
-/// One faint placeholder detail bar, `fraction` of the available width — a simple stand-in for a line of
+/// One faint placeholder detail bar, `fraction` of the available width - a simple stand-in for a line of
 /// document text. Mirrors the Android `DetailLine`.
 private struct ExplainerDetailBar: View {
     let fraction: CGFloat
