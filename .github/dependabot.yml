@@ -1,0 +1,20 @@
+# Dependabot configuration for tessera-swift, matching the main Tessera repository.
+# The package has no dependencies of its own; only the pinned workflow actions need updates.
+# Security updates are enabled in the repository settings.
+
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+      day: monday
+    open-pull-requests-limit: 5
+    # One grouped PR per cycle instead of one PR per action.
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: chore
+      include: scope
