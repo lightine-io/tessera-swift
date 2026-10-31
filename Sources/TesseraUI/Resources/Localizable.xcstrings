@@ -626,7 +626,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Turn on Camera for this app in Settings to scan. Everything is read on your device - nothing is uploaded or stored."
+            "value": "Turn on Camera for this app in Settings to scan. Everything is read on your device - your document is not uploaded or stored."
           }
         }
       }
@@ -656,7 +656,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The scanner reads your document on this device - nothing is uploaded or stored."
+            "value": "The scanner reads your document on this device - it is not uploaded or stored."
           }
         }
       }
@@ -716,7 +716,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tessera reads your document right here on your device. Nothing is uploaded or saved anywhere. What it reads is handed back to the app you are using, and that app decides what happens next."
+            "value": "Tessera reads your document right here on your device. Your document is not uploaded or saved anywhere. What it reads is handed back to the app you are using, and that app decides what happens next."
           }
         }
       }
