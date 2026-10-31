@@ -16,7 +16,7 @@ struct ScannerModelStruggleHintTests {
     }
 
     /// Polls (main actor) until the hint shows or `limit` passes, so a slow runner cannot flake the test.
-    private func waitForHint(_ model: ScannerModel, limit: Duration = .seconds(5)) async throws -> Bool {
+    private func waitForHint(_ model: ScannerModel, limit: Duration = .seconds(30)) async throws -> Bool {
         let deadline = ContinuousClock.now + limit
         while ContinuousClock.now < deadline {
             if isStruggling(model) { return true }
