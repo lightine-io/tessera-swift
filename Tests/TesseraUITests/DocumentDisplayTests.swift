@@ -2,35 +2,28 @@ import Testing
 import Tessera
 @testable import TesseraUI
 
-/// Coverage for the Android→iOS parity fix (TES-111): `ReviewScreen.documentDisplay` must widen an exact
-/// `DocumentTypeCodeTable` miss with the ICAO reserved-leading-character fallback, mirroring mrz-core's
-/// `DocumentType.broadCategory` (TES-99) — which is not itself exported across the Kotlin/Native ObjC
-/// boundary (`DocumentType` is a `@JvmInline value class`, erased to its raw `String`), so
-/// `ReviewScreen.firstLetterCategory` re-implements the fallback's pure half locally. It is `static`
-/// (internal) specifically so this pure mapping can be pinned directly, without standing up a full
-/// `ReviewScreen` view or an MRZ decode. Synthetic codes only — never real document data.
+/// Coverage for the category the review screen's `documentDisplay` shows next to the raw type code. It comes
+/// straight from the SDK's `DocumentTypeCodeTable.broadCategory(code:)` (TES-223): an exact table match first,
+/// then the ICAO reserved-leading-character rule (Doc 9303 Part 4 §4.4 for P/V, Parts 5/6 for A/C/I). The rule
+/// itself is tested in mrz-core; these pin that the Swift call site sees it. Synthetic codes only.
 struct DocumentDisplayTests {
     @Test func reservedLeadingCharacterFallsBackToItsCategory() {
         // "IA" is not in DocumentTypeCodeTable (issuer-specific second letter per Parts 5/6), but 'I' is an
         // ICAO-reserved leading character for the identity-card family.
-        #expect(ReviewScreen.firstLetterCategory("IA") === DocumentCategory.identityCard)
-        #expect(ReviewScreen.firstLetterCategory("AX") === DocumentCategory.identityCard)
-        #expect(ReviewScreen.firstLetterCategory("CX") === DocumentCategory.identityCard)
-        #expect(ReviewScreen.firstLetterCategory("V") === DocumentCategory.visa)
-        #expect(ReviewScreen.firstLetterCategory("p") === DocumentCategory.passport, "case-insensitive on the first character")
+        let table = DocumentTypeCodeTable.shared
+        #expect(table.broadCategory(code: "IA") === DocumentCategory.identityCard)
+        #expect(table.broadCategory(code: "AX") === DocumentCategory.identityCard)
+        #expect(table.broadCategory(code: "CX") === DocumentCategory.identityCard)
+        #expect(table.broadCategory(code: "V") === DocumentCategory.visa)
     }
 
     @Test func unreservedLeadingCharacterStaysUncategorized() {
-        // 'X' is not one of the ICAO-reserved leading characters (P/V/I/A/C), so the raw code alone should
-        // carry through documentDisplay with no category fallback.
-        #expect(ReviewScreen.firstLetterCategory("XY") == nil)
-        #expect(ReviewScreen.firstLetterCategory("") == nil)
+        // 'X' is not an ICAO-reserved leading character, so documentDisplay shows the raw code alone.
+        #expect(DocumentTypeCodeTable.shared.broadCategory(code: "XY") == nil)
+        #expect(DocumentTypeCodeTable.shared.broadCategory(code: "") == nil)
     }
 
-    @Test func tableListedCodeStillResolvesViaTheExactMatchPath() {
-        // "P" is one of the legacy single-character codes DocumentTypeCodeTable enumerates directly —
-        // documentDisplay's primary (table) branch must still resolve it without falling through to
-        // firstLetterCategory, exactly as before this fix.
-        #expect(DocumentTypeCodeTable.shared.lookup(code: "P")?.category === DocumentCategory.passport)
+    @Test func tableListedCodeResolvesViaTheExactMatchPath() {
+        #expect(DocumentTypeCodeTable.shared.broadCategory(code: "P") === DocumentCategory.passport)
     }
 }
