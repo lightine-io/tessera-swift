@@ -250,9 +250,12 @@ func manualLinesOf(_ text: String) -> [String] {
 /// decode does (reader, not oracle: manual entry adds no judgement of its own). Mirrors the Android
 /// `assembleManualDecoded`.
 ///
-/// - Note: Android splits the text into lines and calls the pre-split `List<String>` reader overloads; this
-///   mirrors that (the `input:referenceTime_:` array overloads), so the auto-detect / format-specific
-///   behaviour matches line-for-line.
+/// - Note: Android splits the text into lines and calls the pre-split `List<String>` reader overload. This
+///   passes the same split lines, joined with line breaks, to the one-string overload: its name is the same
+///   in the pinned framework and the next one, where the list overload's Swift name changes (TES-285).
+///   The parser splits the joined text back into the same trimmed, non-empty lines. A pasted `\r\n` (one
+///   Swift character, so not split above) is now split there too, as Android's `manualLinesOf` does.
+///   After the pin moves to 0.7.0, switch back to `read(lines:referenceTime:)`.
 func assembleManualDecoded(
     text: String,
     referenceTime: KotlinInstant = nowInstant()
@@ -260,7 +263,7 @@ func assembleManualDecoded(
     let lines = manualLinesOf(text)
     // Format always auto-detected from the line count and per-line lengths (TES-100 — the Auto/Passport/
     // ID-card hint picker is gone on both platforms; a hint never changed the input, only the parser).
-    let parse = ManualMrzReader.shared.read(input: lines, referenceTime_: referenceTime)
+    let parse = ManualMrzReader.shared.read(input: lines.joined(separator: "\n"), referenceTime: referenceTime)
     return MrzScanResultDecoded(
         parse: parse,
         recognizedText: RecognizedText(lines: lines.map { RecognizedLine(text: $0, confidence: nil) }),
