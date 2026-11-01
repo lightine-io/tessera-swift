@@ -24,8 +24,8 @@ let tesseraBinary: Target = {
     }
     return .binaryTarget(
         name: "Tessera",
-        url: "https://github.com/lightine-io/tessera/releases/download/v0.6.0/Tessera.xcframework.zip",
-        checksum: "47d4310ec633268eb03438254a655051a46a44e2b35e4d5a7d77505e43663406"
+        url: "https://github.com/lightine-io/tessera/releases/download/v0.7.0/Tessera.xcframework.zip",
+        checksum: "72892d28ec0ce05c4bb88742109808ba28486834e85e8f314a97b6739ece66a7"
     )
 }()
 
