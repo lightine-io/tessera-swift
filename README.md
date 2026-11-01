@@ -1,15 +1,15 @@
 # tessera-swift
 
-This repository is the Swift package for Tessera, the open-source SDK that reads, validates, and generates MRZ data. An MRZ (machine-readable zone) is the block of text lines printed at the bottom of a passport or ID card page. The package vends two products: `Tessera`, the XCFramework with the Kotlin core and the headless readers, and `TesseraUI`, the SwiftUI scanner screen. The current release is 0.6.0. The Kotlin source and the releases live in the [main repository](https://github.com/lightine-io/tessera). The SDK reports what it read, and your app decides what to do with it.
+This repository is the Swift package for Tessera, the open-source SDK that reads, validates, and generates MRZ data. An MRZ (machine-readable zone) is the block of text lines printed at the bottom of a passport or ID card page. The package vends two products: `Tessera`, the XCFramework with the Kotlin core and the headless readers, and `TesseraUI`, the SwiftUI scanner screen. The current release is 0.7.0. The Kotlin source and the releases live in the [main repository](https://github.com/lightine-io/tessera). The SDK reports what it read, and your app decides what to do with it.
 
 ## Install
 
-In Xcode, choose **File > Add Package Dependencies**. Enter `https://github.com/lightine-io/tessera-swift` and set the dependency rule to **Exact Version** `0.6.0`. Add both products, `Tessera` and `TesseraUI`, to your app target.
+In Xcode, choose **File > Add Package Dependencies**. Enter `https://github.com/lightine-io/tessera-swift` and set the dependency rule to **Exact Version** `0.7.0`. Add both products, `Tessera` and `TesseraUI`, to your app target.
 
 In a `Package.swift`, the same setup looks like this:
 
 ```swift
-.package(url: "https://github.com/lightine-io/tessera-swift", exact: "0.6.0"),
+.package(url: "https://github.com/lightine-io/tessera-swift", exact: "0.7.0"),
 // In your target's dependencies:
 .product(name: "Tessera", package: "tessera-swift"),
 .product(name: "TesseraUI", package: "tessera-swift"),
@@ -79,7 +79,7 @@ Compatibility within 0.x:
 - [Install Tessera on iOS](https://lightine.youtrack.cloud/articles/TES-A-110) - add the package and its requirements.
 - [Show the scanner screen on iOS](https://lightine.youtrack.cloud/articles/TES-A-121) - set the reading methods, review step, theme, and text.
 - [Read an MRZ from the live camera on iOS](https://lightine.youtrack.cloud/articles/TES-A-18) - the camera behind your own UI.
-- [Release 0.6.0](https://github.com/lightine-io/tessera/releases/tag/v0.6.0) - the release notes and the XCFramework.
+- [Release 0.7.0](https://github.com/lightine-io/tessera/releases/tag/v0.7.0) - the release notes and the XCFramework.
 
 ## Contributing
 
