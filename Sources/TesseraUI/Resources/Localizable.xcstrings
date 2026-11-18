@@ -621,6 +621,76 @@
         }
       }
     },
+    "tessera_scanner_obs_warning_expiry_far": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expiry date is more than %1$@ years away"
+          }
+        }
+      }
+    },
+    "tessera_scanner_obs_warning_expiry_past": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expiry date has passed"
+          }
+        }
+      }
+    },
+    "tessera_scanner_obs_warning_name_truncated": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The name fills its whole line and may be cut short"
+          }
+        }
+      }
+    },
+    "tessera_scanner_obs_warning_personal_number_no_check": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personal number has no check number"
+          }
+        }
+      }
+    },
+    "tessera_scanner_obs_warning_sex_x": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sex is printed as X"
+          }
+        }
+      }
+    },
+    "tessera_scanner_obs_warning_unknown_country": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ %2$@ isn't in our country list"
+          }
+        }
+      }
+    },
+    "tessera_scanner_obs_warning_unknown_document_type": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Document type %1$@ isn't in our list"
+          }
+        }
+      }
+    },
     "tessera_scanner_permission_denied_body": {
       "localizations": {
         "en": {

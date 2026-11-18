@@ -289,7 +289,7 @@ internal struct ReviewScreen: View {
     /// The observation set for the decoded reading (mockups 03 / 03b): the shared per-check verdict from
     /// ``parseObservations`` plus a provenance INFO line naming the read method, slotted before the advisory so
     /// "some checks did not match" stays last. Mirrors the Android `reviewObservations`.
-    private var reviewObservations: [ReviewObservation] {
+    var reviewObservations: [ReviewObservation] {
         let parse = decoded.parse
         var observations = parseObservations(parse)
         // A Failure carries no document → no observations (this screen is never shown for one anyway).
@@ -332,7 +332,10 @@ internal struct ReviewScreen: View {
             (.dateOfBirth, TesseraStrings.string("tessera_scanner_check_label_date_of_birth", bundle: stringsBundle)),
             (.dateOfExpiry, TesseraStrings.string("tessera_scanner_check_label_date_of_expiry", bundle: stringsBundle)),
         ]
-        if fields.checkDigits.optionalData != nil {
+        // A filler in the personal-number check position is neither a match nor a mismatch: the parser reports
+        // it as a warning, shown as its own note in step 3, so no check row is stated for it.
+        let optionalCheckIsFiller = parse.metadata.warnings.contains { $0 is MrzPersonalNumberCheckDigitFiller }
+        if fields.checkDigits.optionalData != nil && !optionalCheckIsFiller {
             // TD3 reuses the "personal number" field label for this observation too, mirroring the field-row
             // choice above; every other format gets its own neutral check-digit label (Principle 1).
             let labelKey = optionalFieldLabelKey(isTD3: document is TD3, forCheckDigit: true)
@@ -371,7 +374,17 @@ internal struct ReviewScreen: View {
             ))
         }
 
-        // 3. Neutral advisory when anything did not match.
+        // 3. One neutral note per warning the parser attached, in the SDK's order (TES-152). Observations only:
+        // never a verdict, never blocking. `reviewObservations` slots provenance before the first INFO row, so
+        // the order is check digits, expiry, provenance, these notes, then the advisory. Mirrors the Android
+        // `parseObservations`.
+        for warning in parse.metadata.warnings {
+            if let text = warningText(warning) {
+                observations.append(ReviewObservation(symbol: symbolInfo, text: text, tone: .info))
+            }
+        }
+
+        // 4. Neutral advisory when anything did not match.
         if !mismatches.isEmpty {
             observations.append(ReviewObservation(
                 symbol: symbolInfo,
@@ -381,6 +394,30 @@ internal struct ReviewScreen: View {
         }
 
         return observations
+    }
+
+    /// The plain-words note for one parser warning, or nil when it gets no row (the deprecated
+    /// `MrzBirthDateImplausiblyOld`, which is never reported, and any subtype this UI does not know yet).
+    private func warningText(_ warning: MrzWarning) -> String? {
+        func string(_ key: String) -> String { TesseraStrings.string(key, bundle: stringsBundle) }
+        if let unknownCountry = warning as? MrzUnknownCountryCode {
+            // Kotlin enum entries are class singletons - match by identity (`===`).
+            let labelKey = unknownCountry.field === MrzField.nationality
+                ? "tessera_scanner_field_nationality" : "tessera_scanner_field_issuing_state"
+            return substituting(string("tessera_scanner_obs_warning_unknown_country"),
+                                string(labelKey), unknownCountry.rawCode)
+        }
+        if let unknownType = warning as? MrzUnknownDocumentTypeCode {
+            return substituting(string("tessera_scanner_obs_warning_unknown_document_type"), unknownType.rawCode)
+        }
+        if warning is MrzExpiryDatePast { return string("tessera_scanner_obs_warning_expiry_past") }
+        if let far = warning as? MrzExpiryDateImplausiblyFar {
+            return substituting(string("tessera_scanner_obs_warning_expiry_far"), String(far.thresholdYears))
+        }
+        if warning is MrzNameTruncated { return string("tessera_scanner_obs_warning_name_truncated") }
+        if warning is MrzPersonalNumberCheckDigitFiller { return string("tessera_scanner_obs_warning_personal_number_no_check") }
+        if warning is MrzSexCharacterX { return string("tessera_scanner_obs_warning_sex_x") }
+        return nil
     }
 
     // MARK: - Display helpers
