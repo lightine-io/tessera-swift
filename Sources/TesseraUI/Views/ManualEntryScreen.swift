@@ -121,12 +121,12 @@ internal struct ManualEntryScreen: View {
         // dismisses it (a simultaneous gesture, so buttons and the field itself keep working); and the keyboard
         // carries a Done button. None of these touch the typed text or start a read.
         .scrollDismissesKeyboard(.interactively)
-        .simultaneousGesture(TapGesture().onEnded { fieldFocused = false })
+        .simultaneousGesture(TapGesture().onEnded { dismissKeyboard() })
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
                 Spacer()
                 Button {
-                    fieldFocused = false
+                    dismissKeyboard()
                 } label: {
                     Text(TesseraStrings.string("tessera_scanner_done", bundle: stringsBundle))
                 }
@@ -135,6 +135,14 @@ internal struct ManualEntryScreen: View {
             }
         }
         .accessibilityIdentifier("tessera-mrz-manual-raw")
+    }
+
+    /// The one handler behind the two keyboard-dismissal controls this screen owns (the Done button and the
+    /// tap outside the field; the scroll dismissal is the system's and has no handler). It clears the focus
+    /// and nothing else: it never calls ``onTextChange`` or ``onRead``, so the typed text stays and no read
+    /// starts (TES-154). Internal, not private, so a test can call it (TES-239).
+    func dismissKeyboard() {
+        fieldFocused = false
     }
 
     /// The live, neutral observation strings - one plain character count per typed line ("Line 2: 28
