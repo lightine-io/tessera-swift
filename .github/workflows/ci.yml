@@ -41,6 +41,23 @@ jobs:
       - name: No real document data (MRZ guard)
         run: bash scripts/private-content-scan.sh --mrz-only
 
+      # The SDK's own sources make no network calls and never log. The check lives in the main
+      # repository (it shares code with other scripts there), so CI fetches its scripts folder.
+      # The script's --root is the Kotlin tree; here it gets an empty folder, so only Sources/
+      # is scanned.
+      - name: Fetch the main repository's scripts
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: lightine-io/tessera
+          path: .tessera-main
+          sparse-checkout: scripts
+          persist-credentials: false
+
+      - name: No network or logging calls in Sources
+        run: |
+          mkdir -p "$RUNNER_TEMP/no-kotlin"
+          python3 -I .tessera-main/scripts/check-no-network-or-logging.py --root "$RUNNER_TEMP/no-kotlin" --swift .
+
       - name: Select Xcode ${{ env.XCODE_VERSION }}
         run: |
           XC="/Applications/Xcode_${XCODE_VERSION}.app"
