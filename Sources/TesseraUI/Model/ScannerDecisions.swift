@@ -235,9 +235,10 @@ func activeMethod(_ state: ScannerState) -> ScanMethod? {
 // MARK: - Manual entry assembly
 
 /// Splits raw typed text into the MRZ lines the reader parses: newline-separated, blank lines dropped, each
-/// line trimmed of surrounding whitespace. Mirrors the Android `manualLinesOf`.
+/// line trimmed of surrounding whitespace. Mirrors the Android `manualLinesOf`. Every line break splits,
+/// including a pasted Windows `\r\n`, which Swift holds as one character.
 func manualLinesOf(_ text: String) -> [String] {
-    text.split(separator: "\n", omittingEmptySubsequences: false)
+    text.split(omittingEmptySubsequences: false, whereSeparator: \.isNewline)
         .map { $0.trimmingCharacters(in: .whitespaces) }
         .filter { !$0.isEmpty }
 }
@@ -250,12 +251,8 @@ func manualLinesOf(_ text: String) -> [String] {
 /// decode does (reader, not oracle: manual entry adds no judgement of its own). Mirrors the Android
 /// `assembleManualDecoded`.
 ///
-/// - Note: Android splits the text into lines and calls the pre-split `List<String>` reader overload. This
-///   passes the same split lines, joined with line breaks, to the one-string overload: its name is the same
-///   in the pinned framework and the next one, where the list overload's Swift name changes (TES-285).
-///   The parser splits the joined text back into the same trimmed, non-empty lines. A pasted `\r\n` (one
-///   Swift character, so not split above) is now split there too, as Android's `manualLinesOf` does.
-///   After the pin moves to 0.7.0, switch back to `read(lines:referenceTime:)`.
+/// - Note: Like Android, this passes the split lines to the reader's list overload
+///   (`read(lines:referenceTime:)`), so the two platforms call the reader the same way.
 func assembleManualDecoded(
     text: String,
     referenceTime: KotlinInstant = nowInstant()
@@ -263,7 +260,7 @@ func assembleManualDecoded(
     let lines = manualLinesOf(text)
     // Format always auto-detected from the line count and per-line lengths (TES-100 — the Auto/Passport/
     // ID-card hint picker is gone on both platforms; a hint never changed the input, only the parser).
-    let parse = ManualMrzReader.shared.read(input: lines.joined(separator: "\n"), referenceTime: referenceTime)
+    let parse = ManualMrzReader.shared.read(lines: lines, referenceTime: referenceTime)
     return MrzScanResultDecoded(
         parse: parse,
         recognizedText: RecognizedText(lines: lines.map { RecognizedLine(text: $0, confidence: nil) }),
