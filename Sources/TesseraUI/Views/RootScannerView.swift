@@ -101,13 +101,9 @@ struct RootScannerView: View {
                             .background(.black.opacity(0.45), in: Circle())
                     }
                     .padding(16)
-                    .accessibilityLabel(TesseraStrings.string("tessera_scanner_torch", bundle: config.stringsBundle))
+                    .scannerControl(.torch, bundle: config.stringsBundle)
                     .accessibilityAddTraits(model.torchOn ? .isSelected : [])
-                    .accessibilityValue(
-                        model.torchOn
-                            ? TesseraStrings.string("tessera_scanner_torch_state_on", bundle: config.stringsBundle)
-                            : TesseraStrings.string("tessera_scanner_torch_state_off", bundle: config.stringsBundle)
-                    )
+                    .accessibilityValue(torchAccessibilityValue(on: model.torchOn, bundle: config.stringsBundle))
                     .accessibilityIdentifier("tessera-mrz-torch")
                 }
             }

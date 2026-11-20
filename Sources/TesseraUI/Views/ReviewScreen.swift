@@ -78,11 +78,7 @@ internal struct ReviewScreen: View {
 
     /// "Rescan" / "Try another photo" / "Edit entry" per the review's source method.
     private var secondaryActionLabel: String {
-        switch source {
-        case .camera: TesseraStrings.string("tessera_scanner_review_rescan", bundle: stringsBundle)
-        case .savedImage: TesseraStrings.string("tessera_scanner_review_try_another_photo", bundle: stringsBundle)
-        case .manualEntry: TesseraStrings.string("tessera_scanner_review_edit_entry", bundle: stringsBundle)
-        }
+        ScannerControl.reviewSecondary(source).label(bundle: stringsBundle)
     }
 
     var body: some View {
@@ -121,16 +117,18 @@ internal struct ReviewScreen: View {
                 }
 
                 Button(action: onToggleExpanded) {
-                    Text(TesseraStrings.string("tessera_scanner_review_show_all", bundle: stringsBundle))
+                    Text(ScannerControl.reviewShowAll.label(bundle: stringsBundle))
                 }
+                .scannerControl(.reviewShowAll, bundle: stringsBundle)
                 .accessibilityIdentifier("tessera-mrz-review-show-all")
             }
         } actions: {
             Button(action: onUse) {
-                Text(TesseraStrings.string("tessera_scanner_review_use", bundle: stringsBundle))
+                Text(ScannerControl.reviewUse.label(bundle: stringsBundle))
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+            .scannerControl(.reviewUse, bundle: stringsBundle)
             .accessibilityIdentifier("tessera-mrz-review-use")
 
             Button(action: onRescan) {
@@ -138,6 +136,7 @@ internal struct ReviewScreen: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.bordered)
+            .scannerControl(.reviewSecondary(source), bundle: stringsBundle)
             .accessibilityIdentifier("tessera-mrz-review-rescan")
         }
         .accessibilityIdentifier("tessera-mrz-review")
@@ -182,16 +181,18 @@ internal struct ReviewScreen: View {
                 .environment(\.layoutDirection, .leftToRight)
 
                 Button(action: onToggleExpanded) {
-                    Text(TesseraStrings.string("tessera_scanner_review_show_less", bundle: stringsBundle))
+                    Text(ScannerControl.reviewShowLess.label(bundle: stringsBundle))
                 }
+                .scannerControl(.reviewShowLess, bundle: stringsBundle)
                 .accessibilityIdentifier("tessera-mrz-review-show-less")
             }
         } actions: {
             Button(action: onUse) {
-                Text(TesseraStrings.string("tessera_scanner_review_use", bundle: stringsBundle))
+                Text(ScannerControl.reviewUse.label(bundle: stringsBundle))
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+            .scannerControl(.reviewUse, bundle: stringsBundle)
             .accessibilityIdentifier("tessera-mrz-review-use")
 
             // Rescan / Try another photo / Edit entry, matching the collapsed view's provenance-aware label
@@ -201,6 +202,7 @@ internal struct ReviewScreen: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.bordered)
+            .scannerControl(.reviewSecondary(source), bundle: stringsBundle)
             .accessibilityIdentifier("tessera-mrz-review-rescan")
         }
         .accessibilityIdentifier("tessera-mrz-review-expanded")
@@ -603,7 +605,7 @@ struct ReviewObservationRow: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(tonePrefix) \(observation.text)")
+        .accessibilityLabel(observationAccessibilityLabel(observation, bundle: stringsBundle))
     }
 
     private var color: Color {
@@ -611,14 +613,6 @@ struct ReviewObservationRow: View {
         case .matches: return .accentColor
         case .mismatch: return .orange
         case .info: return .secondary
-        }
-    }
-
-    private var tonePrefix: String {
-        switch observation.tone {
-        case .matches: return TesseraStrings.string("tessera_scanner_obs_tone_match", bundle: stringsBundle)
-        case .mismatch: return TesseraStrings.string("tessera_scanner_obs_tone_mismatch", bundle: stringsBundle)
-        case .info: return TesseraStrings.string("tessera_scanner_obs_tone_info", bundle: stringsBundle)
         }
     }
 }

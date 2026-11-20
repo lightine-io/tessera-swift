@@ -80,7 +80,7 @@ struct ScannerScaffold<Content: View>: View {
                         // SF Symbol close glyph; the accessibility label carries the spoken name.
                         Image(systemName: "xmark")
                     }
-                    .accessibilityLabel(TesseraStrings.string("tessera_scanner_close", bundle: stringsBundle))
+                    .scannerControl(.close, bundle: stringsBundle)
                     .accessibilityIdentifier("tessera-mrz-close")
                 }
                 // The scan-timeout countdown (TES-125), shown on EVERY screen while a finite `scanTimeout`
@@ -157,9 +157,7 @@ private struct ScanCountdownChip: View {
             .padding(.vertical, 4)
             .background(.secondary.opacity(0.15), in: Capsule())
             .accessibilityElement(children: .combine)
-            .accessibilityLabel(
-                substituting(TesseraStrings.string("tessera_scanner_time_remaining", bundle: stringsBundle), text)
-            )
+            .accessibilityLabel(countdownAccessibilityLabel(shown: text, bundle: stringsBundle))
             .accessibilityIdentifier("tessera-mrz-countdown")
     }
 }
@@ -198,10 +196,6 @@ private struct MethodSwitcher: View {
     }
 
     private func methodLabel(_ method: ScanMethod) -> String {
-        switch method {
-        case .camera: return TesseraStrings.string("tessera_scanner_method_camera", bundle: stringsBundle)
-        case .savedImage: return TesseraStrings.string("tessera_scanner_method_photo", bundle: stringsBundle)
-        case .manualEntry: return TesseraStrings.string("tessera_scanner_method_keyboard", bundle: stringsBundle)
-        }
+        ScannerControl.method(method).label(bundle: stringsBundle)
     }
 }

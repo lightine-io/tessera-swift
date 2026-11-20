@@ -53,18 +53,20 @@ internal struct ReadFailedScreen: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         } actions: {
             Button(action: onTryAgain) {
-                Text(TesseraStrings.string("tessera_scanner_read_failed_try_again", bundle: stringsBundle))
+                Text(ScannerControl.readFailedTryAgain.label(bundle: stringsBundle))
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+            .scannerControl(.readFailedTryAgain, bundle: stringsBundle)
             .accessibilityIdentifier("tessera-mrz-read-failed-try-again")
 
             if showManualEntry {
                 Button(action: onManualEntry) {
-                    Text(TesseraStrings.string("tessera_scanner_read_failed_manual", bundle: stringsBundle))
+                    Text(ScannerControl.readFailedManual.label(bundle: stringsBundle))
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
+                .scannerControl(.readFailedManual, bundle: stringsBundle)
                 .accessibilityIdentifier("tessera-mrz-read-failed-manual")
             }
         }

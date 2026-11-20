@@ -51,9 +51,11 @@ internal struct ManualEntryScreen: View {
                 // Forced left-to-right regardless of the ambient locale: an MRZ is always printed
                 // left-to-right per ICAO 9303, and RTL would mirror a string that must stay verbatim.
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(TesseraStrings.string("tessera_scanner_manual_field_label", bundle: stringsBundle))
+                    Text(ScannerControl.manualField.label(bundle: stringsBundle))
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        // The field below carries this name; read once, not twice.
+                        .accessibilityHidden(true)
                     TextEditor(
                         text: Binding(
                             get: { text },
@@ -72,7 +74,7 @@ internal struct ManualEntryScreen: View {
                     )
                     .focused($fieldFocused)
                     .accessibilityIdentifier("tessera-mrz-manual-raw-field")
-                    .accessibilityLabel(TesseraStrings.string("tessera_scanner_manual_field_label", bundle: stringsBundle))
+                    .scannerControl(.manualField, bundle: stringsBundle)
                 }
 
                 Divider()
@@ -86,7 +88,8 @@ internal struct ManualEntryScreen: View {
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         } icon: {
-                            Text("ⓘ").font(.caption).foregroundStyle(.secondary)
+                            // Decorative; VoiceOver would read the glyph's Unicode name.
+                            Text("ⓘ").font(.caption).foregroundStyle(.secondary).accessibilityHidden(true)
                         }
                     }
                 }
@@ -110,10 +113,11 @@ internal struct ManualEntryScreen: View {
             Button {
                 onRead()
             } label: {
-                Text(TesseraStrings.string("tessera_scanner_manual_read", bundle: stringsBundle))
+                Text(ScannerControl.manualRead.label(bundle: stringsBundle))
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+            .scannerControl(.manualRead, bundle: stringsBundle)
             .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             .accessibilityIdentifier("tessera-mrz-manual-read")
         }
@@ -128,9 +132,9 @@ internal struct ManualEntryScreen: View {
                 Button {
                     dismissKeyboard()
                 } label: {
-                    Text(TesseraStrings.string("tessera_scanner_done", bundle: stringsBundle))
+                    Text(ScannerControl.keyboardDone.label(bundle: stringsBundle))
                 }
-                .accessibilityLabel(TesseraStrings.string("tessera_scanner_done", bundle: stringsBundle))
+                .scannerControl(.keyboardDone, bundle: stringsBundle)
                 .accessibilityIdentifier("tessera-mrz-manual-keyboard-done")
             }
         }

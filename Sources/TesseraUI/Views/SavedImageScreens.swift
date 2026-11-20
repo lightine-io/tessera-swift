@@ -32,10 +32,11 @@ internal struct AwaitingSavedImagePickScreen: View {
             .frame(maxWidth: .infinity)
 
             Button(action: onChoosePhoto) {
-                Text(TesseraStrings.string("tessera_scanner_saved_image_prompt_action", bundle: stringsBundle))
+                Text(ScannerControl.choosePhoto.label(bundle: stringsBundle))
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+            .scannerControl(.choosePhoto, bundle: stringsBundle)
         }
         .padding(24)
         .frame(maxHeight: .infinity)
@@ -107,17 +108,19 @@ internal struct SavedImageEmptyScreen: View {
             Spacer()
 
             Button(action: onChooseDifferent) {
-                Text(TesseraStrings.string("tessera_scanner_saved_image_choose_different", bundle: stringsBundle))
+                Text(ScannerControl.chooseDifferentPhoto.label(bundle: stringsBundle))
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+            .scannerControl(.chooseDifferentPhoto, bundle: stringsBundle)
 
             if showManualEntry {
                 Button(action: onManualEntry) {
-                    Text(TesseraStrings.string("tessera_scanner_saved_image_manual", bundle: stringsBundle))
+                    Text(ScannerControl.savedImageManual.label(bundle: stringsBundle))
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.plain)
+                .scannerControl(.savedImageManual, bundle: stringsBundle)
             }
         }
         .padding(24)
