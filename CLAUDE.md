@@ -33,7 +33,11 @@ Principles, process, and documentation rules live in the main repository's `CLAU
   this repository at the head of `main` and fails while any PR is open.
 - The release workflow writes the `binaryTarget` url and checksum in `Package.swift`.
   Edit them by hand only when that workflow fails.
-- The main repository's `CHANGELOG.md` covers both repositories; there is none here.
+- The main repository's `CHANGELOG.md` covers both repositories; there is none here, and
+  nothing here checks for an entry. A PR that changes what an app gets (behaviour, API,
+  strings) needs a line under `[Unreleased]` there, in a main-repository PR; name that PR
+  in this one. A PR that ships nothing says "no changelog" and why in its body. The main
+  repository's release gate checks every PR merged here against that rule.
 - Screenshots: the hook blocks capture commands in Bash; read the simulator as text.
 - Handoffs follow the main repository's template and live in this checkout's
   gitignored `.handoffs/`.
