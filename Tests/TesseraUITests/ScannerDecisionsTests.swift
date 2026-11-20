@@ -42,12 +42,18 @@ struct ScannerDecisionsTests {
     }
 
     /// Typed text pasted with Windows line breaks reads like text with plain line breaks (TES-285). Swift
-    /// keeps `\r\n` as one character, so `manualLinesOf` does not split it; the reader does, as on Android.
+    /// keeps `\r\n` as one character; `manualLinesOf` splits on it like on any other line break.
     @Test func windowsLineBreaksReadLikePlainOnes() {
         let plain = assembleManualDecoded(text: Self.icaoTD3)
         let windows = assembleManualDecoded(text: Self.icaoTD3.replacingOccurrences(of: "\n", with: "\r\n"))
         #expect(!(windows.parse is ParseResult.Failure))
         #expect(type(of: windows.parse) == type(of: plain.parse))
+    }
+
+    @Test func windowsLineBreaksSplitIntoTheSameLines() {
+        let windows = Self.icaoTD3.replacingOccurrences(of: "\n", with: "\r\n")
+        #expect(manualLinesOf(windows) == manualLinesOf(Self.icaoTD3))
+        #expect(manualLinesOf(windows).count == 2)
     }
 
     // MARK: reduceCameraResult — per-frame effect mapping
