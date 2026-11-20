@@ -41,6 +41,13 @@ jobs:
       - name: No real document data (MRZ guard)
         run: bash scripts/private-content-scan.sh --mrz-only
 
+      # The SDK's own sources make no network calls and never log. The script's --root is the
+      # main repository's Kotlin tree; here it gets an empty folder, so only Sources/ is scanned.
+      - name: No network or logging calls in Sources
+        run: |
+          mkdir -p "$RUNNER_TEMP/no-kotlin"
+          python3 -I scripts/check-no-network-or-logging.py --root "$RUNNER_TEMP/no-kotlin" --swift .
+
       - name: Select Xcode ${{ env.XCODE_VERSION }}
         run: |
           XC="/Applications/Xcode_${XCODE_VERSION}.app"
