@@ -31,10 +31,11 @@ struct MrzExplainerLink: View {
         } label: {
             HStack(spacing: 4) {
                 Text("ⓘ").accessibilityHidden(true)
-                Text(TesseraStrings.string("tessera_scanner_explainer_action", bundle: stringsBundle))
+                Text(ScannerControl.explainer.label(bundle: stringsBundle))
             }
             .foregroundStyle(.white)
         }
+        .scannerControl(.explainer, bundle: stringsBundle)
         .accessibilityIdentifier("tessera-mrz-explainer-action")
         .sheet(isPresented: $showDialog) {
             MrzExplainerDialog(onDismiss: { showDialog = false })
@@ -70,7 +71,7 @@ struct MrzExplainerDialog: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(TesseraStrings.string("tessera_scanner_explainer_dismiss", bundle: stringsBundle), action: onDismiss)
+                    Button(ScannerControl.explainerDismiss.label(bundle: stringsBundle), action: onDismiss)
                 }
             }
         }

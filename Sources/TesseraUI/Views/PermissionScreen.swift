@@ -45,7 +45,7 @@ internal struct PermissionScreen: View {
                 bodyText: TesseraStrings.string("tessera_scanner_permission_grant_body", bundle: stringsBundle),
                 // Grant hands the request to the host; without a handler there is nothing to call, so no dead
                 // button is drawn (only the rationale + the manual-entry escape remain).
-                primaryLabel: hasRequestHandler ? TesseraStrings.string("tessera_scanner_permission_grant_action", bundle: stringsBundle) : nil,
+                primaryControl: hasRequestHandler ? .permissionContinue : nil,
                 onPrimary: onGrant,
                 onManualEntry: onManualEntry,
                 showManualEntry: showManualEntry
@@ -57,7 +57,7 @@ internal struct PermissionScreen: View {
                 title: TesseraStrings.string("tessera_scanner_permission_denied_title", bundle: stringsBundle),
                 bodyText: TesseraStrings.string("tessera_scanner_permission_denied_body", bundle: stringsBundle),
                 // Open Settings is the UI's own navigation — always available in this mode.
-                primaryLabel: TesseraStrings.string("tessera_scanner_permission_open_settings", bundle: stringsBundle),
+                primaryControl: .permissionOpenSettings,
                 onPrimary: onOpenSettings,
                 onManualEntry: onManualEntry,
                 showManualEntry: showManualEntry
@@ -71,7 +71,7 @@ internal struct PermissionScreen: View {
 }
 
 /// The shared layout of both permission faces (mockups 04 / 04b): a centred title + body, a primary action
-/// pinned at the bottom (omitted when ``primaryLabel`` is `nil` - the no-handler Grant case), and the secondary
+/// pinned at the bottom (omitted when ``primaryControl`` is `nil` - the no-handler Grant case), and the secondary
 /// "Enter details manually" escape beneath it. The two faces differ only in their accessibility identifier,
 /// copy, and which callback the primary action fires - everything structural is shared here. Mirrors the
 /// Android private `PermissionScaffold`.
@@ -80,7 +80,7 @@ private struct PermissionScaffold: View {
     let accessibilityIdentifier: String
     let title: String
     let bodyText: String
-    let primaryLabel: String?
+    let primaryControl: ScannerControl?
     let onPrimary: () -> Void
     let onManualEntry: () -> Void
     /// Hidden when the consumer's `enabledMethods` excludes manual entry. Mirrors Android's `showManualEntry`.
@@ -102,24 +102,26 @@ private struct PermissionScaffold: View {
             }
             .frame(maxWidth: .infinity)
 
-            if let primaryLabel {
+            if let primaryControl {
                 Button {
                     onPrimary()
                 } label: {
-                    Text(primaryLabel)
+                    Text(primaryControl.label(bundle: stringsBundle))
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+                .scannerControl(primaryControl, bundle: stringsBundle)
             }
 
             if showManualEntry {
                 Button {
                     onManualEntry()
                 } label: {
-                    Text(TesseraStrings.string("tessera_scanner_camera_manual", bundle: stringsBundle))
+                    Text(ScannerControl.cameraManual.label(bundle: stringsBundle))
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
+                .scannerControl(.cameraManual, bundle: stringsBundle)
             }
         }
         .padding(24)

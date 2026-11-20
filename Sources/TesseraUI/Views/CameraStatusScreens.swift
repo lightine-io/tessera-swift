@@ -53,10 +53,11 @@ internal struct CameraInUseScreen: View {
 
             if showManualEntry {
                 Button(action: onManualEntry) {
-                    Text(TesseraStrings.string("tessera_scanner_camera_manual", bundle: stringsBundle))
+                    Text(ScannerControl.cameraManual.label(bundle: stringsBundle))
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+                .scannerControl(.cameraManual, bundle: stringsBundle)
             }
         }
         .padding(24)
@@ -94,10 +95,11 @@ internal struct CameraUnavailableScreen: View {
 
             if showManualEntry {
                 Button(action: onManualEntry) {
-                    Text(TesseraStrings.string("tessera_scanner_camera_manual", bundle: stringsBundle))
+                    Text(ScannerControl.cameraManual.label(bundle: stringsBundle))
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+                .scannerControl(.cameraManual, bundle: stringsBundle)
             }
         }
         .padding(24)
@@ -159,9 +161,10 @@ internal struct StrugglingHint: View {
                 .accessibilityAddTraits(.updatesFrequently)
             if showManualEntry {
                 Button(action: onManualEntry) {
-                    Text(TesseraStrings.string("tessera_scanner_struggling_manual", bundle: stringsBundle))
+                    Text(ScannerControl.strugglingManual.label(bundle: stringsBundle))
                 }
                 .buttonStyle(.plain)
+                .scannerControl(.strugglingManual, bundle: stringsBundle)
                 .foregroundStyle(.tint)
             }
         }

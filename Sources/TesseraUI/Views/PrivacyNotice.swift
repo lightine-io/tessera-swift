@@ -30,13 +30,13 @@ struct PrivacyNoticeAction: View {
             // on every screen), presentation follows each platform's idiom.
             Image(systemName: "info.circle")
         }
-        .accessibilityLabel(TesseraStrings.string("tessera_scanner_privacy_action", bundle: stringsBundle))
+        .scannerControl(.privacy, bundle: stringsBundle)
         .accessibilityIdentifier("tessera-mrz-privacy-action")
         .alert(
             TesseraStrings.string("tessera_scanner_privacy_dialog_title", bundle: stringsBundle),
             isPresented: $showDialog
         ) {
-            Button(TesseraStrings.string("tessera_scanner_privacy_dialog_dismiss", bundle: stringsBundle)) {}
+            Button(ScannerControl.privacyDismiss.label(bundle: stringsBundle)) {}
         } message: {
             Text(TesseraStrings.string("tessera_scanner_privacy_dialog_body", bundle: stringsBundle))
         }
