@@ -16,8 +16,8 @@ struct ManualEntryKeyboardTests {
         var reads = 0
     }
 
-    // The typed text is the first line of the published ICAO Doc 9303 TD3 specimen.
-    private static let typed = "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<"
+    // The typed text is the first line of the project's own TD3 specimen.
+    private static let typed = "P<UTOSPECIMEN<<ALEX<MORGAN<<<<<<<<<<<<<<<<<<"
 
     private func makeScreen(_ calls: Calls) -> ManualEntryScreen {
         ManualEntryScreen(

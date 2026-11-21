@@ -8,14 +8,14 @@ import SwiftUI
 // trust judgement about any document (Principle 1).
 //
 // The illustration is drawn from SwiftUI shapes (not a baked image) so it adapts to light / dark and scales
-// with the system font, and the specimen text is the ICAO Doc 9303 published example — never real data.
+// with the system font, and the specimen text is the project's own fictional specimen — never real data.
 
-/// The ICAO Doc 9303 published TD3 specimen (fictional UTOPIA / ERIKSSON ANNA MARIA). Synthetic by
-/// definition - this is the standards body's own example, never a real document. Hard-coded in the drawing,
+/// The project's own TD3 specimen (fictional Utopia, code UTO / SPECIMEN ALEX MORGAN), made with the SDK's
+/// generator rules - synthetic, never a real document. Hard-coded in the drawing,
 /// not overridable copy: it illustrates the MRZ's *shape*, so translating it would make no sense. Mirrors the
 /// Android `SPECIMEN_LINE_1` / `SPECIMEN_LINE_2`.
-private let explainerSpecimenLine1 = "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<"
-private let explainerSpecimenLine2 = "L898902C36UTO7408122F1204159ZE184226B<<<<<10"
+private let explainerSpecimenLine1 = "P<UTOSPECIMEN<<ALEX<MORGAN<<<<<<<<<<<<<<<<<<"
+private let explainerSpecimenLine2 = "T220001293UTO9003152F3403141S98765432<<<<<20"
 
 /// The "What's the MRZ?" affordance shown pinned at the bottom of the live camera preview, over the scrim.
 /// Owns the dialog's open/closed state locally, so it can be dropped into the preview overlay with no

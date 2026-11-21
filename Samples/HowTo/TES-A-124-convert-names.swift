@@ -23,7 +23,7 @@ func text(_ outcome: TransliterationOutcome) -> String {
         return ""
     }
 }
-// text(icao("MÜLLER")) is "MULLER". text(icao("ANNA MARIA")) is "ANNA<MARIA".
+// text(icao("MÜLLER")) is "MULLER". text(icao("ALEX MORGAN")) is "ALEX<MORGAN".
 // endregion
 
 // region TES-A-124 block 5

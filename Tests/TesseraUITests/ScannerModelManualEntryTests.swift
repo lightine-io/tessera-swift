@@ -12,7 +12,7 @@ struct ScannerModelManualEntryTests {
 
     @Test func typingWithinTheCapIsNotTruncated() {
         let model = makeModel()
-        let text = "P<UTOERIKSSON<<ANNA<MARIA"
+        let text = "P<UTOSPECIMEN<<ALEX<MORGAN"
         model.updateManualText(text)
 
         if case let .manualRaw(stateText, parseFailed, _) = model.state {

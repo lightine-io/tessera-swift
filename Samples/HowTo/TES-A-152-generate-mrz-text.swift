@@ -9,11 +9,11 @@ import Tessera
 // region TES-A-152 block 3
 func passportLines() -> GenerationResult {
     MrzGenerator.shared.generateTD3(
-        documentType: "P", issuingState: "UTO", documentNumber: "L898902C3",
-        primaryIdentifier: "ERIKSSON", secondaryIdentifier: "ANNA MARIA", nationality: "UTO",
-        dateOfBirth: Kotlinx_datetimeLocalDate(year: 1974, month: 8, day: 12), sex: .female,
-        dateOfExpiry: Kotlinx_datetimeLocalDate(year: 2012, month: 4, day: 15),
-        personalNumber: "ZE184226B", transliteration: nil
+        documentType: "P", issuingState: "UTO", documentNumber: "T22000129",
+        primaryIdentifier: "SPECIMEN", secondaryIdentifier: "ALEX MORGAN", nationality: "UTO",
+        dateOfBirth: Kotlinx_datetimeLocalDate(year: 1990, month: 3, day: 15), sex: .female,
+        dateOfExpiry: Kotlinx_datetimeLocalDate(year: 2034, month: 3, day: 14),
+        personalNumber: "S98765432", transliteration: nil
     )
 }
 // endregion
@@ -27,8 +27,8 @@ func show(_ result: GenerationResult) {
     }
 }
 // show(passportLines()) prints:
-// P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<
-// L898902C36UTO7408122F1204159ZE184226B<<<<<10
+// P<UTOSPECIMEN<<ALEX<MORGAN<<<<<<<<<<<<<<<<<<
+// T220001293UTO9003152F3403141S98765432<<<<<20
 // endregion
 
 // region TES-A-152 block 5
@@ -46,11 +46,11 @@ func regeneratePassport(_ passport: TD3) -> GenerationResult {
 // region TES-A-152 block 7
 func tooLong() -> GenerationResult {
     MrzGenerator.shared.generateTD3(
-        documentType: "P", issuingState: "UTO", documentNumber: "L898902C36",
-        primaryIdentifier: "ERIKSSON", secondaryIdentifier: "ANNA MARIA", nationality: "UTO",
-        dateOfBirth: Kotlinx_datetimeLocalDate(year: 1974, month: 8, day: 12), sex: .female,
-        dateOfExpiry: Kotlinx_datetimeLocalDate(year: 2012, month: 4, day: 15),
-        personalNumber: "ZE184226B", transliteration: nil
+        documentType: "P", issuingState: "UTO", documentNumber: "T220001293",
+        primaryIdentifier: "SPECIMEN", secondaryIdentifier: "ALEX MORGAN", nationality: "UTO",
+        dateOfBirth: Kotlinx_datetimeLocalDate(year: 1990, month: 3, day: 15), sex: .female,
+        dateOfExpiry: Kotlinx_datetimeLocalDate(year: 2034, month: 3, day: 14),
+        personalNumber: "S98765432", transliteration: nil
     )
 }
 // show(tooLong()) prints:

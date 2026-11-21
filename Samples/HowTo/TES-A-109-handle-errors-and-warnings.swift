@@ -43,5 +43,5 @@ func checkDigit(of field: String) -> String? {
     guard let digit = try? CheckDigitKt.computeCheckDigit(input: field) else { return nil }
     return String(utf16CodeUnits: [digit], count: 1)
 }
-// checkDigit(of: "L898902C<") is "3". checkDigit(of: "abc") is nil.
+// checkDigit(of: "T2200012<") is "4". checkDigit(of: "abc") is nil.
 // endregion

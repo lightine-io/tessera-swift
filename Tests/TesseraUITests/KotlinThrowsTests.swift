@@ -3,17 +3,17 @@ import Tessera
 @testable import TesseraUI
 
 /// TES-238: Kotlin functions that reject bad input carry `@Throws`, so Swift sees a thrown error
-/// instead of a crash. Synthetic / ICAO specimen data only.
+/// instead of a crash. Synthetic specimen data only.
 struct KotlinThrowsTests {
     @Test func computeCheckDigitReturnsTheSpecimenDigit() throws {
-        // ICAO Doc 9303 specimen document number "L898902C3" has check digit 6.
-        let digit = try CheckDigitKt.computeCheckDigit(input: "L898902C3")
-        #expect(digit == UInt16(Character("6").asciiValue!))
+        // The project's TD3 specimen document number "T22000129" has check digit 3.
+        let digit = try CheckDigitKt.computeCheckDigit(input: "T22000129")
+        #expect(digit == UInt16(Character("3").asciiValue!))
     }
 
     @Test func computeCheckDigitThrowsOnCharacterOutsideAlphabet() {
         #expect(throws: (any Error).self) {
-            try CheckDigitKt.computeCheckDigit(input: "L89*902C3")
+            try CheckDigitKt.computeCheckDigit(input: "T22*00129")
         }
     }
 

@@ -11,7 +11,7 @@ import Tessera
 func basics(_ document: MrzDocument) -> String {
     let fields = document.commonFields
     return "\(fields.primaryIdentifier), \(fields.secondaryIdentifier) | \(fields.documentNumber) | \(document.format.name)"
-    // ERIKSSON, ANNA MARIA | L898902C3 | TD3
+    // SPECIMEN, ALEX MORGAN | T22000129 | TD3
 }
 // endregion
 
@@ -33,22 +33,22 @@ func sex(_ document: MrzDocument) -> String {
 
 // region TES-A-115 block 6
 func expiry(_ date: MrzDate) -> String {
-    if let resolved = date.computedDate { return resolved.description() }   // 2012-04-15
+    if let resolved = date.computedDate { return resolved.description() }   // 2034-03-14
     return "unresolved \(date.rawYear)-\(date.rawMonth)-\(date.rawDay)"
 }
 // endregion
 
 // region TES-A-115 block 7
 func personalNumber(_ document: MrzDocument) -> String? {
-    (document as? TD3)?.personalNumber   // ZE184226B<<<<<
+    (document as? TD3)?.personalNumber   // S98765432<<<<<
 }
 // endregion
 
 // region TES-A-115 block 8
 func resolves(at epochMilliseconds: Int64) -> Bool {
     let time = KotlinInstant.companion.fromEpochMilliseconds(epochMilliseconds: epochMilliseconds)
-    let date = MrzDate.companion.parseExpiry(rawYear: "12", rawMonth: "04", rawDay: "15", referenceTime: time)
+    let date = MrzDate.companion.parseExpiry(rawYear: "34", rawMonth: "03", rawDay: "14", referenceTime: time)
     return date.inferenceMethod !== MrzDateInferenceMethod.rawOnly
 }
-// resolves(at: 1_275_350_400_000) is true. resolves(at: current time) is false.
+// resolves(at: 1_795_219_200_000) is true. resolves(at: 2_366_841_600_000) is false.
 // endregion

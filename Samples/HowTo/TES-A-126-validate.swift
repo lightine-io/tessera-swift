@@ -7,12 +7,12 @@ import Foundation
 import Tessera
 
 let tampered = """
-P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<
-L898902C30UTO7408122F1204159ZE184226B<<<<<10
+P<UTOSPECIMEN<<ALEX<MORGAN<<<<<<<<<<<<<<<<<<
+T220001290UTO9003152F3403141S98765432<<<<<20
 """
 
 func referenceTime() -> KotlinInstant {
-    KotlinInstant.companion.fromEpochMilliseconds(epochMilliseconds: 1_275_350_400_000)
+    KotlinInstant.companion.fromEpochMilliseconds(epochMilliseconds: 1_795_219_200_000)
 }
 // endregion
 
@@ -36,8 +36,8 @@ func failedChecks(_ result: ValidationResult) -> [String] {
         let observed = String(utf16CodeUnits: [mismatch.observed], count: 1)
         return "\(mismatch.field.name): expected \(expected), observed \(observed)"
     }
-    // DOCUMENT_NUMBER: expected 6, observed 0
-    // COMPOSITE: expected 8, observed 0
+    // DOCUMENT_NUMBER: expected 3, observed 0
+    // COMPOSITE: expected 9, observed 0
 }
 // endregion
 

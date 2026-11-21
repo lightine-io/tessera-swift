@@ -4,12 +4,12 @@ import Tessera
 
 /// Call-site check for the `lines:` overloads as a Swift consumer writes them (TES-289): `parse`, `read` and
 /// `validate` take a list of MRZ lines and give the same kind of result as the one-string `input:` overloads.
-/// The fixture is the ICAO Doc 9303 published TD3 specimen ("UTO" = fictional Utopia, a permitted test
-/// vector, not real document data).
+/// The fixture is the project's own TD3 specimen ("UTO" = fictional Utopia, synthetic, not real document
+/// data).
 struct LinesCallSiteTests {
     private static let specimenLines = [
-        "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<",
-        "L898902C36UTO7408122F1204159ZE184226B<<<<<10",
+        "P<UTOSPECIMEN<<ALEX<MORGAN<<<<<<<<<<<<<<<<<<",
+        "T220001293UTO9003152F3403141S98765432<<<<<20",
     ]
     private static let joined = specimenLines.joined(separator: "\n")
 
