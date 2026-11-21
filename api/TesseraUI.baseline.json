@@ -1974,9 +1974,6 @@
           "usr": "s:Sh"
          }
         ],
-        "declAttributes": [
-         "Transparent"
-        ],
         "declKind": "Accessor",
         "implicit": true,
         "kind": "Accessor",
@@ -2008,9 +2005,6 @@
           "printedName": "Swift.Set<Tessera.DocumentCategory>",
           "usr": "s:Sh"
          }
-        ],
-        "declAttributes": [
-         "Transparent"
         ],
         "declKind": "Accessor",
         "implicit": true,
