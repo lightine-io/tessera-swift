@@ -93,6 +93,7 @@ private struct PermissionScaffold: View {
                 Spacer()
                 Text(title)
                     .font(.title2.weight(.semibold))
+                    .accessibilityAddTraits(.isHeader)
                     .multilineTextAlignment(.center)
                 Text(bodyText)
                     .font(.body)

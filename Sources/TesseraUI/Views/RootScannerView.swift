@@ -112,7 +112,6 @@ struct RootScannerView: View {
                     }
                     .padding(16)
                     .scannerControl(.torch, bundle: config.stringsBundle)
-                    .accessibilityAddTraits(model.torchOn ? .isSelected : [])
                     .accessibilityValue(torchAccessibilityValue(on: model.torchOn, bundle: config.stringsBundle))
                     .accessibilityIdentifier("tessera-mrz-torch")
                 }

@@ -45,6 +45,7 @@ internal struct ManualEntryScreen: View {
         PinnedActionsLayout {
             Text(TesseraStrings.string("tessera_scanner_manual_title", bundle: stringsBundle))
                 .font(.title2.weight(.semibold))
+                .accessibilityAddTraits(.isHeader)
         } scrolling: {
             // The field + observations scroll; the action stays pinned below and always reachable — mirrors
             // the Android split between the scrollable Column and the pinned buttons. In compact height
