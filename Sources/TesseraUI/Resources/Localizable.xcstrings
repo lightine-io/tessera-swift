@@ -698,6 +698,16 @@
         }
       }
     },
+    "tessera_scanner_obs_warning_expiry_century_unknown": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expiry year %1$@ can't be placed in a century"
+          }
+        }
+      }
+    },
     "tessera_scanner_obs_warning_expiry_far": {
       "localizations": {
         "en": {

@@ -42,12 +42,28 @@ struct ReviewWarningObservationsTests {
     @Test func noWarningNotesAppearBeyondTheOnesTheParserReported() {
         // Info rows are: provenance, one note per warning the screen has a text for, and the mismatch
         // advisory (absent here). "At most", not "exactly": a newer framework can report a warning type this
-        // screen has no text for yet (the expiry-century warning, until the package pins that release), and
+        // screen has no text for yet, and
         // such a warning shows no note. Each warning the screen does map has its own test above and below.
         let (decoded, rows) = observations(for: Self.specimen)
         let infoCount = rows.filter { $0.tone == .info }.count
         #expect(infoCount >= 1)
         #expect(infoCount <= 1 + decoded.parse.metadata.warnings.count)
+    }
+
+    @Test func expiryYearThatFitsNoCenturyIsANoteWithTheRawYear() throws {
+        // Expiry year 99 fits neither the 2000s nor the 1900s inside the parser's window, so the parser reports
+        // the century warning and the screen states it with the digits as printed.
+        let unplaced = try expiryReplaced(Self.specimen, with: "990314")
+        let (decoded, rows) = observations(for: unplaced)
+        #expect(decoded.parse.metadata.warnings.contains { $0 is MrzExpiryDateCenturyNotInferred }) // precondition
+        let notes = rows.filter { $0.text == "Expiry year 99 can't be placed in a century" }
+        #expect(notes.count == 1)
+        #expect(notes.first?.tone == .info)
+    }
+
+    @Test func specimenYieldsNoCenturyNote() {
+        let (_, rows) = observations(for: Self.specimen)
+        #expect(!rows.contains { $0.text.contains("can't be placed in a century") })
     }
 
     @Test func fillerPersonalNumberCheckIsANoteAndNotACheckRow() throws {
@@ -90,5 +106,21 @@ private func personalNumberCheckReplacedByFiller(_ text: String) throws -> Strin
     let digit = try CheckDigitKt.computeCheckDigit(input: composite)
     body.append(Character(Unicode.Scalar(digit)!))
     lines[1] = String(body)
+    return lines.joined(separator: "\n")
+}
+
+/// The TD3 `text` with line 2's expiry date (positions 22-27) replaced by `expiry`, its check digit (position 28)
+/// and the composite check digit (position 44) recomputed with the SDK's check-digit function, so the only
+/// observation that changes is the one about the expiry date itself.
+private func expiryReplaced(_ text: String, with expiry: String) throws -> String {
+    var lines = text.split(separator: "\n").map(String.init)
+    var line2 = Array(lines[1])
+    line2.replaceSubrange(21..<27, with: Array(expiry))
+    let expiryDigit = try CheckDigitKt.computeCheckDigit(input: expiry)
+    line2[27] = Character(Unicode.Scalar(expiryDigit)!)
+    let composite = String(line2[0..<10]) + String(line2[13..<20]) + String(line2[21..<43])
+    let compositeDigit = try CheckDigitKt.computeCheckDigit(input: composite)
+    line2[43] = Character(Unicode.Scalar(compositeDigit)!)
+    lines[1] = String(line2)
     return lines.joined(separator: "\n")
 }

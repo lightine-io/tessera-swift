@@ -398,8 +398,8 @@ internal struct ReviewScreen: View {
         return observations
     }
 
-    /// The plain-words note for one parser warning, or nil when it gets no row (the deprecated
-    /// `MrzBirthDateImplausiblyOld`, which is never reported, and any subtype this UI does not know yet).
+    /// The plain-words note for one parser warning, or nil when it gets no row (any subtype this
+    /// UI does not know yet).
     private func warningText(_ warning: MrzWarning) -> String? {
         func string(_ key: String) -> String { TesseraStrings.string(key, bundle: stringsBundle) }
         if let unknownCountry = warning as? MrzUnknownCountryCode {
@@ -415,6 +415,9 @@ internal struct ReviewScreen: View {
         if warning is MrzExpiryDatePast { return string("tessera_scanner_obs_warning_expiry_past") }
         if let far = warning as? MrzExpiryDateImplausiblyFar {
             return substituting(string("tessera_scanner_obs_warning_expiry_far"), String(far.thresholdYears))
+        }
+        if let century = warning as? MrzExpiryDateCenturyNotInferred {
+            return substituting(string("tessera_scanner_obs_warning_expiry_century_unknown"), century.rawYear)
         }
         if warning is MrzNameTruncated { return string("tessera_scanner_obs_warning_name_truncated") }
         if warning is MrzPersonalNumberCheckDigitFiller { return string("tessera_scanner_obs_warning_personal_number_no_check") }
