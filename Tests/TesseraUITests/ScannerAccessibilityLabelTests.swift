@@ -50,6 +50,8 @@ struct ScannerAccessibilityLabelTests {
         "permission, denied": [.permissionOpenSettings, .cameraManual],
         "read failed": [.readFailedTryAgain, .readFailedManual],
         "saved image, no MRZ": [.chooseDifferentPhoto, .savedImageManual],
+        // TES-103: the photo screen for a kind the app does not accept reuses the "no MRZ" actions.
+        "saved image, not accepted": [.chooseDifferentPhoto, .savedImageManual],
         "manual entry": [.manualField, .manualRead, .keyboardDone],
         "review, camera": [.reviewShowAll, .reviewUse, .reviewSecondary(.camera)],
         "review, photo": [.reviewShowAll, .reviewUse, .reviewSecondary(.savedImage)],

@@ -1,4 +1,5 @@
 import SwiftUI
+import Tessera
 
 // The manual raw-MRZ entry screen (mockup 06) — the iOS mirror of the Android `ManualRawContent`. The user
 // types the MRZ lines by hand; the SDK parses exactly what they typed and stamps the manual-entry read method
@@ -29,6 +30,11 @@ internal struct ManualEntryScreen: View {
     @Environment(\.tesseraStringsBundle) private var stringsBundle
     let text: String
     let parseFailed: Bool
+    /// TES-103: the category the typed lines read as when the app does not accept it; shows an inline note.
+    /// Any edit clears it, like `parseFailed`.
+    var notAccepted: DocumentCategory? = nil
+    /// The kinds the app accepts, named in that note.
+    var acceptedDocumentTypes: Set<DocumentCategory> = allDocumentCategories
     let onTextChange: (String) -> Void
     let onRead: () -> Void
     // Whether the MRZ field has keyboard focus. Dismissing the keyboard only clears this; it never calls
@@ -104,6 +110,12 @@ internal struct ManualEntryScreen: View {
                         .font(.caption)
                         .foregroundStyle(.red)
                         .accessibilityIdentifier("tessera-mrz-manual-parse-failed")
+                }
+
+                // TES-103: the typed lines read as a kind of document the app does not accept. The text stays;
+                // the note states what kind was read and what kinds the app accepts, and clears on the next edit.
+                if let notAccepted {
+                    ManualNotAcceptedNote(read: notAccepted, acceptedDocumentTypes: acceptedDocumentTypes)
                 }
             }
         } actions: {

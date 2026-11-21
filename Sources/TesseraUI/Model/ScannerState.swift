@@ -18,7 +18,13 @@ enum ScannerState {
     /// enough frames, to overlay the "hold steady" cue - it takes render precedence over `struggling`, since
     /// getting a decode at all means progress is being made. Mirrors the Android `Scanning(struggling,
     /// gathering)`.
-    case scanning(struggling: Bool, gathering: Bool)
+    ///
+    /// `notAccepted` (TES-103) is the category of the last reading the frames agreed on that is not in
+    /// ``MrzScannerConfig/acceptedDocumentTypes``. While set, the preview shows a notice saying what kind was
+    /// read and what kinds the app accepts; the camera keeps scanning. It renders below gathering and above
+    /// struggling, and clears when an accepted reading starts gathering or 3 seconds after the last frame of
+    /// that document. Mirrors the Android `Scanning.notAccepted`.
+    case scanning(struggling: Bool, gathering: Bool, notAccepted: DocumentCategory? = nil)
 
     /// The camera permission is not held and can still be requested (mockup 04).
     case permissionNeeded
@@ -63,10 +69,20 @@ enum ScannerState {
     ///   counterpart).
     case savedImageEmpty
 
+    /// A picked photo read as a document of category `read`, which is not in the app's
+    /// ``MrzScannerConfig/acceptedDocumentTypes`` (TES-103). The screen states what kind was read and what
+    /// kinds the app accepts, and offers another photo. The reading itself is not kept. Mirrors the Android
+    /// `SavedImageNotAccepted`.
+    case savedImageNotAccepted(read: DocumentCategory)
+
     /// Manual entry of the MRZ lines as raw text (mockup 06). `text` is the in-progress input. `parseFailed`
     /// is set when the last submitted read did not parse - an inline note shown on this same screen, never a
     /// jump to the read-failed screen (which is camera/photo-flavoured and would mislabel typed input). Any
     /// edit clears it (see ``ScannerModel/updateManualText(_:)``). Mirrors the Android `ManualRaw(text,
     /// parseFailed)`.
-    case manualRaw(text: String, parseFailed: Bool)
+    ///
+    /// `notAccepted` (TES-103) is set when the typed lines read as a document whose category is not in the
+    /// app's ``MrzScannerConfig/acceptedDocumentTypes``: the text stays and an inline note shows instead of
+    /// review. Any edit clears it, like `parseFailed`.
+    case manualRaw(text: String, parseFailed: Bool, notAccepted: DocumentCategory? = nil)
 }

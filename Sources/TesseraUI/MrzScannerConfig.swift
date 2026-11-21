@@ -1,4 +1,7 @@
 import SwiftUI
+// `@preconcurrency`: `DocumentCategory` is a Kotlin enum bridged as a class the compiler cannot see is Sendable.
+// Its entries are immutable singletons, safe to share across threads, so the config stays `Sendable` (TES-103).
+@preconcurrency import Tessera
 
 // The default-UI configuration surface, the iOS analogue of the Android module's `MrzScannerConfig`.
 //
@@ -163,6 +166,18 @@ public struct MrzScannerConfig: Sendable {
     /// - Since: 0.5.1
     public var stringsBundle: Bundle?
 
+    /// The kinds of document your app takes.
+    ///
+    /// Default: every ``DocumentCategory``. This is your app's intake rule; the SDK does not judge the document.
+    /// A reading whose category is not in the set does not go to review and is not returned. The screen says
+    /// what kind it read and what kinds your app accepts, and lets the person go on: the camera keeps scanning,
+    /// a photo can be swapped, and typed lines stay on the entry screen.
+    /// The category is the document type code's broad category (`DocumentTypeCodeTable.broadCategory(code:)`).
+    /// A code with no category is not filtered. An empty set is treated as every category.
+    ///
+    /// - Since: 0.8.0
+    public var acceptedDocumentTypes: Set<DocumentCategory>
+
     /// Creates a configuration.
     ///
     /// - Parameters:
@@ -176,6 +191,7 @@ public struct MrzScannerConfig: Sendable {
     ///   - theme: Accent color and light or dark mode. Default: `MrzScannerTheme()`.
     ///   - onRequestPermission: Called to request the camera permission. Default: `nil`.
     ///   - stringsBundle: Bundle with string overrides. Default: `nil`. Since 0.5.1.
+    ///   - acceptedDocumentTypes: The kinds of document your app takes. Default: every category. Since 0.8.0.
     public init(
         enabledMethods: Set<ScanMethod> = [.camera, .manualEntry],
         reviewMode: ReviewMode = .review,
@@ -186,7 +202,8 @@ public struct MrzScannerConfig: Sendable {
         hapticFeedback: Bool = true,
         theme: MrzScannerTheme = MrzScannerTheme(),
         onRequestPermission: (@Sendable () -> Void)? = nil,
-        stringsBundle: Bundle? = nil
+        stringsBundle: Bundle? = nil,
+        acceptedDocumentTypes: Set<DocumentCategory> = Set(DocumentCategory.entries)
     ) {
         self.enabledMethods = enabledMethods
         self.reviewMode = reviewMode
@@ -198,5 +215,6 @@ public struct MrzScannerConfig: Sendable {
         self.theme = theme
         self.onRequestPermission = onRequestPermission
         self.stringsBundle = stringsBundle
+        self.acceptedDocumentTypes = acceptedDocumentTypes
     }
 }

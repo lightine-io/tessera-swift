@@ -15,7 +15,7 @@ struct ScannerModelManualEntryTests {
         let text = "P<UTOERIKSSON<<ANNA<MARIA"
         model.updateManualText(text)
 
-        if case let .manualRaw(stateText, parseFailed) = model.state {
+        if case let .manualRaw(stateText, parseFailed, _) = model.state {
             #expect(stateText == text)
             #expect(parseFailed == false)
         } else {
@@ -30,7 +30,7 @@ struct ScannerModelManualEntryTests {
         let pasted = String(repeating: "A", count: 1524)
         model.updateManualText(pasted)
 
-        if case let .manualRaw(stateText, _) = model.state {
+        if case let .manualRaw(stateText, _, _) = model.state {
             #expect(stateText.count == 1024, "the draft must truncate to exactly 1024 characters, not reject or overflow past it")
         } else {
             Issue.record("updateManualText must transition to .manualRaw")
@@ -42,7 +42,7 @@ struct ScannerModelManualEntryTests {
         let pasted = String(repeating: "B", count: 2000)
         model.updateManualText(pasted)
 
-        if case let .manualRaw(_, parseFailed) = model.state {
+        if case let .manualRaw(_, parseFailed, _) = model.state {
             #expect(parseFailed == false, "any edit — truncated or not — clears a prior parse-failed note")
         } else {
             Issue.record("updateManualText must transition to .manualRaw")

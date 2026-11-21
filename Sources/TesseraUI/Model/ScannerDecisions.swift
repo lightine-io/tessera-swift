@@ -29,6 +29,10 @@ enum DecodeRoute {
 
     /// Review mode: park the decode on the review screen for the user to accept or rescan.
     case showReview(decoded: MrzScanResultDecoded)
+
+    /// TES-103: the reading is of category `read`, which the app's ``MrzScannerConfig/acceptedDocumentTypes``
+    /// does not include. Not reviewed, not returned; the screen states what was read and what the app accepts.
+    case notAccepted(read: DocumentCategory)
 }
 
 /// The routing decision for a decoded reading. A `ParseResultFailure` routes to
@@ -37,9 +41,21 @@ enum DecodeRoute {
 /// ``DecodeRoute/showReview(decoded:)``. A `ParseResultPartialSuccess` (check-digit mismatch) is a
 /// non-failure and follows the same path as `ParseResultSuccess` - the UI never treats a mismatch as a
 /// failure or diverts it (Principle 1). Mirrors the Android `routeDecode`.
-func routeDecode(_ decoded: MrzScanResultDecoded, reviewMode: ReviewMode) -> DecodeRoute {
+///
+/// TES-103: a non-failure reading whose category the app does not accept (``notAcceptedCategory(_:acceptedDocumentTypes:)``)
+/// routes to ``DecodeRoute/notAccepted(read:)`` in BOTH modes, so it is never returned under instant-return.
+/// A reading with no category is not filtered. With every category accepted (the default) the routing is
+/// exactly as before.
+func routeDecode(
+    _ decoded: MrzScanResultDecoded,
+    reviewMode: ReviewMode,
+    acceptedDocumentTypes: Set<DocumentCategory> = allDocumentCategories
+) -> DecodeRoute {
     if decoded.parse is ParseResult.Failure {
         return .showReadFailed(capturedText: decoded.recognizedText)
+    }
+    if let read = notAcceptedCategory(decoded, acceptedDocumentTypes: acceptedDocumentTypes) {
+        return .notAccepted(read: read)
     }
     if reviewMode == .instantReturn {
         return .returnConfirmed(decoded: decoded)
@@ -210,7 +226,7 @@ func switcherMethods(enabledMethods: Set<ScanMethod>) -> [ScanMethod] {
 /// Android `showsMethodSwitcher`.
 func showsMethodSwitcher(_ state: ScannerState) -> Bool {
     switch state {
-    case .scanning, .manualRaw, .awaitingSavedImagePick, .savedImageEmpty:
+    case .scanning, .manualRaw, .awaitingSavedImagePick, .savedImageEmpty, .savedImageNotAccepted:
         return true
     default:
         return false
@@ -225,7 +241,7 @@ func activeMethod(_ state: ScannerState) -> ScanMethod? {
         return .camera
     case .manualRaw:
         return .manualEntry
-    case .awaitingSavedImagePick, .savedImageEmpty:
+    case .awaitingSavedImagePick, .savedImageEmpty, .savedImageNotAccepted:
         return .savedImage
     default:
         return nil
@@ -363,6 +379,9 @@ func announcementKey(for state: ScannerState) -> String? {
         return "tessera_scanner_camera_in_use_title"
     case .savedImageAnalyzing:
         return "tessera_scanner_saved_image_analyzing_title"
+    case let .savedImageNotAccepted(read):
+        // TES-103: assertive on Android, like the "no MRZ found" screen - the title is what is announced.
+        return notAcceptedTitleKey(read)
     default:
         return nil
     }
@@ -392,6 +411,10 @@ enum GuidanceMessage: Equatable {
     /// The frame-agreement consensus gate is confirming a read across several frames - "Hold steady…".
     case gathering
 
+    /// TES-103: the frames agreed on a reading the app does not accept - what kind was read, what kinds the
+    /// app accepts.
+    case notAccepted
+
     /// No decode for a while - the "still looking / type it instead" nudge.
     case struggling
 
@@ -403,8 +426,12 @@ enum GuidanceMessage: Equatable {
 /// decode at all (gathering) is better news than "still looking" (struggling), and either supersedes the
 /// baseline hint. Pure so the precedence itself is host-testable with no view or camera. Mirrors the Android
 /// `MrzGuideOverlay`'s `when { gathering -> ...; struggling -> ...; else -> ... }`.
-func guidanceMessage(gathering: Bool, struggling: Bool) -> GuidanceMessage {
+///
+/// TES-103: the not-accepted notice ranks below gathering (a new reading takes over) and above struggling (the
+/// person is pointing a document at the camera, so the notice is the more useful message).
+func guidanceMessage(gathering: Bool, struggling: Bool, notAccepted: Bool = false) -> GuidanceMessage {
     if gathering { return .gathering }
+    if notAccepted { return .notAccepted }
     if struggling { return .struggling }
     return .framingHint
 }

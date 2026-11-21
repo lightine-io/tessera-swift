@@ -98,6 +98,21 @@ final class ScannerModel {
     private var lastGatheringAt: Date?
     private let gatheringCueLinger: TimeInterval = 0.6
 
+    /// TES-103: wall-clock of the last frame that read a document the app does not accept, so the live notice
+    /// stays while that document is in view and drops ``notAcceptedNoticeLinger`` after it leaves. Mirrors the
+    /// Android `lastNotAcceptedAtMs`.
+    private var lastNotAcceptedAt: Date?
+
+    /// The clock behind ``lastNotAcceptedAt`` and its linger check. A seam so a host test can step past the
+    /// linger without waiting 3 seconds; the screen always uses the wall clock.
+    var notAcceptedClock: () -> Date = { Date() }
+
+    /// The kinds of document this presentation accepts (TES-103): the configured set, or every category when
+    /// the configured set is empty (``effectiveAcceptedDocumentTypes(_:)``).
+    var acceptedDocumentTypes: Set<DocumentCategory> {
+        effectiveAcceptedDocumentTypes(config.acceptedDocumentTypes)
+    }
+
     /// TES-151: whether the configured struggle timeout has already elapsed for this session. If the timer
     /// fires while the scanning state is not showing (a camera-in-use notice, say), the next qualifying frame
     /// flips the UI to struggling the moment scanning resumes (see the `.stayScanning` branch in
@@ -274,10 +289,13 @@ final class ScannerModel {
     /// call site guards this to fire once, on the transition into the overlay - never on every recompute of
     /// an already-showing one, mirroring the Android `StrugglingHint`/`GatheringHint` polite live regions.
     private func postAnnouncement(key: String) {
-        UIAccessibility.post(
-            notification: .announcement,
-            argument: TesseraStrings.string(key, bundle: config.stringsBundle)
-        )
+        postAnnouncement(text: TesseraStrings.string(key, bundle: config.stringsBundle))
+    }
+
+    /// Posts an already-resolved announcement text - used for the TES-103 not-accepted notice and note, whose
+    /// spoken text is built from several keys (``notAcceptedAnnouncement(_:acceptedDocumentTypes:bundle:)``).
+    private func postAnnouncement(text: String) {
+        UIAccessibility.post(notification: .announcement, argument: text)
     }
 
     // MARK: - Global chrome hooks
@@ -387,7 +405,7 @@ final class ScannerModel {
         if decoded.parse is ParseResult.Failure {
             state = .manualRaw(text: text, parseFailed: true)
         } else {
-            routeThroughDecode(decoded, source: .manualEntry)
+            routeThroughDecode(decoded, source: .manualEntry, manualText: text)
         }
     }
 
@@ -677,8 +695,8 @@ final class ScannerModel {
             await MainActor.run {
                 guard let self else { return }
                 self.struggleTimeoutElapsed = true
-                guard case let .scanning(struggling, gathering) = self.state, !struggling else { return }
-                self.state = .scanning(struggling: true, gathering: gathering)
+                guard case let .scanning(struggling, gathering, notAccepted) = self.state, !struggling else { return }
+                self.state = .scanning(struggling: true, gathering: gathering, notAccepted: notAccepted)
                 self.postAnnouncement(key: "tessera_scanner_struggling_hint")
             }
         }
@@ -698,6 +716,7 @@ final class ScannerModel {
         struggleTask?.cancel(); struggleTask = nil
         struggleTimeoutArmed = false
         lastGatheringAt = nil
+        lastNotAcceptedAt = nil
         resultsTask?.cancel(); resultsTask = nil
         previewTask?.cancel(); previewTask = nil
         previewSession = nil
@@ -797,26 +816,47 @@ final class ScannerModel {
     /// transient misread the MRZ has no check digit for cannot win on one frame - Gathering keeps scanning
     /// (surfacing the "hold steady" cue), Confirmed routes once (the latch stops repeats). Mirrors the Android
     /// `onCameraResult`'s consensus wiring (TES-91).
-    private func onCameraResult(_ result: MrzScanResult) {
+    ///
+    /// Internal, not private, so a host test can feed it frames without a camera (TES-103).
+    func onCameraResult(_ result: MrzScanResult) {
         switch reduceCameraResult(result) {
         case let .goDecoded(decoded):
-            guard !decodeRouted, !(decoded.parse is ParseResult.Failure) else { return }
-            switch consensus.offer(decoded: decoded) {
-            case is ConsensusVerdictConfirmed:
+            // TES-103: the pure stepLiveDecode also applies the app's intake rule. A reading the frames agree
+            // on but the app does not accept never trips the latch and never counts as the confirmed reading:
+            // the consensus is reset, the preview shows a notice, and the session keeps scanning, so a later
+            // document of an accepted kind still routes. With every kind accepted (the default) it behaves
+            // exactly as before.
+            switch stepLiveDecode(
+                decoded,
+                alreadyRouted: decodeRouted,
+                consensus: consensus,
+                acceptedDocumentTypes: acceptedDocumentTypes
+            ) {
+            case .ignore:
+                return
+            case let .route(decoded):
                 decodeRouted = true
                 // TES-134 (Android hapticFeedback mirror): bump the sensory-feedback trigger the moment a
                 // live-camera read is accepted — the view's `.sensoryFeedback` plays the confirm haptic
                 // (gated there on `config.hapticFeedback`). Camera path only, exactly like Android.
                 confirmedReadHaptic += 1
                 routeThroughDecode(decoded, source: .camera)
-            case is ConsensusVerdictGathering:
+            case .gathering:
                 lastGatheringAt = Date()
-                if case let .scanning(struggling, gathering) = state, !gathering {
-                    state = .scanning(struggling: struggling, gathering: true)
-                    postAnnouncement(key: "tessera_scanner_gathering_hint")
+                // A new reading gathering also replaces a not-accepted notice (TES-103).
+                if case let .scanning(struggling, gathering, notAccepted) = state, !gathering || notAccepted != nil {
+                    state = .scanning(struggling: struggling, gathering: true, notAccepted: nil)
+                    if !gathering {
+                        postAnnouncement(key: "tessera_scanner_gathering_hint")
+                    }
                 }
-            default:
-                break
+            case .notAcceptedGathering:
+                // TES-103: a not-accepted document is still in view. No "hold steady" cue (it is not heading
+                // for review); only keep the notice alive while it shows.
+                lastNotAcceptedAt = notAcceptedClock()
+            case let .notAccepted(read):
+                lastNotAcceptedAt = notAcceptedClock()
+                showLiveNotAcceptedNotice(read)
             }
         case .goCameraInUse:
             state = .cameraInUse
@@ -831,9 +871,10 @@ final class ScannerModel {
                 state = .scanning(struggling: false, gathering: false)
                 return
             }
-            guard case let .scanning(struggling, gathering) = state else { return }
+            guard case let .scanning(struggling, gathering, notAccepted) = state else { return }
             var newStruggling = struggling
             var newGathering = gathering
+            var newNotAccepted = notAccepted
             // Clear the "hold steady" cue only after the linger window with no decode, so a single miss
             // between two decodes (normal even on a steady card) does not strobe it.
             if newGathering, let lastGathering = lastGatheringAt,
@@ -845,8 +886,14 @@ final class ScannerModel {
             if !newStruggling, struggleTimeoutElapsed {
                 newStruggling = true
             }
-            if newStruggling != struggling || newGathering != gathering {
-                state = .scanning(struggling: newStruggling, gathering: newGathering)
+            // TES-103: the not-accepted notice drops a while after that document left the view, so the framing
+            // guide (or the struggling hint) comes back.
+            if newNotAccepted != nil, let lastNotAccepted = lastNotAcceptedAt,
+               notAcceptedClock().timeIntervalSince(lastNotAccepted) > notAcceptedNoticeLinger {
+                newNotAccepted = nil
+            }
+            if newStruggling != struggling || newGathering != gathering || newNotAccepted != notAccepted {
+                state = .scanning(struggling: newStruggling, gathering: newGathering, notAccepted: newNotAccepted)
                 // Announce only the rising edge (false → true), never the falling edge or an unrelated change.
                 if newStruggling, !struggling {
                     postAnnouncement(key: "tessera_scanner_struggling_hint")
@@ -855,19 +902,50 @@ final class ScannerModel {
         }
     }
 
-    /// Routes a decode to the matching state via ``routeDecode(_:reviewMode:)`` - shared by the camera path,
-    /// manual entry, and saved-image, all of which produce a `Decoded` that follows the identical routing.
-    /// `source` is carried onto ``ScannerState/review(decoded:expanded:source:)`` so a rescan/edit-entry
-    /// returns to the method that produced it (TES-92/TES-93/TES-96). Mirrors the Android `routeDecoded` /
-    /// `routeThroughDecode`.
-    private func routeThroughDecode(_ decoded: MrzScanResultDecoded, source: ScanMethod) {
-        switch routeDecode(decoded, reviewMode: config.reviewMode) {
+    /// Routes a decode to the matching state via ``routeDecode(_:reviewMode:acceptedDocumentTypes:)`` - shared
+    /// by the camera path, manual entry, and saved-image, all of which produce a `Decoded` that follows the
+    /// identical routing. `source` is carried onto ``ScannerState/review(decoded:expanded:source:)`` so a
+    /// rescan/edit-entry returns to the method that produced it (TES-92/TES-93/TES-96). Mirrors the Android
+    /// `routeDecoded` / `routeThroughDecode`.
+    ///
+    /// TES-103: a reading of a kind the app does not accept is never reviewed or returned; each method states
+    /// it in its own place (``notAcceptedState(for:read:current:manualDraft:)``). `manualText` is the typed
+    /// text to keep on the entry screen; the camera filters before it gets here (``stepLiveDecode(_:alreadyRouted:consensus:acceptedDocumentTypes:)``),
+    /// so the camera branch is only a fallback.
+    private func routeThroughDecode(_ decoded: MrzScanResultDecoded, source: ScanMethod, manualText: String? = nil) {
+        switch routeDecode(decoded, reviewMode: config.reviewMode, acceptedDocumentTypes: acceptedDocumentTypes) {
         case let .showReadFailed(capturedText):
             transition(to: .readFailed(capturedText: capturedText))
         case let .returnConfirmed(decoded):
             onResult(.confirmed(decoded))
         case let .showReview(decoded):
             transition(to: .review(decoded: decoded, expanded: false, source: source))
+        case let .notAccepted(read):
+            switch source {
+            case .camera:
+                showLiveNotAcceptedNotice(read)
+            case .savedImage:
+                // The title is announced on arrival (announcementKey), like the "no MRZ found" screen.
+                transition(to: notAcceptedState(for: .savedImage, read: read, current: state, manualDraft: manualDraft))
+            case .manualEntry:
+                if let manualText { manualDraft = manualText }
+                // Stays on the entry screen: plain assignment, no transition (the screen does not change).
+                state = notAcceptedState(for: .manualEntry, read: read, current: state, manualDraft: manualDraft)
+                postAnnouncement(text: notAcceptedAnnouncement(
+                    read, acceptedDocumentTypes: acceptedDocumentTypes, bundle: config.stringsBundle))
+            }
+        }
+    }
+
+    /// Shows the live not-accepted notice for `read` over the preview (TES-103), announcing it when it first
+    /// appears or names a different kind.
+    private func showLiveNotAcceptedNotice(_ read: DocumentCategory) {
+        let previous: DocumentCategory?
+        if case let .scanning(_, _, notAccepted) = state { previous = notAccepted } else { return }
+        state = showNotAcceptedNotice(state, read: read)
+        if previous !== read {
+            postAnnouncement(text: notAcceptedAnnouncement(
+                read, acceptedDocumentTypes: acceptedDocumentTypes, bundle: config.stringsBundle))
         }
     }
 }

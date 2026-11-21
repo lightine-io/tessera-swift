@@ -74,7 +74,7 @@ struct RootScannerView: View {
     @ViewBuilder
     private func body(for state: ScannerState) -> some View {
         switch state {
-        case let .scanning(struggling, gathering):
+        case let .scanning(struggling, gathering, notAccepted):
             // The single live-preview guidance region (gathering > struggling > the plain framing hint) now
             // renders INSIDE CameraPreviewView's MrzGuideOverlay, below the guide box — not as separate top
             // banners here, so exactly one guidance message ever shows, in one place, over the dimmed scrim.
@@ -82,6 +82,8 @@ struct RootScannerView: View {
                 session: model.previewSession,
                 gathering: gathering,
                 struggling: struggling,
+                notAccepted: notAccepted,
+                acceptedDocumentTypes: model.acceptedDocumentTypes,
                 onManualEntry: { model.enterManualEntry() },
                 showManualEntry: model.showManualEntry,
                 // WYSIWYG band alignment (TES-129): the viewfinder reports the guide box's real on-screen
@@ -174,10 +176,21 @@ struct RootScannerView: View {
                 showManualEntry: model.showManualEntry
             )
 
-        case let .manualRaw(text, parseFailed):
+        case let .savedImageNotAccepted(read):
+            SavedImageNotAcceptedScreen(
+                read: read,
+                acceptedDocumentTypes: model.acceptedDocumentTypes,
+                onChooseDifferent: { model.launchPhotoPicker() },
+                onManualEntry: { model.enterManualEntry() },
+                showManualEntry: model.showManualEntry
+            )
+
+        case let .manualRaw(text, parseFailed, notAccepted):
             ManualEntryScreen(
                 text: text,
                 parseFailed: parseFailed,
+                notAccepted: notAccepted,
+                acceptedDocumentTypes: model.acceptedDocumentTypes,
                 onTextChange: { model.updateManualText($0) },
                 onRead: { model.readManual(text: text) }
             )
