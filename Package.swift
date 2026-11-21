@@ -47,9 +47,43 @@ let package = Package(
             path: "Sources/TesseraUI",
             resources: [.process("Resources")]
         ),
+        // Compiled samples (TES-230): every Swift code block of the public iOS how-to pages and
+        // tutorials, one file per page under Samples/. How-tos build in the package's Swift 6
+        // mode unless the page states Swift 5. Not in `products`, so nothing ships to
+        // consumers. Each tutorial builds an app of its own, so it gets a target of its own.
+        // scripts/check-samples.py compares the samples with the live pages.
+        // The test action builds only what the tests depend on, so
+        // TesseraUITests depends on the samples targets: that is what makes CI compile them.
+        .target(
+            name: "TesseraSamples",
+            dependencies: ["Tessera", "TesseraUI"],
+            path: "Samples/HowTo"
+        ),
+        .target(
+            name: "TesseraSamplesSwift5",
+            dependencies: ["Tessera"],
+            path: "Samples/HowToSwift5",
+            // TES-A-18 states the Swift 5 language mode; TES-A-120 builds on it.
+            swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
+        .target(
+            name: "TesseraSamplesFirstMrz",
+            dependencies: ["Tessera", "TesseraUI"],
+            path: "Samples/Tutorials/FirstMrz"
+        ),
+        .target(
+            name: "TesseraSamplesCameraHeadless",
+            dependencies: ["Tessera"],
+            path: "Samples/Tutorials/CameraHeadless",
+            // TES-A-143 step 2 sets the app to the Swift 5 language mode.
+            swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
         .testTarget(
             name: "TesseraUITests",
-            dependencies: ["TesseraUI"],
+            dependencies: [
+                "TesseraUI",
+                "TesseraSamples", "TesseraSamplesSwift5", "TesseraSamplesFirstMrz", "TesseraSamplesCameraHeadless",
+            ],
             path: "Tests/TesseraUITests"
         ),
     ]
