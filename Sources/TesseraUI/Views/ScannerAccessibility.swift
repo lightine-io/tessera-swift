@@ -138,3 +138,13 @@ extension View {
         accessibilityLabel(control.spokenLabel(bundle: bundle))
     }
 }
+
+/// Tells VoiceOver a new screen arrived (TES-298): it moves to the new content and, when `title` is given,
+/// speaks it. The scanner swaps screens inside one presented view, so the system sends no such signal itself.
+/// The post is deferred one turn so the new screen is in the accessibility tree when VoiceOver looks.
+@MainActor
+func postScreenChanged(title: String?) {
+    DispatchQueue.main.async {
+        AccessibilityNotification.ScreenChanged(title).post()
+    }
+}
