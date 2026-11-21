@@ -173,10 +173,13 @@ public struct MrzScannerConfig: Sendable {
     /// what kind it read and what kinds your app accepts, and lets the person go on: the camera keeps scanning,
     /// a photo can be swapped, and typed lines stay on the entry screen.
     /// The category is the document type code's broad category (`DocumentTypeCodeTable.broadCategory(code:)`).
-    /// A code with no category is not filtered. An empty set is treated as every category.
+    /// A code with no category is not filtered.
+    /// An empty set is a configuration error: setting one stops the program with a precondition failure.
     ///
     /// - Since: 0.8.0
-    public var acceptedDocumentTypes: Set<DocumentCategory>
+    public var acceptedDocumentTypes: Set<DocumentCategory> {
+        didSet { requireAcceptableDocumentTypeSet(acceptedDocumentTypes) }
+    }
 
     /// Creates a configuration.
     ///
@@ -191,7 +194,8 @@ public struct MrzScannerConfig: Sendable {
     ///   - theme: Accent color and light or dark mode. Default: `MrzScannerTheme()`.
     ///   - onRequestPermission: Called to request the camera permission. Default: `nil`.
     ///   - stringsBundle: Bundle with string overrides. Default: `nil`. Since 0.5.1.
-    ///   - acceptedDocumentTypes: The kinds of document your app takes. Default: every category. Since 0.8.0.
+    ///   - acceptedDocumentTypes: The kinds of document your app takes. Default: every category. Must not be
+    ///     empty: an empty set stops the program with a precondition failure. Since 0.8.0.
     public init(
         enabledMethods: Set<ScanMethod> = [.camera, .manualEntry],
         reviewMode: ReviewMode = .review,
@@ -215,6 +219,26 @@ public struct MrzScannerConfig: Sendable {
         self.theme = theme
         self.onRequestPermission = onRequestPermission
         self.stringsBundle = stringsBundle
+        // A property observer does not run during init, so the initializer checks the value itself.
+        requireAcceptableDocumentTypeSet(acceptedDocumentTypes)
         self.acceptedDocumentTypes = acceptedDocumentTypes
     }
+}
+
+// MARK: - Accepted document types validation (TES-103)
+
+/// The message of the precondition failure an empty ``MrzScannerConfig/acceptedDocumentTypes`` triggers.
+let emptyAcceptedDocumentTypesMessage =
+    "acceptedDocumentTypes must not be empty; pass the kinds of document the app accepts, or leave the default"
+
+/// Whether `types` is a valid ``MrzScannerConfig/acceptedDocumentTypes`` value: an empty set is a configuration
+/// error (an app that accepts nothing could never get a result), the same rule as the Android builder's
+/// `require`. Pure, so a host test checks the rule; the trap itself cannot run in a simulator test.
+func isAcceptableDocumentTypeSet(_ types: Set<DocumentCategory>) -> Bool {
+    !types.isEmpty
+}
+
+/// Stops the program when `types` is not a valid accepted set - a programming error, not a runtime condition.
+private func requireAcceptableDocumentTypeSet(_ types: Set<DocumentCategory>) {
+    precondition(isAcceptableDocumentTypeSet(types), emptyAcceptedDocumentTypesMessage)
 }

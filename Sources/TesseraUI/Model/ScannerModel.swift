@@ -107,10 +107,9 @@ final class ScannerModel {
     /// linger without waiting 3 seconds; the screen always uses the wall clock.
     var notAcceptedClock: () -> Date = { Date() }
 
-    /// The kinds of document this presentation accepts (TES-103): the configured set, or every category when
-    /// the configured set is empty (``effectiveAcceptedDocumentTypes(_:)``).
+    /// The kinds of document this presentation accepts (TES-103). Never empty: the config refuses an empty set.
     var acceptedDocumentTypes: Set<DocumentCategory> {
-        effectiveAcceptedDocumentTypes(config.acceptedDocumentTypes)
+        config.acceptedDocumentTypes
     }
 
     /// TES-151: whether the configured struggle timeout has already elapsed for this session. If the timer

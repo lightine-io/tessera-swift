@@ -15,12 +15,6 @@ var allDocumentCategories: Set<DocumentCategory> { Set(DocumentCategory.entries)
 /// `NOT_ACCEPTED_NOTICE_LINGER_MS`.
 let notAcceptedNoticeLinger: TimeInterval = 3
 
-/// The accepted set the screen applies. An empty set is a configuration slip, not a request to accept nothing
-/// (that would leave a screen that can never return): it is treated as every category, the same defensive
-/// fallback the screen applies to an empty ``MrzScannerConfig/enabledMethods`` (see ``initialState(enabledMethods:)``).
-func effectiveAcceptedDocumentTypes(_ configured: Set<DocumentCategory>) -> Set<DocumentCategory> {
-    configured.isEmpty ? allDocumentCategories : configured
-}
 
 /// The broad category of a parsed reading, or `nil` when it did not parse or its type code has no category.
 /// `documentType` is a Kotlin value class erased to its raw code `String`, so the category is looked up through

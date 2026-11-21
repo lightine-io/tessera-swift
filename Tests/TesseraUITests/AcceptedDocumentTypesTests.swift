@@ -59,14 +59,23 @@ struct AcceptedDocumentTypesTests {
         #expect(documentCategory(of: uncategorized) == nil)
     }
 
-    @Test func defaultAcceptsEveryCategoryAndAnEmptySetIsTreatedAsEvery() {
+    @Test func defaultAcceptsEveryCategoryAndASetIsStoredAsGiven() {
         #expect(MrzScannerConfig().acceptedDocumentTypes == Set(DocumentCategory.entries))
         #expect(MrzScannerConfig().acceptedDocumentTypes.count == 5)
         #expect(MrzScannerConfig(acceptedDocumentTypes: passportOnly).acceptedDocumentTypes == passportOnly)
         var config = MrzScannerConfig()
-        config.acceptedDocumentTypes = []
-        #expect(effectiveAcceptedDocumentTypes(config.acceptedDocumentTypes) == allDocumentCategories)
-        #expect(ScannerModel(config: config, onResult: { _ in }).acceptedDocumentTypes == allDocumentCategories)
+        config.acceptedDocumentTypes = idCardOnly
+        #expect(config.acceptedDocumentTypes == idCardOnly)
+        #expect(ScannerModel(config: config, onResult: { _ in }).acceptedDocumentTypes == idCardOnly)
+    }
+
+    /// The rule the initializer's and the setter's precondition apply. The trap itself is not run: exit tests
+    /// are not available on the iOS Simulator.
+    @Test func anEmptySetIsAConfigurationError() {
+        #expect(!isAcceptableDocumentTypeSet([]))
+        #expect(isAcceptableDocumentTypeSet(passportOnly))
+        #expect(isAcceptableDocumentTypeSet(allDocumentCategories))
+        #expect(emptyAcceptedDocumentTypesMessage.contains("acceptedDocumentTypes must not be empty"))
     }
 
     // MARK: - routeDecode: saved image and manual entry route through it
