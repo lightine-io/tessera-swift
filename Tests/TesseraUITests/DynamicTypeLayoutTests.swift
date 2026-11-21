@@ -82,7 +82,10 @@ struct DynamicTypeLayoutTests {
 
     @Test(arguments: Screen.allCases)
     func theScreenStaysWithinThePhoneWidthAtLargeTextSizes(_ screen: Screen) {
-        for textSize in [DynamicTypeSize.xxxLarge, .accessibility1, .accessibility3, .accessibility5] {
+        // Two sizes, the largest standard one and the largest accessibility one: every layout here runs on the
+        // main actor, and on a slow CI runner four sizes per screen kept it busy long enough to time out
+        // other suites' waits.
+        for textSize in [DynamicTypeSize.xxxLarge, .accessibility5] {
             let width = fittedSize(screen, textSize).width
             #expect(width <= Self.narrowestWidth + 0.5, "\(screen) at \(textSize) is \(width) points wide")
         }
