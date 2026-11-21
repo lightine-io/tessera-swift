@@ -63,7 +63,6 @@ internal struct SavedImageAnalyzingScreen: View {
         VStack(spacing: 16) {
             Text(TesseraStrings.string("tessera_scanner_saved_image_analyzing_title", bundle: stringsBundle))
                 .font(.title2.weight(.semibold))
-                .accessibilityAddTraits(.updatesFrequently)
 
             ProgressView()
                 .controlSize(.large)

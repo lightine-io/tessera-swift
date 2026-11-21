@@ -54,6 +54,14 @@ struct RootScannerView: View {
         .onChange(of: model.pickedItem) { _, item in
             if let item { model.handlePickedItem(item) }
         }
+        // VoiceOver: a new screen is announced when it arrives (TES-298). Keyed on the screen, so an overlay or a
+        // toggle on the same screen (struggling hint, expanded review) does not re-announce.
+        .onChange(of: screen(of: model.state)) { _, _ in
+            let title = screenTitleKey(for: model.state).map {
+                TesseraStrings.string($0, bundle: config.stringsBundle)
+            }
+            postScreenChanged(title: title)
+        }
         .onChange(of: scenePhase) { _, phase in
             // Forwards to the session-level scan deadline (TES-124/126) — it advances only while `.active`,
             // pausing on background/inactive and resuming from the accumulated elapsed time, never restarting.

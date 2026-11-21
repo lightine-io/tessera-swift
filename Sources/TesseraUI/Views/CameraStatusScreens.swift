@@ -36,12 +36,10 @@ internal struct CameraInUseScreen: View {
             Spacer()
 
             VStack(spacing: 12) {
+                // Announced on arrival by the root view's screen-changed notification (TES-298).
                 Text(TesseraStrings.string("tessera_scanner_camera_in_use_title", bundle: stringsBundle))
                     .font(.title2)
                     .multilineTextAlignment(.center)
-                    // The screen arrives via an auto-transition (another app grabs the camera), so the
-                    // recoverable status is announced on appearance without the user moving focus to it.
-                    .accessibilityAddTraits(.updatesFrequently)
                 Text(TesseraStrings.string("tessera_scanner_camera_in_use_body", bundle: stringsBundle))
                     .font(.callout)
                     .foregroundStyle(.secondary)
