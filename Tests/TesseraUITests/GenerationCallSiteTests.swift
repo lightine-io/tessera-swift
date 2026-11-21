@@ -2,22 +2,22 @@ import Testing
 import Tessera
 @testable import TesseraUI
 
-/// Call-site check for the 0.6.0 generator as a Swift consumer writes it (TES-223): the same ICAO Doc 9303
-/// published TD3 specimen ("UTO" = fictional Utopia, a permitted test vector, not real document data) comes
+/// Call-site check for the 0.6.0 generator as a Swift consumer writes it (TES-223): the project's own
+/// TD3 specimen ("UTO" = fictional Utopia, synthetic, not real document data) comes
 /// back from `MrzGenerator` both from field values and from a parsed document.
 struct GenerationCallSiteTests {
     private static let specimenLines = [
-        "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<",
-        "L898902C36UTO7408122F1204159ZE184226B<<<<<10",
+        "P<UTOSPECIMEN<<ALEX<MORGAN<<<<<<<<<<<<<<<<<<",
+        "T220001293UTO9003152F3403141S98765432<<<<<20",
     ]
 
     @Test func generatesTheSpecimenFromFieldValues() {
         let result = MrzGenerator.shared.generateTD3(
-            documentType: "P", issuingState: "UTO", documentNumber: "L898902C3",
-            primaryIdentifier: "ERIKSSON", secondaryIdentifier: "ANNA MARIA", nationality: "UTO",
-            dateOfBirth: Kotlinx_datetimeLocalDate(year: 1974, month: 8, day: 12), sex: .female,
-            dateOfExpiry: Kotlinx_datetimeLocalDate(year: 2012, month: 4, day: 15),
-            personalNumber: "ZE184226B", transliteration: nil)
+            documentType: "P", issuingState: "UTO", documentNumber: "T22000129",
+            primaryIdentifier: "SPECIMEN", secondaryIdentifier: "ALEX MORGAN", nationality: "UTO",
+            dateOfBirth: Kotlinx_datetimeLocalDate(year: 1990, month: 3, day: 15), sex: .female,
+            dateOfExpiry: Kotlinx_datetimeLocalDate(year: 2034, month: 3, day: 14),
+            personalNumber: "S98765432", transliteration: nil)
         guard let success = result as? GenerationResult.Success else {
             Issue.record("expected GenerationResult.Success, got \(type(of: result))")
             return

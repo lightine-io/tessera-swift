@@ -7,11 +7,11 @@ import Tessera
 /// field/observation *rendering* is exercised by the Android host tests (same logic) and by on-device
 /// verification; here we test the pure routing/mapping decisions that need no UI.
 struct ScannerDecisionsTests {
-    // The ICAO Doc 9303 published TD3 specimen (country "UTO" = fictional Utopia) — a permitted test vector,
-    // not real document data. Used to get a non-failure parse for the review-routing path.
-    private static let icaoTD3 = """
-    P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<
-    L898902C36UTO7408122F1204159ZE184226B<<<<<10
+    // The project's own TD3 specimen (country "UTO" = fictional Utopia) - synthetic, not real document data.
+    // Used to get a non-failure parse for the review-routing path.
+    private static let specimenTD3 = """
+    P<UTOSPECIMEN<<ALEX<MORGAN<<<<<<<<<<<<<<<<<<
+    T220001293UTO9003152F3403141S98765432<<<<<20
     """
 
     private func quality() -> ScanQuality {
@@ -31,7 +31,7 @@ struct ScannerDecisionsTests {
     }
 
     @Test func nonFailureRoutesToReviewOrInstantReturn() {
-        let decoded = assembleManualDecoded(text: Self.icaoTD3)
+        let decoded = assembleManualDecoded(text: Self.specimenTD3)
         #expect(!(decoded.parse is ParseResult.Failure)) // Success or PartialSuccess — a non-failure
         if case .showReview = routeDecode(decoded, reviewMode: .review) { } else {
             Issue.record("review mode must park a non-failure decode on review")
@@ -44,15 +44,15 @@ struct ScannerDecisionsTests {
     /// Typed text pasted with Windows line breaks reads like text with plain line breaks (TES-285). Swift
     /// keeps `\r\n` as one character; `manualLinesOf` splits on it like on any other line break.
     @Test func windowsLineBreaksReadLikePlainOnes() {
-        let plain = assembleManualDecoded(text: Self.icaoTD3)
-        let windows = assembleManualDecoded(text: Self.icaoTD3.replacingOccurrences(of: "\n", with: "\r\n"))
+        let plain = assembleManualDecoded(text: Self.specimenTD3)
+        let windows = assembleManualDecoded(text: Self.specimenTD3.replacingOccurrences(of: "\n", with: "\r\n"))
         #expect(!(windows.parse is ParseResult.Failure))
         #expect(type(of: windows.parse) == type(of: plain.parse))
     }
 
     @Test func windowsLineBreaksSplitIntoTheSameLines() {
-        let windows = Self.icaoTD3.replacingOccurrences(of: "\n", with: "\r\n")
-        #expect(manualLinesOf(windows) == manualLinesOf(Self.icaoTD3))
+        let windows = Self.specimenTD3.replacingOccurrences(of: "\n", with: "\r\n")
+        #expect(manualLinesOf(windows) == manualLinesOf(Self.specimenTD3))
         #expect(manualLinesOf(windows).count == 2)
     }
 
@@ -144,7 +144,7 @@ struct ScannerDecisionsTests {
     /// reader runs in single-read mode (`tolerant: false`), so `mapSavedImageResult` no longer inspects
     /// `candidates` at all; there is no candidates outcome to route to any more.
     @Test func savedImageMapsToSingleDecodeIgnoringAnyCandidates() {
-        let decoded = assembleManualDecoded(text: Self.icaoTD3)
+        let decoded = assembleManualDecoded(text: Self.specimenTD3)
         let candidate = MrzCandidate(mrzLines: [], parse: decoded.parse, disambiguations: [])
         let result = SavedImageScanResult(scan: decoded, candidates: [candidate], captureMetadata: nil)
         guard case let .singleDecode(mapped) = mapSavedImageResult(result) else {
@@ -170,7 +170,7 @@ struct ScannerDecisionsTests {
     /// it confirms exactly once.
     @Test func consensusGathersThenConfirmsAcrossAgreeingFrames() throws {
         let consensus = try MrzDecodeConsensus(threshold: 2)
-        let decoded = assembleManualDecoded(text: Self.icaoTD3)
+        let decoded = assembleManualDecoded(text: Self.specimenTD3)
 
         guard let gathering = consensus.offer(decoded: decoded) as? ConsensusVerdictGathering else {
             Issue.record("the first agreeing frame must gather, not confirm, at threshold 2")
@@ -190,7 +190,7 @@ struct ScannerDecisionsTests {
     /// gate on a fresh live session, so a prior session's votes never carry over.
     @Test func consensusResetClearsThePriorTally() throws {
         let consensus = try MrzDecodeConsensus(threshold: 2)
-        let decoded = assembleManualDecoded(text: Self.icaoTD3)
+        let decoded = assembleManualDecoded(text: Self.specimenTD3)
         _ = consensus.offer(decoded: decoded) // one vote cast
         consensus.reset()
         guard let gathering = consensus.offer(decoded: decoded) as? ConsensusVerdictGathering else {
@@ -271,7 +271,7 @@ struct ScannerDecisionsTests {
     /// other state — the scanning overlays included, which are announced separately by `ScannerModel` on
     /// their own rising edge — maps to `nil`.
     @Test func announcementKeyMapsTheSixOutcomeStatesAndNothingElse() {
-        let decoded = assembleManualDecoded(text: Self.icaoTD3)
+        let decoded = assembleManualDecoded(text: Self.specimenTD3)
         #expect(announcementKey(for: .review(decoded: decoded, expanded: false, source: .camera)) == "tessera_scanner_review_title")
         #expect(announcementKey(for: .readFailed(capturedText: RecognizedText(lines: []))) == "tessera_scanner_read_failed_title")
         #expect(announcementKey(for: .cameraUnavailable) == "tessera_scanner_camera_unavailable_title")
@@ -293,11 +293,11 @@ struct ScannerDecisionsTests {
     /// Trailing MRZ filler (`<`) is stripped for display; interior fillers and non-filler content are left
     /// alone — mirrors the Android `String.withoutTrailingFiller` (`trimEnd('<')`).
     @Test func withoutTrailingFillerStripsOnlyTrailingFillerCharacters() {
-        #expect(withoutTrailingFiller("L898902C<") == "L898902C")
-        #expect(withoutTrailingFiller("L898902C<<<<") == "L898902C")
-        #expect(withoutTrailingFiller("L898902C") == "L898902C")
+        #expect(withoutTrailingFiller("T2200012<") == "T2200012")
+        #expect(withoutTrailingFiller("T2200012<<<<") == "T2200012")
+        #expect(withoutTrailingFiller("T2200012") == "T2200012")
         // Interior '<' (a real MRZ separator, e.g. between name components) is not a trailing filler.
-        #expect(withoutTrailingFiller("ERIKSSON<<ANNA") == "ERIKSSON<<ANNA")
+        #expect(withoutTrailingFiller("SPECIMEN<<ALEX") == "SPECIMEN<<ALEX")
         // All-filler collapses to empty, matching Android's "no row at all" blank check downstream.
         #expect(withoutTrailingFiller("<<<<<") == "")
         #expect(withoutTrailingFiller("") == "")

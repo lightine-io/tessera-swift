@@ -7,8 +7,8 @@ import Foundation
 import Tessera
 
 let specimen = """
-P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<
-L898902C36UTO7408122F1204159ZE184226B<<<<<10
+P<UTOSPECIMEN<<ALEX<MORGAN<<<<<<<<<<<<<<<<<<
+T220001293UTO9003152F3403141S98765432<<<<<20
 """
 // endregion
 
@@ -16,7 +16,7 @@ L898902C36UTO7408122F1204159ZE184226B<<<<<10
 struct ParseAnMrzString {
     // region TES-A-113 block 3
     func referenceTime() -> KotlinInstant {
-        KotlinInstant.companion.fromEpochMilliseconds(epochMilliseconds: 1_275_350_400_000)
+        KotlinInstant.companion.fromEpochMilliseconds(epochMilliseconds: 1_795_219_200_000)
     }
     // endregion
 

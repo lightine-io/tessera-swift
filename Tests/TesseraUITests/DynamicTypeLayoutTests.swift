@@ -19,10 +19,10 @@ struct DynamicTypeLayoutTests {
     /// The narrowest iPhone screen width iOS 18 supports, in points.
     private static let narrowestWidth: CGFloat = 375
 
-    // The published ICAO Doc 9303 TD3 specimen.
+    // The project's own TD3 specimen (synthetic).
     private static let specimen = """
-    P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<
-    L898902C36UTO7408122F1204159ZE184226B<<<<<10
+    P<UTOSPECIMEN<<ALEX<MORGAN<<<<<<<<<<<<<<<<<<
+    T220001293UTO9003152F3403141S98765432<<<<<20
     """
 
     private static var capturedSpecimen: RecognizedText {

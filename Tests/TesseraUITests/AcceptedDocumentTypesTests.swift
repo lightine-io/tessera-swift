@@ -11,28 +11,29 @@ import Testing
 /// driven through ``ScannerModel`` (the camera by feeding frames to ``ScannerModel/onCameraResult(_:)``, since
 /// the simulator has no camera).
 ///
-/// Fixtures: the published ICAO TD3 specimen (UTO, the reserved test issuer) as the passport, and lines built
-/// with the SDK's own `MrzGenerator` for an ID card (TD1, code `I`) and for a code with no category (`X`).
+/// Fixtures: the project's own TD3 specimen (UTO, the reserved test issuer) as the passport, and lines built
+/// with the SDK's own `MrzGenerator` for an ID card (TD1, code `I`, the project's TD1 specimen) and for a code
+/// with no category (`X`).
 @MainActor
 struct AcceptedDocumentTypesTests {
     static let passportLines = [
-        "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<",
-        "L898902C36UTO7408122F1204159ZE184226B<<<<<10",
+        "P<UTOSPECIMEN<<ALEX<MORGAN<<<<<<<<<<<<<<<<<<",
+        "T220001293UTO9003152F3403141S98765432<<<<<20",
     ]
 
     static let idCardLines: [String] = generated(MrzGenerator.shared.generateTD1(
-        documentType: "I", issuingState: "UTO", documentNumber: "D23145890",
-        primaryIdentifier: "SPECIMEN", secondaryIdentifier: "TEST", nationality: "UTO",
-        dateOfBirth: Kotlinx_datetimeLocalDate(year: 1974, month: 8, day: 12), sex: .female,
-        dateOfExpiry: Kotlinx_datetimeLocalDate(year: 2032, month: 4, day: 15),
+        documentType: "I", issuingState: "UTO", documentNumber: "T42000137",
+        primaryIdentifier: "SPECIMEN", secondaryIdentifier: "ALEX MORGAN", nationality: "UTO",
+        dateOfBirth: Kotlinx_datetimeLocalDate(year: 1990, month: 3, day: 15), sex: .female,
+        dateOfExpiry: Kotlinx_datetimeLocalDate(year: 2034, month: 3, day: 14),
         optionalData1: "", optionalData2: "", transliteration: nil))
 
     // A document type code whose first letter is none of P, I, A, C, V: broadCategory is nil.
     static let uncategorizedLines: [String] = generated(MrzGenerator.shared.generateTD3(
-        documentType: "X", issuingState: "UTO", documentNumber: "L898902C",
-        primaryIdentifier: "SPECIMEN", secondaryIdentifier: "TEST", nationality: "UTO",
-        dateOfBirth: Kotlinx_datetimeLocalDate(year: 1969, month: 8, day: 6), sex: .female,
-        dateOfExpiry: Kotlinx_datetimeLocalDate(year: 2032, month: 6, day: 23),
+        documentType: "X", issuingState: "UTO", documentNumber: "T22000129",
+        primaryIdentifier: "SPECIMEN", secondaryIdentifier: "ALEX MORGAN", nationality: "UTO",
+        dateOfBirth: Kotlinx_datetimeLocalDate(year: 1990, month: 3, day: 15), sex: .female,
+        dateOfExpiry: Kotlinx_datetimeLocalDate(year: 2034, month: 3, day: 14),
         personalNumber: "", transliteration: nil))
 
     private static func generated(_ result: GenerationResult) -> [String] {

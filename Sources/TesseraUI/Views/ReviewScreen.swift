@@ -484,7 +484,7 @@ func dateDisplay(_ date: MrzDate, bundle: Bundle?) -> String {
 }
 
 /// Strips trailing MRZ filler (`<`) from a parsed field VALUE for display - the fillers are fixed-width
-/// padding, not data, so `L898902C<` reads as `L898902C`. Display-only: the raw MRZ section still renders
+/// padding, not data, so `T2200012<` reads as `T2200012`. Display-only: the raw MRZ section still renders
 /// every character verbatim, so transparency is preserved (Principle 5). Mirrors the Android
 /// `String.withoutTrailingFiller`.
 func withoutTrailingFiller(_ value: String) -> String {
