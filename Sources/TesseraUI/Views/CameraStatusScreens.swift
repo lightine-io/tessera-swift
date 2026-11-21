@@ -39,6 +39,7 @@ internal struct CameraInUseScreen: View {
                 // Announced on arrival by the root view's screen-changed notification (TES-298).
                 Text(TesseraStrings.string("tessera_scanner_camera_in_use_title", bundle: stringsBundle))
                     .font(.title2)
+                    .accessibilityAddTraits(.isHeader)
                     .multilineTextAlignment(.center)
                 Text(TesseraStrings.string("tessera_scanner_camera_in_use_body", bundle: stringsBundle))
                     .font(.callout)
@@ -82,6 +83,7 @@ internal struct CameraUnavailableScreen: View {
             VStack(spacing: 12) {
                 Text(TesseraStrings.string("tessera_scanner_camera_unavailable_title", bundle: stringsBundle))
                     .font(.title2)
+                    .accessibilityAddTraits(.isHeader)
                     .multilineTextAlignment(.center)
                 Text(TesseraStrings.string("tessera_scanner_camera_unavailable_body", bundle: stringsBundle))
                     .font(.callout)
@@ -132,7 +134,6 @@ private struct ReconnectingIndicator: View {
             Text(TesseraStrings.string("tessera_scanner_camera_reconnecting", bundle: stringsBundle))
                 .font(.caption)
                 .foregroundStyle(.orange)
-                .accessibilityAddTraits(.updatesFrequently)
         }
     }
 }
@@ -155,8 +156,7 @@ internal struct StrugglingHint: View {
                 .font(.callout)
                 .multilineTextAlignment(.center)
                 // The hint overlays the preview via a struggle-timeout auto-transition, so it is announced on
-                // appearance without the user needing to move focus to it.
-                .accessibilityAddTraits(.updatesFrequently)
+                // arrival (``ScannerModel`` posts it directly) without the user needing to move focus to it.
             if showManualEntry {
                 Button(action: onManualEntry) {
                     Text(ScannerControl.strugglingManual.label(bundle: stringsBundle))
@@ -189,9 +189,8 @@ internal struct GatheringHint: View {
             Text(TesseraStrings.string("tessera_scanner_gathering_hint", bundle: stringsBundle))
                 .font(.callout)
                 .multilineTextAlignment(.center)
-                // Appears on an auto-transition (a read starting to confirm), so it is announced on
-                // appearance without the user needing to move focus to it.
-                .accessibilityAddTraits(.updatesFrequently)
+                // Appears on an auto-transition (a read starting to confirm), so it is announced on arrival
+                // (``ScannerModel`` posts it directly) without the user needing to move focus to it.
         }
         .padding(24)
         .accessibilityIdentifier("tessera-mrz-gathering")

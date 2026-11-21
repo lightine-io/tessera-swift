@@ -175,8 +175,10 @@ private struct MethodSwitcher: View {
         let methods = switcherMethods(enabledMethods: enabledMethods)
         // Fewer than two enabled methods → nothing to switch between; hide the switcher entirely.
         if methods.count >= 2 {
+            // No container label (the old hidden "Scan document" label was read before each tab,
+            // duplicating the tab names): VoiceOver reads only the segments' own names.
             Picker(
-                TesseraStrings.string("tessera_scanner_title", bundle: stringsBundle),
+                "",
                 selection: Binding(
                     get: { activeMethod(currentState) ?? methods.first! },
                     set: { onSelectMethod($0) }
