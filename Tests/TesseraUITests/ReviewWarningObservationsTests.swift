@@ -61,6 +61,21 @@ struct ReviewWarningObservationsTests {
         #expect(notes.first?.tone == .info)
     }
 
+    @Test func onePassportLetterWithExpiryFrom2038IsANoteWithTheRawCode() throws {
+        // The specimen's document code is "P<" (no second letter); an expiry in 2040 is past the limit.
+        let late = try expiryReplaced(Self.specimen, with: "400314")
+        let (decoded, rows) = observations(for: late)
+        #expect(decoded.parse.metadata.warnings.contains { $0 is MrzExpiryDateAfterSingleLetterPassportLimit }) // precondition
+        let notes = rows.filter { $0.text == "Passport code P< has no second letter, and ICAO says such passports expire before 2038" }
+        #expect(notes.count == 1)
+        #expect(notes.first?.tone == .info)
+    }
+
+    @Test func specimenYieldsNoSingleLetterPassportNote() {
+        let (_, rows) = observations(for: Self.specimen)
+        #expect(!rows.contains { $0.text.contains("has no second letter") })
+    }
+
     @Test func specimenYieldsNoCenturyNote() {
         let (_, rows) = observations(for: Self.specimen)
         #expect(!rows.contains { $0.text.contains("can't be placed in a century") })
