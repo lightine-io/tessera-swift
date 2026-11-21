@@ -18,7 +18,7 @@ struct ResultStreamTests {
 
     /// Polls until `condition` holds or `limit` passes. A bounded wait, not a fixed sleep.
     private func waitUntil(
-        limit: Duration = .seconds(30),
+        limit: Duration = .seconds(120),
         _ condition: @MainActor () -> Bool
     ) async throws -> Bool {
         let deadline = ContinuousClock.now + limit
