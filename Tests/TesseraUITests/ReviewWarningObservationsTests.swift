@@ -21,6 +21,22 @@ struct ReviewWarningObservationsTests {
         return (decoded, screen.reviewObservations)
     }
 
+    private static let paddedNote = "The end of the name line wasn't read, so it was left blank. Please compare the name with your document."
+
+    /// The specimen decode re-assembled to carry the camera reader's own report — the end of the name line
+    /// was not read, so the reader appended the line's 18 trailing `<` fillers itself (Kotlin `fillerPadding`;
+    /// the specimen's line 1 ends in 18 fillers after "MORGAN", i.e. 26 characters read of the TD3's 44).
+    /// Manual entry never reports padding, so this is what a padded camera decode looks like.
+    private static var paddedSpecimen: MrzScanResultDecoded {
+        let manual = assembleManualDecoded(text: specimen)
+        return MrzScanResultDecoded(
+            parse: manual.parse,
+            recognizedText: manual.recognizedText,
+            quality: manual.quality,
+            fillerPadding: MrzFillerPadding(lineIndex: 0, recognizedLength: 26, paddedLength: 44)
+        )
+    }
+
     private func isUnknownCountryNote(_ row: ReviewObservation) -> Bool {
         row.text.contains("isn't in our country list")
     }
@@ -61,19 +77,32 @@ struct ReviewWarningObservationsTests {
         #expect(notes.first?.tone == .info)
     }
 
-    @Test func onePassportLetterWithExpiryFrom2038IsANoteWithTheRawCode() throws {
-        // The specimen's document code is "P<" (no second letter); an expiry in 2040 is past the limit.
+    @Test func nonHarmonizedPassportCodeWithExpiryFrom2038IsANoteWithTheRawCode() throws {
+        // The specimen's document code is "P<": its second character is a filler, not a letter from the
+        // ICAO list; an expiry in 2040 is past the limit ICAO gives such non-harmonized passports.
         let late = try expiryReplaced(Self.specimen, with: "400314")
         let (decoded, rows) = observations(for: late)
-        #expect(decoded.parse.metadata.warnings.contains { $0 is MrzExpiryDateAfterSingleLetterPassportLimit }) // precondition
-        let notes = rows.filter { $0.text == "Passport code P< has no second letter, and ICAO says such passports expire before 2038" }
+        #expect(decoded.parse.metadata.warnings.contains { $0 is MrzExpiryDateAfterNonHarmonizedPassportLimit }) // precondition
+        let notes = rows.filter { $0.text == "Passport code P< has no second letter from the ICAO list, and ICAO says passports without one expire before 2038" }
         #expect(notes.count == 1)
         #expect(notes.first?.tone == .info)
     }
 
-    @Test func specimenYieldsNoSingleLetterPassportNote() {
+    @Test func passportCodeWithASecondLetterOutsideTheIcaoListIsANoteToo() throws {
+        // "PX" has a second letter, but not one ICAO harmonized for passport codes, so the same pre-2038
+        // limit applies as to "P<". Line 1's document code carries no check digit, so only the code changes.
+        let late = try expiryReplaced(Self.specimen, with: "400314")
+        let px = late.replacingOccurrences(of: "P<UTOSPECIMEN", with: "PXUTOSPECIMEN")
+        let (decoded, rows) = observations(for: px)
+        #expect(decoded.parse.metadata.warnings.contains { $0 is MrzExpiryDateAfterNonHarmonizedPassportLimit }) // precondition
+        let notes = rows.filter { $0.text == "Passport code PX has no second letter from the ICAO list, and ICAO says passports without one expire before 2038" }
+        #expect(notes.count == 1)
+        #expect(notes.first?.tone == .info)
+    }
+
+    @Test func specimenYieldsNoNonHarmonizedPassportNote() {
         let (_, rows) = observations(for: Self.specimen)
-        #expect(!rows.contains { $0.text.contains("has no second letter") })
+        #expect(!rows.contains { $0.text.contains("has no second letter from the ICAO list") })
     }
 
     @Test func specimenYieldsNoCenturyNote() {
@@ -90,6 +119,31 @@ struct ReviewWarningObservationsTests {
         let (_, rows) = observations(for: filler)
         #expect(rows.contains { $0.text == "Personal number has no check number" })
         #expect(!rows.contains { $0.text.hasPrefix("Personal number (optional) - ") })
+    }
+
+    @Test func fillerPaddingIsANoteRightAfterTheReadByLine() {
+        // The reader could not read the end of the name line and padded it with `<` fillers: the review
+        // states that as a note, right after the provenance line, in both views.
+        let screen = ReviewScreen(decoded: Self.paddedSpecimen, expanded: true, source: .manualEntry,
+                                  onToggleExpanded: {}, onUse: {}, onRescan: {})
+        let rows = screen.reviewObservations
+        guard let provenance = rows.firstIndex(where: { $0.text.hasPrefix("Read by") }),
+              let note = rows.firstIndex(where: { $0.text == Self.paddedNote })
+        else {
+            Issue.record("expected the read-by line and the padding note; got \\(rows.map(\\.text))")
+            return
+        }
+        #expect(note == provenance + 1)
+        #expect(rows[note].tone == .info)
+        // The collapsed summary states it too: it keeps every non-matching check, provenance, and note.
+        #expect(screen.reviewSummaryObservations.contains { $0.text == Self.paddedNote })
+    }
+
+    @Test func manualEntryYieldsNoPaddedNameLineNote() {
+        // A manually typed line was never padded, so no note is stated for it.
+        let (decoded, rows) = observations(for: Self.specimen)
+        #expect(decoded.fillerPadding == nil) // precondition
+        #expect(!rows.contains { $0.text.hasPrefix("The end of the name line") })
     }
 
     @Test func orderIsChecksExpiryProvenanceNotesThenAdvisoryLast() {

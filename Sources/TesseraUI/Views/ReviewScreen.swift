@@ -72,7 +72,7 @@ internal struct ReviewScreen: View {
 
     /// The collapsed summary's observation set: mismatches + the advisory + provenance ONLY - every passing
     /// ✓ check moves to the expanded view (TES-96). Mirrors the Android `reviewSummaryObservations`.
-    private var reviewSummaryObservations: [ReviewObservation] {
+    var reviewSummaryObservations: [ReviewObservation] {
         reviewObservations.filter { $0.tone != .matches }
     }
 
@@ -289,24 +289,38 @@ internal struct ReviewScreen: View {
     // MARK: - Observations
 
     /// The observation set for the decoded reading (mockups 03 / 03b): the shared per-check verdict from
-    /// ``parseObservations`` plus a provenance INFO line naming the read method, slotted before the advisory so
-    /// "some checks did not match" stays last. Mirrors the Android `reviewObservations`.
+    /// ``parseObservations`` plus a provenance INFO line naming the read method — and, when the reader
+    /// padded the end of the name line (Kotlin `MrzScanResult.Decoded.fillerPadding`), a note stating that
+    /// right after it — slotted before the advisory so "some checks did not match" stays last. Mirrors the
+    /// Android `reviewObservations`.
     var reviewObservations: [ReviewObservation] {
         let parse = decoded.parse
         var observations = parseObservations(parse)
         // A Failure carries no document → no observations (this screen is never shown for one anyway).
         if parse is ParseResult.Failure { return observations }
 
-        let provenance = ReviewObservation(
-            symbol: symbolInfo,
-            text: substituting(TesseraStrings.string("tessera_scanner_obs_read_by", bundle: stringsBundle),
-                               readMethodLabel(parse.metadata.readMethod)),
-            tone: .info
-        )
+        var provenanceRows: [ReviewObservation] = [
+            ReviewObservation(
+                symbol: symbolInfo,
+                text: substituting(TesseraStrings.string("tessera_scanner_obs_read_by", bundle: stringsBundle),
+                                   readMethodLabel(parse.metadata.readMethod)),
+                tone: .info
+            )
+        ]
+        // The reader pads the end of the name line with `<` fillers when it was not read (the result
+        // carries that in `fillerPadding`); the review states it, right after the provenance line, in both
+        // the summary and the expanded view (every passing ✓ check aside). A note, not a verdict.
+        if decoded.fillerPadding != nil {
+            provenanceRows.append(ReviewObservation(
+                symbol: symbolInfo,
+                text: TesseraStrings.string("tessera_scanner_obs_name_line_padded", bundle: stringsBundle),
+                tone: .info
+            ))
+        }
         if let advisoryIndex = observations.firstIndex(where: { $0.tone == .info }) {
-            observations.insert(provenance, at: advisoryIndex)
+            observations.insert(contentsOf: provenanceRows, at: advisoryIndex)
         } else {
-            observations.append(provenance)
+            observations.append(contentsOf: provenanceRows)
         }
         return observations
     }
@@ -377,9 +391,9 @@ internal struct ReviewScreen: View {
         }
 
         // 3. One neutral note per warning the parser attached, in the SDK's order (TES-152). Observations only:
-        // never a verdict, never blocking. `reviewObservations` slots provenance before the first INFO row, so
-        // the order is check digits, expiry, provenance, these notes, then the advisory. Mirrors the Android
-        // `parseObservations`.
+        // never a verdict, never blocking. `reviewObservations` slots provenance (and the padding note) before
+        // the first INFO row, so the order is check digits, expiry, provenance, these notes, then the advisory.
+        // Mirrors the Android `parseObservations`.
         for warning in parse.metadata.warnings {
             if let text = warningText(warning) {
                 observations.append(ReviewObservation(symbol: symbolInfo, text: text, tone: .info))
@@ -419,8 +433,8 @@ internal struct ReviewScreen: View {
         if let century = warning as? MrzExpiryDateCenturyNotInferred {
             return substituting(string("tessera_scanner_obs_warning_expiry_century_unknown"), century.rawYear)
         }
-        if let limit = warning as? MrzExpiryDateAfterSingleLetterPassportLimit {
-            return substituting(string("tessera_scanner_obs_warning_expiry_after_single_letter_passport_limit"),
+        if let limit = warning as? MrzExpiryDateAfterNonHarmonizedPassportLimit {
+            return substituting(string("tessera_scanner_obs_warning_expiry_after_non_harmonized_passport_limit"),
                                 limit.rawDocumentCode)
         }
         if warning is MrzNameTruncated { return string("tessera_scanner_obs_warning_name_truncated") }

@@ -27,7 +27,8 @@ struct ScannerModelTelemetryTests {
             recognizedLineCount: 0,
             mrzRegionFound: false,
             ocrConfidence: nil,
-            detectedFormat: nil
+            detectedFormat: nil,
+            fillerPaddingAdded: 0
         ))
         #expect(sink.names == ["mrz.camera.frame"])
     }

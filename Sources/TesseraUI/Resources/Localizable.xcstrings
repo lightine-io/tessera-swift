@@ -648,6 +648,16 @@
         }
       }
     },
+    "tessera_scanner_obs_name_line_padded": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The end of the name line wasn't read, so it was left blank. Please compare the name with your document."
+          }
+        }
+      }
+    },
     "tessera_scanner_obs_read_by": {
       "localizations": {
         "en": {
@@ -698,12 +708,12 @@
         }
       }
     },
-    "tessera_scanner_obs_warning_expiry_after_single_letter_passport_limit": {
+    "tessera_scanner_obs_warning_expiry_after_non_harmonized_passport_limit": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Passport code %1$@ has no second letter, and ICAO says such passports expire before 2038"
+            "value": "Passport code %1$@ has no second letter from the ICAO list, and ICAO says passports without one expire before 2038"
           }
         }
       }

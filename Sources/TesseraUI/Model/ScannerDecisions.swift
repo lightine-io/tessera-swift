@@ -284,7 +284,10 @@ func assembleManualDecoded(
             mrzRegionFound: true,
             ocrConfidence: nil,
             recognizedLineCount: Int32(lines.count)
-        )
+        ),
+        // Manual entry never pads a line: the person typed every character, so `fillerPadding` (the `<`
+        // fillers a camera reader appends when the end of the name line was not read) is always absent.
+        fillerPadding: nil
     )
 }
 
