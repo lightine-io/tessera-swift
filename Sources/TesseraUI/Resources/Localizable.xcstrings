@@ -541,6 +541,83 @@
         }
       }
     },
+    "tessera_scanner_not_accepted_body": {
+      "comment": "The kinds the app accepts. %1$@ is the list of category names (tessera_scanner_category_*), joined with tessera_scanner_not_accepted_separator.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This app accepts: %1$@."
+          }
+        }
+      }
+    },
+    "tessera_scanner_not_accepted_separator": {
+      "comment": "Goes between two category names in tessera_scanner_not_accepted_body. Keep the space.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ", "
+          }
+        }
+      }
+    },
+    "tessera_scanner_not_accepted_title_identity_card": {
+      "comment": "Shown when a reading is of a kind of document the app does not accept (MrzScannerConfig acceptedDocumentTypes): over the live camera preview, on its own screen after a photo, and as a note on the manual-entry screen. Two facts only: what kind was read, and what kinds the app accepts. Never \"invalid\", \"wrong\" or \"rejected\". One title per category, so a translation can get the article and grammar right.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This looks like an ID card"
+          }
+        }
+      }
+    },
+    "tessera_scanner_not_accepted_title_other": {
+      "comment": "Shown when a reading is of a kind of document the app does not accept (MrzScannerConfig acceptedDocumentTypes): over the live camera preview, on its own screen after a photo, and as a note on the manual-entry screen. Two facts only: what kind was read, and what kinds the app accepts. Never \"invalid\", \"wrong\" or \"rejected\". One title per category, so a translation can get the article and grammar right.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This looks like another kind of document"
+          }
+        }
+      }
+    },
+    "tessera_scanner_not_accepted_title_passport": {
+      "comment": "Shown when a reading is of a kind of document the app does not accept (MrzScannerConfig acceptedDocumentTypes): over the live camera preview, on its own screen after a photo, and as a note on the manual-entry screen. Two facts only: what kind was read, and what kinds the app accepts. Never \"invalid\", \"wrong\" or \"rejected\". One title per category, so a translation can get the article and grammar right.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This looks like a passport"
+          }
+        }
+      }
+    },
+    "tessera_scanner_not_accepted_title_residence_permit": {
+      "comment": "Shown when a reading is of a kind of document the app does not accept (MrzScannerConfig acceptedDocumentTypes): over the live camera preview, on its own screen after a photo, and as a note on the manual-entry screen. Two facts only: what kind was read, and what kinds the app accepts. Never \"invalid\", \"wrong\" or \"rejected\". One title per category, so a translation can get the article and grammar right.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This looks like a residence permit"
+          }
+        }
+      }
+    },
+    "tessera_scanner_not_accepted_title_visa": {
+      "comment": "Shown when a reading is of a kind of document the app does not accept (MrzScannerConfig acceptedDocumentTypes): over the live camera preview, on its own screen after a photo, and as a note on the manual-entry screen. Two facts only: what kind was read, and what kinds the app accepts. Never \"invalid\", \"wrong\" or \"rejected\". One title per category, so a translation can get the article and grammar right.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This looks like a visa"
+          }
+        }
+      }
+    },
     "tessera_scanner_obs_check_match": {
       "localizations": {
         "en": {

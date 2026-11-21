@@ -1,5 +1,6 @@
 import AVFoundation
 import SwiftUI
+import Tessera
 import UIKit
 
 /// The live preview. The scanner (`AVCaptureMrzScanner`) owns the camera session and lifecycle; this view
@@ -20,6 +21,11 @@ struct CameraPreviewView: View {
     /// Whether the "still looking / type it instead" struggling hint should show in the single guidance
     /// region - shown only when `gathering` is `false`. Defaults to `false`.
     var struggling: Bool = false
+    /// TES-103: the category of the last agreed reading the app does not accept, shown as a notice in the
+    /// guidance region (below gathering, above struggling); `nil` when there is none.
+    var notAccepted: DocumentCategory? = nil
+    /// The kinds the app accepts, named in that notice.
+    var acceptedDocumentTypes: Set<DocumentCategory> = allDocumentCategories
     /// The struggling hint's "type it instead" escape into manual entry. Defaults to a no-op so
     /// chrome-focused call sites don't need to thread it.
     var onManualEntry: () -> Void = {}
@@ -63,6 +69,8 @@ struct CameraPreviewView: View {
                 MrzGuideOverlay(
                     gathering: gathering,
                     struggling: struggling,
+                    notAccepted: notAccepted,
+                    acceptedDocumentTypes: acceptedDocumentTypes,
                     onManualEntry: onManualEntry,
                     showManualEntry: showManualEntry,
                     onGuideFrame: { guideGlobalFrame = $0 }
@@ -100,6 +108,8 @@ private struct MrzGuideOverlay: View {
     @Environment(\.tesseraStringsBundle) private var stringsBundle
     var gathering: Bool = false
     var struggling: Bool = false
+    var notAccepted: DocumentCategory? = nil
+    var acceptedDocumentTypes: Set<DocumentCategory> = allDocumentCategories
     var onManualEntry: () -> Void = {}
     var showManualEntry: Bool = true
     /// Reports the guide box's frame in global (window) coordinates whenever layout resolves or changes,
@@ -174,9 +184,13 @@ private struct MrzGuideOverlay: View {
     @ViewBuilder
     private var guidanceRegion: some View {
         Group {
-            switch guidanceMessage(gathering: gathering, struggling: struggling) {
+            switch guidanceMessage(gathering: gathering, struggling: struggling, notAccepted: notAccepted != nil) {
             case .gathering:
                 GatheringHint()
+            case .notAccepted:
+                if let notAccepted {
+                    NotAcceptedHint(read: notAccepted, acceptedDocumentTypes: acceptedDocumentTypes)
+                }
             case .struggling:
                 StrugglingHint(onManualEntry: onManualEntry, showManualEntry: showManualEntry)
             case .framingHint:

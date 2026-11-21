@@ -54,7 +54,7 @@ struct ManualEntryKeyboardTests {
 
         screen.dismissKeyboard()
 
-        if case let .manualRaw(text, parseFailed) = model.state {
+        if case let .manualRaw(text, parseFailed, _) = model.state {
             #expect(text == Self.typed)
             #expect(parseFailed == false)
         } else {

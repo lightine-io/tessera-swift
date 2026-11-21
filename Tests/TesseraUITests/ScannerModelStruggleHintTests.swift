@@ -11,7 +11,7 @@ struct ScannerModelStruggleHintTests {
     }
 
     private func isStruggling(_ model: ScannerModel) -> Bool {
-        if case let .scanning(struggling, _) = model.state { return struggling }
+        if case let .scanning(struggling, _, _) = model.state { return struggling }
         return false
     }
 

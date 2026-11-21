@@ -1955,6 +1955,102 @@
       "usr": "s:9TesseraUI16MrzScannerConfigV13stringsBundleSo8NSBundleCSgvp"
      },
      {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "DocumentCategory",
+            "printedName": "Tessera.DocumentCategory",
+            "usr": "c:objc(cs)TesseraDocumentCategory"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Set",
+          "printedName": "Swift.Set<Tessera.DocumentCategory>",
+          "usr": "s:Sh"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV21acceptedDocumentTypesShySo0aG8CategoryCGvg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV21acceptedDocumentTypesShySo0aG8CategoryCGvg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "DocumentCategory",
+            "printedName": "Tessera.DocumentCategory",
+            "usr": "c:objc(cs)TesseraDocumentCategory"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Set",
+          "printedName": "Swift.Set<Tessera.DocumentCategory>",
+          "usr": "s:Sh"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV21acceptedDocumentTypesShySo0aG8CategoryCGvs",
+        "moduleName": "TesseraUI",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV21acceptedDocumentTypesShySo0aG8CategoryCGvs"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "DocumentCategory",
+          "printedName": "Tessera.DocumentCategory",
+          "usr": "c:objc(cs)TesseraDocumentCategory"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Set",
+        "printedName": "Swift.Set<Tessera.DocumentCategory>",
+        "usr": "s:Sh"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI16MrzScannerConfigV21acceptedDocumentTypesShySo0aG8CategoryCGvp",
+      "moduleName": "TesseraUI",
+      "name": "acceptedDocumentTypes",
+      "printedName": "acceptedDocumentTypes",
+      "usr": "s:9TesseraUI16MrzScannerConfigV21acceptedDocumentTypesShySo0aG8CategoryCGvp"
+     },
+     {
       "children": [
        {
         "kind": "TypeNominal",
@@ -2089,16 +2185,31 @@
         "name": "Optional",
         "printedName": "Foundation.Bundle?",
         "usr": "s:Sq"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "DocumentCategory",
+          "printedName": "Tessera.DocumentCategory",
+          "usr": "c:objc(cs)TesseraDocumentCategory"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Set",
+        "printedName": "Swift.Set<Tessera.DocumentCategory>",
+        "usr": "s:Sh"
        }
       ],
       "declKind": "Constructor",
       "init_kind": "Designated",
       "kind": "Constructor",
-      "mangledName": "$s9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR014hapticFeedback5theme19onRequestPermission13stringsBundleACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgAUSbAA0cD5ThemeVyyYbcSgSo8NSBundleCSgtcfc",
+      "mangledName": "$s9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR014hapticFeedback5theme19onRequestPermission13stringsBundle21acceptedDocumentTypesACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgAVSbAA0cD5ThemeVyyYbcSgSo8NSBundleCSgShySo0A16DocumentCategoryCGtcfc",
       "moduleName": "TesseraUI",
       "name": "init",
-      "printedName": "init(enabledMethods:reviewMode:showTorchButton:torchOnByDefault:struggleTimeout:scanTimeout:hapticFeedback:theme:onRequestPermission:stringsBundle:)",
-      "usr": "s:9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR014hapticFeedback5theme19onRequestPermission13stringsBundleACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgAUSbAA0cD5ThemeVyyYbcSgSo8NSBundleCSgtcfc"
+      "printedName": "init(enabledMethods:reviewMode:showTorchButton:torchOnByDefault:struggleTimeout:scanTimeout:hapticFeedback:theme:onRequestPermission:stringsBundle:acceptedDocumentTypes:)",
+      "usr": "s:9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR014hapticFeedback5theme19onRequestPermission13stringsBundle21acceptedDocumentTypesACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgAVSbAA0cD5ThemeVyyYbcSgSo8NSBundleCSgShySo0A16DocumentCategoryCGtcfc"
      }
     ],
     "conformances": [

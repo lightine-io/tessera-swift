@@ -34,6 +34,8 @@ struct DynamicTypeLayoutTests {
         case readFailed, choosePhoto, analyzingPhoto, noMrzInPhoto
         case manualEntry, review, reviewAllFields
         case initializing, strugglingHint, gatheringHint
+        // TES-103: the three not-accepted views.
+        case notAcceptedHint, notAcceptedPhoto, manualEntryNotAccepted
     }
 
     private func view(_ screen: Screen) -> AnyView {
@@ -71,6 +73,15 @@ struct DynamicTypeLayoutTests {
             AnyView(StrugglingHint(onManualEntry: {}, showManualEntry: true))
         case .gatheringHint:
             AnyView(GatheringHint())
+        case .notAcceptedHint:
+            AnyView(NotAcceptedHint(read: .residencePermit, acceptedDocumentTypes: allDocumentCategories))
+        case .notAcceptedPhoto:
+            AnyView(SavedImageNotAcceptedScreen(read: .other, acceptedDocumentTypes: allDocumentCategories,
+                                                onChooseDifferent: {}, onManualEntry: {}, showManualEntry: true))
+        case .manualEntryNotAccepted:
+            AnyView(ManualEntryScreen(text: Self.specimen, parseFailed: false, notAccepted: .passport,
+                                      acceptedDocumentTypes: [.identityCard, .residencePermit],
+                                      onTextChange: { _ in }, onRead: {}))
         }
     }
 
