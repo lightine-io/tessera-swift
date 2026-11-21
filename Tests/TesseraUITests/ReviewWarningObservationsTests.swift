@@ -40,10 +40,14 @@ struct ReviewWarningObservationsTests {
     }
 
     @Test func noWarningNotesAppearBeyondTheOnesTheParserReported() {
-        // Info rows are: provenance, one note per mapped warning, and the mismatch advisory (absent here).
+        // Info rows are: provenance, one note per warning the screen has a text for, and the mismatch
+        // advisory (absent here). "At most", not "exactly": a newer framework can report a warning type this
+        // screen has no text for yet (the expiry-century warning, until the package pins that release), and
+        // such a warning shows no note. Each warning the screen does map has its own test above and below.
         let (decoded, rows) = observations(for: Self.specimen)
         let infoCount = rows.filter { $0.tone == .info }.count
-        #expect(infoCount == 1 + decoded.parse.metadata.warnings.count)
+        #expect(infoCount >= 1)
+        #expect(infoCount <= 1 + decoded.parse.metadata.warnings.count)
     }
 
     @Test func fillerPersonalNumberCheckIsANoteAndNotACheckRow() {
