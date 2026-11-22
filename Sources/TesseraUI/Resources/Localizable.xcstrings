@@ -607,6 +607,17 @@
         }
       }
     },
+    "tessera_scanner_not_accepted_title_unknown": {
+      "comment": "Shown when a reading's kind of document could not be told and the app accepts only some kinds (MrzScannerConfig acceptedDocumentTypes): over the live camera preview, on its own screen after a photo, and as a note on the manual-entry screen. Followed by the line of kinds the app accepts. Never \"invalid\", \"wrong\" or \"rejected\".",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We could not tell what kind of document this is"
+          }
+        }
+      }
+    },
     "tessera_scanner_not_accepted_title_visa": {
       "comment": "Shown when a reading is of a kind of document the app does not accept (MrzScannerConfig acceptedDocumentTypes): over the live camera preview, on its own screen after a photo, and as a note on the manual-entry screen. Two facts only: what kind was read, and what kinds the app accepts. Never \"invalid\", \"wrong\" or \"rejected\". One title per category, so a translation can get the article and grammar right.",
       "localizations": {

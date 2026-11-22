@@ -30,9 +30,9 @@ enum DecodeRoute {
     /// Review mode: park the decode on the review screen for the user to accept or rescan.
     case showReview(decoded: MrzScanResultDecoded)
 
-    /// TES-103: the reading is of category `read`, which the app's ``MrzScannerConfig/acceptedDocumentTypes``
-    /// does not include. Not reviewed, not returned; the screen states what was read and what the app accepts.
-    case notAccepted(read: DocumentCategory)
+    /// TES-103: the reading is of a kind `read` that the app's ``MrzScannerConfig/acceptedDocumentTypes``
+    /// does not include, or (TES-341) whose kind could not be told while the app limits the kinds it takes. Not reviewed, not returned; the screen states what was read and what the app accepts.
+    case notAccepted(read: NotAcceptedKind)
 }
 
 /// The routing decision for a decoded reading. A `ParseResultFailure` routes to
@@ -42,10 +42,10 @@ enum DecodeRoute {
 /// non-failure and follows the same path as `ParseResultSuccess` - the UI never treats a mismatch as a
 /// failure or diverts it (Principle 1). Mirrors the Android `routeDecode`.
 ///
-/// TES-103: a non-failure reading whose category the app does not accept (``notAcceptedCategory(_:acceptedDocumentTypes:)``)
+/// TES-103: a non-failure reading whose category the app does not accept (``notAcceptedKind(_:acceptedDocumentTypes:)``)
 /// routes to ``DecodeRoute/notAccepted(read:)`` in BOTH modes, so it is never returned under instant-return.
-/// A reading with no category is not filtered. With every category accepted (the default) the routing is
-/// exactly as before.
+/// A reading with no category is refused the same way (``NotAcceptedKind/unknown``) when the set is limited
+/// (TES-341). With every category accepted (the default) the routing is exactly as before.
 func routeDecode(
     _ decoded: MrzScanResultDecoded,
     reviewMode: ReviewMode,
@@ -54,7 +54,7 @@ func routeDecode(
     if decoded.parse is ParseResult.Failure {
         return .showReadFailed(capturedText: decoded.recognizedText)
     }
-    if let read = notAcceptedCategory(decoded, acceptedDocumentTypes: acceptedDocumentTypes) {
+    if let read = notAcceptedKind(decoded, acceptedDocumentTypes: acceptedDocumentTypes) {
         return .notAccepted(read: read)
     }
     if reviewMode == .instantReturn {

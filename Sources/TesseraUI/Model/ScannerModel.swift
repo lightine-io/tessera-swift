@@ -938,11 +938,11 @@ final class ScannerModel {
 
     /// Shows the live not-accepted notice for `read` over the preview (TES-103), announcing it when it first
     /// appears or names a different kind.
-    private func showLiveNotAcceptedNotice(_ read: DocumentCategory) {
-        let previous: DocumentCategory?
+    private func showLiveNotAcceptedNotice(_ read: NotAcceptedKind) {
+        let previous: NotAcceptedKind?
         if case let .scanning(_, _, notAccepted) = state { previous = notAccepted } else { return }
         state = showNotAcceptedNotice(state, read: read)
-        if previous !== read {
+        if previous != read {
             postAnnouncement(text: notAcceptedAnnouncement(
                 read, acceptedDocumentTypes: acceptedDocumentTypes, bundle: config.stringsBundle))
         }

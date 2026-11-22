@@ -173,7 +173,9 @@ public struct MrzScannerConfig: Sendable {
     /// what kind it read and what kinds your app accepts, and lets the person go on: the camera keeps scanning,
     /// a photo can be swapped, and typed lines stay on the entry screen.
     /// The category is the document type code's broad category (`DocumentTypeCodeTable.broadCategory(code:)`).
-    /// A code with no category is not filtered.
+    /// A code with no category is refused like a kind outside the set when the set is limited (not every
+    /// category): the screen says the kind could not be told. With the default (every category) it is not
+    /// filtered.
     /// An empty set is a configuration error: setting one stops the program with a precondition failure.
     ///
     /// - Since: 0.8.0

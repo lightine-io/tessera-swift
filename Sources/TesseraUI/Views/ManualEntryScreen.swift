@@ -32,7 +32,7 @@ internal struct ManualEntryScreen: View {
     let parseFailed: Bool
     /// TES-103: the category the typed lines read as when the app does not accept it; shows an inline note.
     /// Any edit clears it, like `parseFailed`.
-    var notAccepted: DocumentCategory? = nil
+    var notAccepted: NotAcceptedKind? = nil
     /// The kinds the app accepts, named in that note.
     var acceptedDocumentTypes: Set<DocumentCategory> = allDocumentCategories
     let onTextChange: (String) -> Void

@@ -23,7 +23,7 @@ struct CameraPreviewView: View {
     var struggling: Bool = false
     /// TES-103: the category of the last agreed reading the app does not accept, shown as a notice in the
     /// guidance region (below gathering, above struggling); `nil` when there is none.
-    var notAccepted: DocumentCategory? = nil
+    var notAccepted: NotAcceptedKind? = nil
     /// The kinds the app accepts, named in that notice.
     var acceptedDocumentTypes: Set<DocumentCategory> = allDocumentCategories
     /// The struggling hint's "type it instead" escape into manual entry. Defaults to a no-op so
@@ -108,7 +108,7 @@ private struct MrzGuideOverlay: View {
     @Environment(\.tesseraStringsBundle) private var stringsBundle
     var gathering: Bool = false
     var struggling: Bool = false
-    var notAccepted: DocumentCategory? = nil
+    var notAccepted: NotAcceptedKind? = nil
     var acceptedDocumentTypes: Set<DocumentCategory> = allDocumentCategories
     var onManualEntry: () -> Void = {}
     var showManualEntry: Bool = true

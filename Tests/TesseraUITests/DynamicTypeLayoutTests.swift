@@ -74,12 +74,12 @@ struct DynamicTypeLayoutTests {
         case .gatheringHint:
             AnyView(GatheringHint())
         case .notAcceptedHint:
-            AnyView(NotAcceptedHint(read: .residencePermit, acceptedDocumentTypes: allDocumentCategories))
+            AnyView(NotAcceptedHint(read: .ofCategory(.residencePermit), acceptedDocumentTypes: allDocumentCategories))
         case .notAcceptedPhoto:
-            AnyView(SavedImageNotAcceptedScreen(read: .other, acceptedDocumentTypes: allDocumentCategories,
+            AnyView(SavedImageNotAcceptedScreen(read: .ofCategory(.other), acceptedDocumentTypes: allDocumentCategories,
                                                 onChooseDifferent: {}, onManualEntry: {}, showManualEntry: true))
         case .manualEntryNotAccepted:
-            AnyView(ManualEntryScreen(text: Self.specimen, parseFailed: false, notAccepted: .passport,
+            AnyView(ManualEntryScreen(text: Self.specimen, parseFailed: false, notAccepted: .ofCategory(.passport),
                                       acceptedDocumentTypes: [.identityCard, .residencePermit],
                                       onTextChange: { _ in }, onRead: {}))
         }
