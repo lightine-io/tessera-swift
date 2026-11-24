@@ -147,7 +147,7 @@ private struct MrzGuideOverlay: View {
                     .frame(width: window.width, height: window.height)
                     // Measure the SIZED box (before .position wraps it): the geometry here is the box's
                     // real global frame after placement.
-                    .onGeometryChange(for: CGRect.self, of: { $0.frame(in: .global) }, action: onGuideFrame)
+                    .compatOnGlobalFrameChange(onGuideFrame)
                     // .position, NOT .offset: offset translates only the RENDERING and leaves the layout
                     // frame behind at the stack origin — the geometry measurement would then report the box
                     // at the top-left corner and aim the OCR band + focus there (device-verified TES-132: a

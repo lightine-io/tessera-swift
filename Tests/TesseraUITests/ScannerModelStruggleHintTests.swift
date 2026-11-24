@@ -1,13 +1,15 @@
+import Foundation
 import Testing
 @testable import TesseraUI
 
 /// Host tests for the "struggling" hint timer (TES-151): the hint shows on the timer alone, with no text
 /// ever seen by the recognizer, and not before the timeout. Drives the timer directly through
-/// ``ScannerModel/armStruggleTimeout()`` (the camera normally arms it) — no camera, no frames.
+/// ``ScannerModel/armStruggleTimeout()`` (the camera normally arms it) — no camera, no frames. Times are in
+/// seconds (the iOS 15 form of the setting).
 @MainActor
 struct ScannerModelStruggleHintTests {
-    private func makeModel(timeout: Duration?) -> ScannerModel {
-        ScannerModel(config: MrzScannerConfig(struggleTimeout: timeout), onResult: { _ in })
+    private func makeModel(timeout: TimeInterval?) -> ScannerModel {
+        ScannerModel(config: MrzScannerConfig(struggleTimeoutInterval: timeout), onResult: { _ in })
     }
 
     private func isStruggling(_ model: ScannerModel) -> Bool {
@@ -15,18 +17,18 @@ struct ScannerModelStruggleHintTests {
         return false
     }
 
-    /// Polls (main actor) until the hint shows or `limit` passes, so a slow runner cannot flake the test.
-    private func waitForHint(_ model: ScannerModel, limit: Duration = .seconds(120)) async throws -> Bool {
-        let deadline = ContinuousClock.now + limit
-        while ContinuousClock.now < deadline {
+    /// Polls (main actor) until the hint shows or `limit` seconds pass, so a slow runner cannot flake the test.
+    private func waitForHint(_ model: ScannerModel, limit: TimeInterval = 120) async throws -> Bool {
+        let deadline = Date().addingTimeInterval(limit)
+        while Date() < deadline {
             if isStruggling(model) { return true }
-            try await Task.sleep(for: .milliseconds(20))
+            try await Task.sleep(nanoseconds: 20_000_000)
         }
         return isStruggling(model)
     }
 
     @Test func hintAppearsAfterTheTimeoutWithNoTextEverSeen() async throws {
-        let model = makeModel(timeout: .milliseconds(100))
+        let model = makeModel(timeout: 0.1)
         model.armStruggleTimeout()
         let shown = try await waitForHint(model)
         withExtendedLifetime(model) {}
@@ -34,16 +36,16 @@ struct ScannerModelStruggleHintTests {
     }
 
     @Test func hintDoesNotAppearBeforeTheTimeout() async throws {
-        let model = makeModel(timeout: .seconds(30))
+        let model = makeModel(timeout: 30)
         model.armStruggleTimeout()
-        try await Task.sleep(for: .milliseconds(300))
+        try await Task.sleep(nanoseconds: 300_000_000)
         #expect(!isStruggling(model))
     }
 
     @Test func aNilTimeoutNeverShowsTheHint() async throws {
         let model = makeModel(timeout: nil)
         model.armStruggleTimeout()
-        try await Task.sleep(for: .milliseconds(300))
+        try await Task.sleep(nanoseconds: 300_000_000)
         #expect(!isStruggling(model))
     }
 }

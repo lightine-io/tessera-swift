@@ -136,7 +136,7 @@ internal struct ManualEntryScreen: View {
         // Keyboard dismissal (TES-154). Scrolling dismisses it interactively; a tap anywhere outside the field
         // dismisses it (a simultaneous gesture, so buttons and the field itself keep working); and the keyboard
         // carries a Done button. None of these touch the typed text or start a read.
-        .scrollDismissesKeyboard(.interactively)
+        .compatScrollDismissesKeyboard()
         .simultaneousGesture(TapGesture().onEnded { dismissKeyboard() })
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {

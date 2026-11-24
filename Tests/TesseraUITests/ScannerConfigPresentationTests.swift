@@ -11,12 +11,15 @@ import UIKit
 /// view identity, as each `fullScreenCover` presentation does. No modal presentation is involved: UIKit
 /// presentation and dismissal in a package test host are slow and timing-dependent. Each render of the scanner
 /// is reported through ``EnvironmentValues/scannerRenderProbe``.
+// The package supports iOS 15; the test host uses Observation, which needs iOS 17. Swift Testing takes
+// `@available` on each test, not on the suite.
 @MainActor
 @Suite(.serialized)
 struct ScannerConfigPresentationTests {
     private static let everyMethod: Set<ScanMethod> = [.camera, .savedImage, .manualEntry]
     private static let noCamera: Set<ScanMethod> = [.savedImage, .manualEntry]
 
+    @available(iOS 17, *)
     @MainActor
     @Observable
     final class Host {
@@ -29,6 +32,7 @@ struct ScannerConfigPresentationTests {
         init(config: MrzScannerConfig) { self.config = config }
     }
 
+    @available(iOS 17, *)
     struct HostView: View {
         let host: Host
         var body: some View {
@@ -44,6 +48,7 @@ struct ScannerConfigPresentationTests {
         }
     }
 
+    @available(iOS 17, *)
     @Test func theScannerUsesTheConfigGivenWhenItOpens() async throws {
         let host = Host(config: MrzScannerConfig(enabledMethods: Self.everyMethod))
         let window = show(HostView(host: host))
@@ -62,6 +67,7 @@ struct ScannerConfigPresentationTests {
         #expect(!render.model.state.isCameraState)
     }
 
+    @available(iOS 17, *)
     @Test func aChangeWhileOpenWaitsForTheNextOpening() async throws {
         let host = Host(config: MrzScannerConfig(enabledMethods: Self.noCamera))
         let window = show(HostView(host: host))
@@ -106,6 +112,7 @@ struct ScannerConfigPresentationTests {
     }
 
     /// Lets SwiftUI apply pending updates until `condition` holds; fails the test after 10 seconds.
+    @available(iOS 17, *)
     private func update(_ window: UIWindow, until condition: () -> Bool) async throws {
         let deadline = ContinuousClock.now + .seconds(10)
         while !condition() {
@@ -119,6 +126,7 @@ struct ScannerConfigPresentationTests {
     }
 
     /// Lets SwiftUI apply any further pending updates.
+    @available(iOS 17, *)
     private func flush(_ window: UIWindow) async throws {
         for _ in 0..<20 {
             window.layoutIfNeeded()

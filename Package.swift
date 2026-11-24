@@ -33,7 +33,7 @@ let package = Package(
     name: "Tessera",
     defaultLocalization: "en",
     platforms: [
-        .iOS(.v18),
+        .iOS(.v15),
     ],
     products: [
         .library(name: "Tessera", targets: ["Tessera"]),
@@ -45,6 +45,8 @@ let package = Package(
             name: "TesseraUI",
             dependencies: ["Tessera"],
             path: "Sources/TesseraUI",
+            // The compatibility layer's notes for maintainers: not a resource, not shipped.
+            exclude: ["Compat/README.md"],
             resources: [.process("Resources")]
         ),
         // Compiled samples (TES-230): every Swift code block of the public iOS how-to pages and

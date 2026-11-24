@@ -213,22 +213,22 @@ struct ScannerDecisionsTests {
         #expect(decoded.parse is ParseResult.Failure)
     }
 
-    // MARK: formatCountdown — TES-125 countdown-chip formatting
+    // MARK: formatCountdown — TES-125 countdown-chip formatting (times in seconds)
 
     /// Seconds round UP (never down) and are zero-padded; minutes are never capped at two digits.
     @Test func formatCountdownRoundsSecondsUpAndPadsToTwoDigits() {
-        #expect(formatCountdown(.seconds(90)) == "1:30")
+        #expect(formatCountdown(90) == "1:30")
         // 4.5s must ceil to 5s (0:05), not floor to 0:04 — the chip reads "0:05" through the whole last second.
-        #expect(formatCountdown(.milliseconds(4500)) == "0:05")
-        #expect(formatCountdown(.zero) == "0:00")
+        #expect(formatCountdown(4.5) == "0:05")
+        #expect(formatCountdown(0) == "0:00")
         // A multi-minute scanTimeout is not capped at two digits.
-        #expect(formatCountdown(.seconds(600)) == "10:00")
+        #expect(formatCountdown(600) == "10:00")
     }
 
     /// A negative input (should not occur — the caller clamps via `DeadlineClock.remaining`) still clamps to
     /// `0:00` defensively, mirroring the Android `coerceAtLeast(0L)`.
     @Test func formatCountdownClampsNegativeToZero() {
-        #expect(formatCountdown(.seconds(-5)) == "0:00")
+        #expect(formatCountdown(-5) == "0:00")
     }
 
     // MARK: DeadlineClock — TES-124/126 session-deadline accumulation
@@ -236,32 +236,32 @@ struct ScannerDecisionsTests {
     /// Accumulates active elapsed time across ticks and fires exactly once — on the tick that first reaches
     /// the total — never again on a later tick.
     @Test func deadlineClockAccumulatesAndFiresExactlyOnceAtTheTotal() {
-        var clock = DeadlineClock(total: .seconds(2))
-        #expect(clock.remaining == .seconds(2))
-        let first = clock.advance(by: .seconds(1))
+        var clock = DeadlineClock(total: 2)
+        #expect(clock.remaining == 2)
+        let first = clock.advance(by: 1)
         #expect(!first)
-        #expect(clock.remaining == .seconds(1))
+        #expect(clock.remaining == 1)
         #expect(!clock.fired)
 
-        let second = clock.advance(by: .seconds(1)) // this tick reaches the total — fires
+        let second = clock.advance(by: 1) // this tick reaches the total — fires
         #expect(second)
         #expect(clock.fired)
-        #expect(clock.remaining == .zero)
+        #expect(clock.remaining == 0)
 
         // A further advance after firing is a no-op — the one-shot latch never fires twice.
-        let third = clock.advance(by: .seconds(5))
+        let third = clock.advance(by: 5)
         #expect(!third)
         #expect(clock.fired)
-        #expect(clock.remaining == .zero)
+        #expect(clock.remaining == 0)
     }
 
     /// A single tick that overshoots the total (e.g. a scheduler hiccup) still clamps the accumulator at the
     /// total and fires exactly once, rather than accumulating past it.
     @Test func deadlineClockClampsAccumulatedAtTheTotalOnAnOvershootingTick() {
-        var clock = DeadlineClock(total: .seconds(2))
-        let fired = clock.advance(by: .seconds(10))
+        var clock = DeadlineClock(total: 2)
+        let fired = clock.advance(by: 10)
         #expect(fired)
-        #expect(clock.remaining == .zero)
+        #expect(clock.remaining == 0)
         #expect(clock.fired)
     }
 

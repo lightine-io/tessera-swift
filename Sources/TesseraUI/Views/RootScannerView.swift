@@ -7,17 +7,17 @@ import SwiftUI
 /// callbacks. The saved-image photo picker and the foreground permission re-check are attached here (they
 /// are host-side platform I/O the model drives).
 struct RootScannerView: View {
-    @State private var model: ScannerModel
+    @StateObject private var model: ScannerModel
     @Environment(\.scenePhase) private var scenePhase
 
     // The configuration is fixed per presentation (TES-155): SwiftUI keeps the first model for as long as this
     // view keeps its identity and ignores the `config` of a later init, so every read below goes through the
     // model. Reading the latest `config` here instead would mix two configurations on one open screen (the
     // switcher from the new one, the flow from the old one). A new presentation is a new identity, so it gets a
-    // new model with the config it opens with. The model's init only stores values; building one that SwiftUI
-    // then discards is cheap.
+    // new model with the config it opens with. `StateObject` builds the model only once per identity (the
+    // autoclosure is not called again on a later init).
     init(config: MrzScannerConfig, onResult: @escaping (TesseraUIResult) -> Void) {
-        _model = State(initialValue: ScannerModel(config: config, onResult: onResult))
+        _model = StateObject(wrappedValue: ScannerModel(config: config, onResult: onResult))
     }
 
     /// The configuration this presentation opened with.
@@ -26,7 +26,6 @@ struct RootScannerView: View {
     @Environment(\.scannerRenderProbe) private var renderProbe
 
     var body: some View {
-        @Bindable var model = model
         let _ = renderProbe?.report(ScannerRender(switcherMethods: config.enabledMethods, model: model))
         ScannerScaffold(
             enabledMethods: config.enabledMethods,
@@ -40,21 +39,20 @@ struct RootScannerView: View {
         .scannerTheme(config.theme)
         // A short confirming haptic the moment a live-camera read is accepted (TES-134, Android
         // `hapticFeedback` mirror): the model bumps the trigger exactly when the consensus gate confirms a
-        // camera read. `.sensoryFeedback` honours the system haptic setting; the closure gates the
-        // consumer's opt-out (`nil` = no feedback). Camera path only — manual/saved-image have their own
-        // interaction feedback.
-        .sensoryFeedback(trigger: model.confirmedReadHaptic) { _, _ in
-            config.hapticFeedback ? .success : nil
-        }
-        .photosPicker(
-            isPresented: $model.photoPickerPresented,
-            selection: $model.pickedItem,
-            matching: .images
+        // camera read. `.sensoryFeedback` honours the system haptic setting; `enabled` is the consumer's
+        // opt-out. Camera path only — manual/saved-image have their own interaction feedback. Gathering (the
+        // gate has seen a reading and waits for agreement) means a confirm is likely within a second.
+        .compatSuccessHaptic(
+            trigger: model.confirmedReadHaptic,
+            enabled: config.hapticFeedback,
+            likelySoon: isGathering
         )
-        .onChange(of: model.pickedItem) { _, item in
-            if let item { model.handlePickedItem(item) }
-        }
-        .onChange(of: scenePhase) { _, phase in
+        // The saved-image photo picker: images only, one photo. A cancel leaves the current screen as is.
+        .compatSavedImagePicker(
+            isPresented: $model.photoPickerPresented,
+            onPick: { model.handlePickedImage(load: $0) }
+        )
+        .compatOnChange(of: scenePhase) { phase in
             // Forwards to the session-level scan deadline (TES-124/126) — it advances only while `.active`,
             // pausing on background/inactive and resuming from the accumulated elapsed time, never restarting.
             model.setForeground(phase == .active)
@@ -69,6 +67,12 @@ struct RootScannerView: View {
         // The strings-bundle override (TES-139), injected once so every screen's
         // ``TesseraStrings/string(_:bundle:)`` call sees it. From the model, like the rest of the config.
         .environment(\.tesseraStringsBundle, config.stringsBundle)
+    }
+
+    /// Whether the live consensus gate is gathering agreement, so a confirmed read (and its haptic) is near.
+    private var isGathering: Bool {
+        if case .scanning(_, true, _) = model.state { return true }
+        return false
     }
 
     @ViewBuilder
@@ -195,6 +199,32 @@ struct RootScannerView: View {
                 onRead: { model.readManual(text: text) }
             )
         }
+    }
+}
+
+// MARK: - Saved-image photo picker
+
+/// Loads the picked image's data; `nil` when it cannot be loaded. Handed to
+/// ``ScannerModel/handlePickedImage(load:)``.
+typealias PickedImageLoader = @MainActor () async -> Data?
+
+/// Presents SwiftUI's photo picker while `isPresented` is true: images only, a single photo. A pick hands a
+/// loader to `onPick` (the selection is held here, not in the model); a cancel just dismisses. Below iOS 16
+/// ``View/compatSavedImagePicker(isPresented:onPick:)`` presents a `PHPickerViewController` instead.
+@available(iOS 16, *)
+struct SavedImagePhotosPicker: ViewModifier {
+    @Binding var isPresented: Bool
+    let onPick: (@escaping PickedImageLoader) -> Void
+    @State private var pickedItem: PhotosPickerItem?
+
+    func body(content: Content) -> some View {
+        content
+            .photosPicker(isPresented: $isPresented, selection: $pickedItem, matching: .images)
+            .compatOnChange(of: pickedItem) { item in
+                guard let item else { return }
+                pickedItem = nil
+                onPick { try? await item.loadTransferable(type: Data.self) }
+            }
     }
 }
 

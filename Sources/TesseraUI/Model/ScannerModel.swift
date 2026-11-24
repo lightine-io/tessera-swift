@@ -1,6 +1,5 @@
 import AVFoundation
-import Observation
-import PhotosUI
+import Combine
 import SwiftUI
 import Tessera
 import UIKit
@@ -12,23 +11,31 @@ import UIKit
 /// dispatches on ``state``; the model holds the one-shot decode latch, the camera-in-use self-resume, the
 /// struggle timeout, the session-level scan deadline, and the method / rescan / manual-read hooks.
 ///
+/// An `ObservableObject` (not `@Observable`, which needs iOS 17): the properties the root view reads are
+/// `@Published`; everything else is plain, so per-frame bookkeeping (the linger timestamps, the consensus
+/// tally) never republishes the screen. ``state`` is the only published property a camera frame can write,
+/// and only when the screen changes (see ``updateState(_:)``).
+///
 /// Everything is on the main actor: SwiftUI observation and the `AVCaptureMrzScanner` results are marshalled
 /// here, matching how the Android flow runs on the composition thread. Reports back exactly once through
 /// ``onResult`` - either a confirmed decode the user accepted or a cancellation.
 @MainActor
-@Observable
-final class ScannerModel {
+final class ScannerModel: ObservableObject {
+    // COMPAT-NOTE(iOS 17): not a shim; this is the one implementation for every version. It could move back to
+    // `@Observable` (with `@State` in ``RootScannerView``) when the minimum is iOS 17.
+
     /// The screen the UI is currently showing; the root view dispatches on this.
-    private(set) var state: ScannerState
+    @Published private(set) var state: ScannerState
 
     /// The running `AVCaptureSession` to preview, or `nil` while headless / warming up. Observed by
     /// ``CameraPreviewView``; the initializing state shows while it is `nil`.
-    private(set) var previewSession: AVCaptureSession?
+    @Published private(set) var previewSession: AVCaptureSession?
 
-    /// Drives the SwiftUI photo picker (``RootScannerView`` attaches `.photosPicker` to these). Saved-image
-    /// reading is opt-in; the picker only ever appears when the consumer enabled ``ScanMethod/savedImage``.
-    var photoPickerPresented = false
-    var pickedItem: PhotosPickerItem?
+    /// Drives the photo picker (``RootScannerView`` presents it: `.photosPicker` on iOS 16+, a
+    /// `PHPickerViewController` below). Saved-image reading is opt-in; the picker only ever appears when the
+    /// consumer enabled ``ScanMethod/savedImage``. The picked photo comes back through
+    /// ``handlePickedImage(load:)``, so the model holds no picker-specific type.
+    @Published var photoPickerPresented = false
 
     /// Whether the host has been handed a camera-permission request in this flow - the iOS analogue of the
     /// Android `hasAsked`. On iOS a status of anything other than `.notDetermined` also means the user has
@@ -38,11 +45,11 @@ final class ScannerModel {
     /// The trigger for the accepted-read confirm haptic (TES-134): bumped exactly when the live-camera
     /// consensus gate confirms a read, observed by the root view's `.sensoryFeedback` (which gates on
     /// ``MrzScannerConfig/hapticFeedback``). A counter - not a Bool - so back-to-back sessions retrigger.
-    private(set) var confirmedReadHaptic = 0
+    @Published private(set) var confirmedReadHaptic = 0
 
     /// Whether the torch is currently on (reflected by the torch button). K/N does not expose the AVFoundation
     /// torch API, so the torch is driven here in Swift via the capture device published on the session.
-    private(set) var torchOn = false
+    @Published private(set) var torchOn = false
     // Applies `torchOnByDefault` once per session, so it is not re-forced on every preview-session update.
     private var torchDefaultApplied = false
 
@@ -140,22 +147,24 @@ final class ScannerModel {
     // MARK: - Session scan deadline (TES-124/125/126)
 
     /// The time left for the countdown chip, or `nil` when `config.scanTimeout` is `nil` (no deadline → no
-    /// chip). Refreshed on each ~500ms tick while the app is foreground. Mirrors the Android
-    /// `rememberScanDeadline`'s returned `Duration?`.
-    private(set) var timeRemaining: Duration?
+    /// chip). Refreshed on each ~500ms tick while the app is foreground, so the screen republishes twice a
+    /// second while a deadline runs (as it re-rendered before, when the root view read this under
+    /// Observation). In seconds. Mirrors the Android `rememberScanDeadline`'s returned `Duration?`.
+    @Published private(set) var timeRemaining: TimeInterval?
 
     /// The pure accumulator behind the deadline (see ``DeadlineClock``); `nil` when `config.scanTimeout` is
     /// `nil` - the deadline never arms.
     private var deadlineClock: DeadlineClock?
 
-    /// The monotonic clock the deadline measures active elapsed time against - never wall-clock `Date` (a
-    /// clock change, DST, or NTP correction must never perturb the deadline). Mirrors the Android
-    /// `SystemClock.elapsedRealtime()`.
-    private let deadlineTickClock = ContinuousClock()
+    /// The monotonic clock the deadline measures active elapsed time against, in seconds - never wall-clock
+    /// `Date` (a clock change, DST, or NTP correction must never perturb the deadline). ``monotonicNow()``
+    /// reads the same clock `ContinuousClock` does (it keeps counting while the device sleeps) and works on
+    /// iOS 15. Mirrors the Android `SystemClock.elapsedRealtime()`.
+    private let deadlineTickClock: () -> TimeInterval = monotonicNow
 
     /// The instant of the deadline's last tick while foreground, so each tick advances by the REAL elapsed
     /// time since then (drift-corrected), not the nominal 500ms interval. Mirrors the Android `lastTick`.
-    private var deadlineLastTick: ContinuousClock.Instant?
+    private var deadlineLastTick: TimeInterval?
 
     private var deadlineTask: Task<Void, Never>?
 
@@ -198,7 +207,7 @@ final class ScannerModel {
 
     // DECIDED (TES-129, 2026-07-30): flow state is deliberately NOT persisted across scene/process death —
     // no SceneStorage/Codable snapshot, unlike Android's saved-instance restoration (TES-102). iOS has no
-    // config-change recreation (rotation loses nothing; this @Observable model is the in-memory layer that
+    // config-change recreation (rotation loses nothing; this observable model is the in-memory layer that
     // survives view churn), so the only loss trigger is backgrounding plus memory eviction inside a
     // seconds-long flow — a re-scan costs seconds, and not persisting means the SDK never writes document
     // data of its own. Revisit only on real field reports of lost long manual entries, privacy-first.
@@ -206,11 +215,11 @@ final class ScannerModel {
     /// Starts the session-level scan-timeout deadline (TES-124) exactly once, independent of which screen or
     /// reading method is showing - called from ``onAppear()``, so it starts the moment the scanner UI appears
     /// and survives every later method switch, review, or manual-entry detour. A `nil` `config.scanTimeout`
-    /// never arms (``timeRemaining`` stays `nil`, so the countdown chip never shows - Swift's `Duration` has
-    /// no infinity sentinel, so `nil` plays the role the Android `Duration.INFINITE` does). Idempotent: a
+    /// never arms (``timeRemaining`` stays `nil`, so the countdown chip never shows - `nil` plays the role the
+    /// Android `Duration.INFINITE` does; a non-finite seconds value is treated the same). Idempotent: a
     /// second call (e.g. a re-fired `.onAppear`) is a no-op once a deadline is already running.
     private func beginSession() {
-        guard deadlineClock == nil, let timeout = config.scanTimeout else { return }
+        guard deadlineClock == nil, let timeout = config.scanTimeoutInterval, timeout.isFinite else { return }
         deadlineClock = DeadlineClock(total: timeout)
         timeRemaining = timeout
         armDeadlineTickIfNeeded()
@@ -239,10 +248,10 @@ final class ScannerModel {
     /// backgrounded) is never counted as elapsed active time.
     private func armDeadlineTickIfNeeded() {
         guard deadlineClock != nil, deadlineForeground, deadlineTask == nil else { return }
-        deadlineLastTick = deadlineTickClock.now
+        deadlineLastTick = deadlineTickClock()
         deadlineTask = Task { [weak self] in
             while true {
-                try? await Task.sleep(for: .milliseconds(500))
+                try? await Task.sleep(nanoseconds: 500_000_000)
                 if Task.isCancelled { return }
                 // Exits the loop for good once the model itself is gone, rather than spinning forever on a
                 // weak reference that will never resolve again.
@@ -259,9 +268,9 @@ final class ScannerModel {
     /// Android `onElapsed`.
     private func tickDeadline() {
         guard var clock = deadlineClock, let lastTick = deadlineLastTick else { return }
-        let now = deadlineTickClock.now
+        let now = deadlineTickClock()
         deadlineLastTick = now
-        let justFired = clock.advance(by: lastTick.duration(to: now))
+        let justFired = clock.advance(by: now - lastTick)
         deadlineClock = clock
         timeRemaining = clock.remaining
         if justFired {
@@ -415,13 +424,13 @@ final class ScannerModel {
         photoPickerPresented = true
     }
 
-    /// A photo was picked: show the analyzing state and read it on-device. Mirrors the Android
-    /// `readPickedImage`.
-    func handlePickedItem(_ item: PhotosPickerItem) {
-        pickedItem = nil
+    /// A photo was picked: show the analyzing state and read it on-device. `load` fetches the picked image's
+    /// data (`nil` when it cannot be loaded); each picker path supplies its own (`PhotosPickerItem` on iOS 16+,
+    /// `NSItemProvider` below), so the model needs neither type. Mirrors the Android `readPickedImage`.
+    func handlePickedImage(load: @escaping @MainActor () async -> Data?) {
         state = .savedImageAnalyzing
         postAnnouncement(for: .savedImageAnalyzing)
-        Task { await readPickedPhoto(item) }
+        Task { await readPickedPhoto(await load()) }
     }
 
     /// Reads the picked photo through the `SavedImageMrzReader` in single-read mode, entirely on-device, then
@@ -432,9 +441,9 @@ final class ScannerModel {
     /// Saved-image reading is opt-in and off by default - reaching here means the consumer enabled
     /// ``ScanMethod/savedImage``, which IS the acknowledgement (ADR-023), so the acknowledgement is
     /// constructed here with no separate screen.
-    private func readPickedPhoto(_ item: PhotosPickerItem) async {
+    private func readPickedPhoto(_ data: Data?) async {
         guard
-            let data = try? await item.loadTransferable(type: Data.self),
+            let data,
             let url = writeTempImage(data)
         else {
             state = .savedImageEmpty
@@ -525,6 +534,17 @@ final class ScannerModel {
     /// Moves to a new state and runs its entry side effects (start/stop scanner, launch picker, arm the
     /// struggle timer). Centralised so every transition - switcher, rescan, decode routing - goes through the
     /// same entry wiring, mirroring how the Android flow reacts to `uiState` changes.
+    /// Assigns ``state`` only when the screen would change (``ScannerState/showsSameScreen(as:)``), and
+    /// returns whether it did. `@Published` republishes the whole screen on every assignment, even of an equal
+    /// value (as `@Observable` notified on every set before), so a write that can repeat at frame rate goes
+    /// through here.
+    @discardableResult
+    private func updateState(_ newState: ScannerState) -> Bool {
+        guard !state.showsSameScreen(as: newState) else { return false }
+        state = newState
+        return true
+    }
+
     private func transition(to newState: ScannerState) {
         state = newState
         postAnnouncement(for: newState)
@@ -686,7 +706,7 @@ final class ScannerModel {
     func armStruggleTimeout() {
         struggleTask?.cancel()
         // A nil struggleTimeout means "never struggle".
-        guard let timeout = config.struggleTimeout else { return }
+        guard let timeout = config.struggleTimeoutInterval else { return }
         let nanos = nanoseconds(for: timeout)
         struggleTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: nanos)
@@ -701,11 +721,12 @@ final class ScannerModel {
         }
     }
 
-    /// Nanoseconds for `Task.sleep`, clamped at ≥0. Used by the struggle timer's `Task.sleep(nanoseconds:)`
-    /// call (the session deadline below uses `Task.sleep(for:)` directly on a fixed 500ms tick instead).
-    private func nanoseconds(for duration: Duration) -> UInt64 {
-        UInt64(max(0, duration.components.seconds)) * 1_000_000_000
-            + UInt64(max(0, duration.components.attoseconds / 1_000_000_000))
+    /// Nanoseconds for `Task.sleep`, clamped at ≥0 (and at the largest sleep for a huge or infinite value).
+    /// Used by the struggle timer (the session deadline sleeps a fixed 500ms tick instead).
+    private func nanoseconds(for seconds: TimeInterval) -> UInt64 {
+        guard seconds > 0 else { return 0 }
+        let nanos = (seconds * 1_000_000_000).rounded(.down)
+        return nanos >= 18_000_000_000_000_000_000 ? .max : UInt64(nanos)
     }
 
     private func teardownScanner() {
@@ -858,11 +879,11 @@ final class ScannerModel {
                 showLiveNotAcceptedNotice(read)
             }
         case .goCameraInUse:
-            state = .cameraInUse
-            postAnnouncement(for: .cameraInUse)
+            // Can arrive on every frame while another app holds the camera: publish and announce only the
+            // first, so the screen is not rebuilt and VoiceOver not re-told at frame rate.
+            if updateState(.cameraInUse) { postAnnouncement(for: .cameraInUse) }
         case .goCameraUnavailable:
-            state = .cameraUnavailable
-            postAnnouncement(for: .cameraUnavailable)
+            if updateState(.cameraUnavailable) { postAnnouncement(for: .cameraUnavailable) }
         case .stayScanning:
             // A transient miss. If a recoverable camera-in-use notice is showing, a clean frame proves the
             // camera reconnected — return to scanning.
@@ -941,7 +962,8 @@ final class ScannerModel {
     private func showLiveNotAcceptedNotice(_ read: NotAcceptedKind) {
         let previous: NotAcceptedKind?
         if case let .scanning(_, _, notAccepted) = state { previous = notAccepted } else { return }
-        state = showNotAcceptedNotice(state, read: read)
+        // Called on every frame the not-accepted document stays in view: an unchanged notice is not republished.
+        updateState(showNotAcceptedNotice(state, read: read))
         if previous != read {
             postAnnouncement(text: notAcceptedAnnouncement(
                 read, acceptedDocumentTypes: acceptedDocumentTypes, bundle: config.stringsBundle))

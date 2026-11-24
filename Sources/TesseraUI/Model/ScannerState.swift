@@ -86,3 +86,29 @@ enum ScannerState {
     /// review. Any edit clears it, like `parseFailed`.
     case manualRaw(text: String, parseFailed: Bool, notAccepted: NotAcceptedKind? = nil)
 }
+
+extension ScannerState {
+    /// Whether `other` shows exactly the same screen as this state, so assigning it would change nothing the
+    /// user sees. Compared case by case without making ``ScannerState`` `Equatable`: a state that carries
+    /// document data (``review(decoded:expanded:source:)``, ``readFailed(capturedText:)``,
+    /// ``manualRaw(text:parseFailed:notAccepted:)``) never counts as the same, so its assignment always goes
+    /// through. Pure, so it is host-tested.
+    func showsSameScreen(as other: ScannerState) -> Bool {
+        switch (self, other) {
+        case let (.scanning(s1, g1, n1), .scanning(s2, g2, n2)):
+            return s1 == s2 && g1 == g2 && n1 == n2
+        case (.permissionNeeded, .permissionNeeded),
+             (.permissionPermanentlyDenied, .permissionPermanentlyDenied),
+             (.cameraInUse, .cameraInUse),
+             (.cameraUnavailable, .cameraUnavailable),
+             (.awaitingSavedImagePick, .awaitingSavedImagePick),
+             (.savedImageAnalyzing, .savedImageAnalyzing),
+             (.savedImageEmpty, .savedImageEmpty):
+            return true
+        case let (.savedImageNotAccepted(r1), .savedImageNotAccepted(r2)):
+            return r1 == r2
+        default:
+            return false
+        }
+    }
+}

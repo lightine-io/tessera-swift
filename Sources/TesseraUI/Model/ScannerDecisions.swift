@@ -297,35 +297,37 @@ func assembleManualDecoded(
 /// `rememberScanDeadline`'s accumulation math, extracted as a value type so the drift-corrected
 /// advance-and-fire logic is host-testable without a real clock, timer, or scene-phase observer.
 /// ``ScannerModel`` owns one instance and feeds it the REAL elapsed *active* time between ticks (measured
-/// against a monotonic `ContinuousClock`, never wall-clock `Date` - a clock change, DST, or NTP correction
+/// against a monotonic clock, ``monotonicNow()``, never wall-clock `Date` - a clock change, DST, or NTP correction
 /// must never perturb the deadline). Pausing/resuming while backgrounded needs no special-case here: the
 /// caller stops calling ``advance(by:)`` while backgrounded, and the accumulated total already carries
 /// the pause forward, exactly like the Android `repeatOnLifecycle(RESUMED)` gate resuming from the saved
-/// `accumulatedMs` rather than restarting.
+/// `accumulatedMs` rather than restarting. All times are in seconds (`TimeInterval`), since `Duration`
+/// needs iOS 16.
 struct DeadlineClock {
-    /// The total session budget.
-    let total: Duration
+    /// The total session budget, in seconds.
+    let total: TimeInterval
 
-    /// The active time accumulated so far, clamped to `[0, total]`.
-    private(set) var accumulated: Duration = .zero
+    /// The active time accumulated so far, in seconds, clamped to `[0, total]`.
+    private(set) var accumulated: TimeInterval = 0
 
     /// One-shot latch: once `true`, further ``advance(by:)`` calls are no-ops. Mirrors the Android `fired`.
     private(set) var fired = false
 
-    init(total: Duration) {
+    init(total: TimeInterval) {
         self.total = total
     }
 
-    /// The time left, clamped to `[0, total]` - what the countdown chip shows (via ``formatCountdown(_:)``).
-    var remaining: Duration {
-        max(.zero, total - accumulated)
+    /// The time left in seconds, clamped to `[0, total]` - what the countdown chip shows (via
+    /// ``formatCountdown(_:)``).
+    var remaining: TimeInterval {
+        max(0, total - accumulated)
     }
 
-    /// Advances the accumulator by `elapsed` (clamped so it never exceeds `total`). Returns `true` exactly
-    /// once - on the call that first reaches the total - so the caller fires its one-shot "give up" effect
-    /// only once, never on a later tick. A no-op (always returns `false`) once already fired.
+    /// Advances the accumulator by `elapsed` seconds (clamped so it never exceeds `total`). Returns `true`
+    /// exactly once - on the call that first reaches the total - so the caller fires its one-shot "give up"
+    /// effect only once, never on a later tick. A no-op (always returns `false`) once already fired.
     @discardableResult
-    mutating func advance(by elapsed: Duration) -> Bool {
+    mutating func advance(by elapsed: TimeInterval) -> Bool {
         guard !fired else { return false }
         accumulated = min(total, accumulated + elapsed)
         guard accumulated >= total else { return false }
@@ -334,18 +336,26 @@ struct DeadlineClock {
     }
 }
 
-/// Formats a countdown `Duration` as `M:SS` (minutes:seconds, seconds zero-padded) - the shape the
-/// scan-countdown chip shows. Seconds are rounded **up** so the chip reads `0:01` through the final second
-/// and only shows `0:00` at true expiry; a negative input (should not occur - the caller clamps at zero, via
-/// ``DeadlineClock/remaining``) also clamps to `0:00`. Minutes are not capped at two digits (a multi-minute
-/// host `scanTimeout` renders e.g. `10:00`). Digits only - no `String(format:)`, matching the module's
-/// established positional-substitution style (see `Localization.swift`) rather than a locale-sensitive
-/// formatter. Pure, so it is host-tested. Mirrors the Android `formatCountdown`.
-func formatCountdown(_ remaining: Duration) -> String {
-    let seconds = remaining.components.seconds
-    let attoseconds = remaining.components.attoseconds
-    guard seconds > 0 || (seconds == 0 && attoseconds > 0) else { return "0:00" }
-    let totalSeconds = attoseconds > 0 ? seconds + 1 : seconds
+/// Seconds on the clock `ContinuousClock` reads on Apple platforms (`CLOCK_MONOTONIC_RAW`: never set back,
+/// not slewed by time adjustments, and - like `CLOCK_MONOTONIC` on Darwin - it keeps counting while the
+/// device sleeps), available on iOS 15. Only differences between two readings mean anything.
+// COMPAT-NOTE(iOS 16): not a shim. With an iOS 16 minimum this could be `ContinuousClock.now` and the timing
+// could use `Duration`; the seconds version works the same on every version, so nothing forces the change.
+func monotonicNow() -> TimeInterval {
+    TimeInterval(clock_gettime_nsec_np(CLOCK_MONOTONIC_RAW)) / 1_000_000_000
+}
+
+/// Formats a countdown of `remaining` seconds as `M:SS` (minutes:seconds, seconds zero-padded) - the shape
+/// the scan-countdown chip shows. Seconds are rounded **up** so the chip reads `0:01` through the final
+/// second and only shows `0:00` at true expiry; a negative input (should not occur - the caller clamps at
+/// zero, via ``DeadlineClock/remaining``) also clamps to `0:00`. Minutes are not capped at two digits (a
+/// multi-minute host `scanTimeout` renders e.g. `10:00`). Digits only - no `String(format:)`, matching the
+/// module's established positional-substitution style (see `Localization.swift`) rather than a
+/// locale-sensitive formatter. Pure, so it is host-tested. Mirrors the Android `formatCountdown`.
+func formatCountdown(_ remaining: TimeInterval) -> String {
+    // `!(x > 0)` also catches NaN; a non-finite or huge value is capped so the integer conversion cannot trap.
+    guard remaining > 0 else { return "0:00" }
+    let totalSeconds = Int64(min(remaining.rounded(.up), 1e15))
     let minutes = totalSeconds / 60
     let secs = totalSeconds % 60
     let secsString = secs < 10 ? "0\(secs)" : "\(secs)"

@@ -573,10 +573,8 @@ struct MonoLine: View {
     init(_ text: String) { self.text = text }
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            ForEach(MonoLineFit.ladder, id: \.self) { fit in
-                rung(fit)
-            }
+        CompatMonoLineFit(text: text) { fit in
+            rung(fit)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

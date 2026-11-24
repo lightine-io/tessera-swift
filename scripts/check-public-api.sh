@@ -16,7 +16,7 @@ set -euo pipefail
 
 MODULE="TesseraUI"
 SCHEME="TesseraUI"
-TARGET_TRIPLE="arm64-apple-ios18.0-simulator"       # matches Package.swift .iOS(.v18)
+TARGET_TRIPLE="arm64-apple-ios15.0-simulator"       # matches Package.swift .iOS(.v15)
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BASELINE="$REPO_ROOT/api/$MODULE.baseline.json"
 DDP="${API_GUARD_DERIVED_DATA:-$REPO_ROOT/.build-apiguard}"

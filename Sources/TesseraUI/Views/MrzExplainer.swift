@@ -51,7 +51,7 @@ struct MrzExplainerDialog: View {
     let onDismiss: () -> Void
 
     var body: some View {
-        NavigationStack {
+        CompatNavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     Text(TesseraStrings.string("tessera_scanner_explainer_intro", bundle: stringsBundle))
