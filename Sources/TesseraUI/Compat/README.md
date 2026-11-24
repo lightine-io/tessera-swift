@@ -43,9 +43,10 @@ In a debug build, `Compat.forceLegacy` makes every shim take its old-iOS path, s
 1. Delete `BelowIOS16.swift`.
 2. Build. At each compile error, use the modern call that the deleted shim's doc comment named (the table above).
 3. In `Package.swift`, change `.iOS(.v15)` to `.iOS(.v16)`.
-4. Remove the `@available(iOS 16, *)` marks that are now redundant (`grep -rn "@available(iOS 16" Sources Tests Samples`), including the ones on the `Duration` properties and initializers in `MrzScannerConfig.swift`.
+4. Remove the `@available(iOS 16, *)` marks that are now redundant (`grep -rn "@available(iOS 16" Sources Tests Samples`), including the ones on the `Duration` properties and initializers in `MrzScannerConfig.swift`. The two `@available(iOS 16, *)` `Duration` initializers there can then merge back into one with defaults (`struggleTimeout: Duration? = .seconds(10)`, `scanTimeout: Duration? = nil`); keep the seconds initializer.
 5. Remove the `CompatShim` cases of the deleted shims, and the tests in `CompatLegacyPathTests.swift` for them (the `monoLineLegacyFit` tests, the old photo picker tests).
-6. In `scripts/check-public-api.sh`, change `TARGET_TRIPLE` to `ios16.0`, then update the API baseline with `--update` and review the diff.
+6. In `Package.swift`, remove the `exclude: ["Compat/README.md"]` entry when the `Compat` folder goes away.
+7. In `scripts/check-public-api.sh`, change `TARGET_TRIPLE` to `ios16.0`, then update the API baseline with `--update` and review the diff.
 
 ## Dropping iOS 16
 

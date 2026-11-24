@@ -234,6 +234,11 @@ struct LegacyPhotoPicker: UIViewControllerRepresentable {
         var configuration = PHPickerConfiguration()
         configuration.filter = .images
         configuration.selectionLimit = 1
+        // `.compatible`: the system hands over a widely readable format (JPEG for a HEIC photo), so a picked
+        // photo does not depend on what the reader can decode. The default `.automatic` may return the stored
+        // format. (Apple's PHPicker header: "Uses the most compatible representation if possible, even if
+        // transcoding is required.")
+        configuration.preferredAssetRepresentationMode = .compatible
         let picker = PHPickerViewController(configuration: configuration)
         picker.delegate = context.coordinator
         return picker
@@ -268,10 +273,19 @@ private struct ItemProviderBox: @unchecked Sendable {
     /// The image's data in its original representation (what `loadTransferable(type: Data.self)` gives),
     /// or `nil` when it cannot be loaded.
     func loadImageData() async -> Data? {
-        await withCheckedContinuation { continuation in
-            provider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, _ in
+        let identifier = legacyPickerImageTypeIdentifier(registered: provider.registeredTypeIdentifiers)
+        return await withCheckedContinuation { continuation in
+            provider.loadDataRepresentation(forTypeIdentifier: identifier) { data, _ in
                 continuation.resume(returning: data)
             }
         }
     }
+}
+
+/// Part of ``View/compatSavedImagePicker(isPresented:onPick:)``'s iOS 15 path; goes with it. The type to ask a
+/// picked photo's `NSItemProvider` for: the first registered type that is an image (the provider may register
+/// only concrete types such as `public.heic`, and an abstract request for `public.image` can then fail), or
+/// `public.image` when none is.
+func legacyPickerImageTypeIdentifier(registered: [String]) -> String {
+    registered.first { UTType($0)?.conforms(to: .image) == true } ?? UTType.image.identifier
 }

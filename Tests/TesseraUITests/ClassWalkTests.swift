@@ -3,6 +3,10 @@ import ObjectiveC
 import Testing
 @testable import TesseraUI
 
+/// `class_getName` taking the class as a raw pointer, so reading a name does not retain the class.
+@_silgen_name("class_getName")
+private func rawClassGetName(_ cls: UnsafeRawPointer) -> UnsafePointer<CChar>
+
 /// TES-343: imitates what a library that walks every Objective-C class at start does.
 ///
 /// On iOS 15 and 16 a class that is visible to Objective-C, and whose Swift code names a type that
@@ -49,10 +53,21 @@ struct ClassWalkTests {
             }
         }
 
-        let selector = NSSelectorFromString("URLSession:dataTask:didReceiveResponse:completionHandler:")
-        _ = class_getInstanceMethod(cls, selector)
-        _ = class_respondsToSelector(cls, selector)
+        // A selector lookup runs the class's `+initialize`. That is what a library's walk does to its own and
+        // the app's classes, so it is done for the filtered walk only. On every class of the process it
+        // would start system frameworks from a test thread (WebKit aborts: "Threading Violation").
+        if imageFilter != nil {
+            let selector = NSSelectorFromString("URLSession:dataTask:didReceiveResponse:completionHandler:")
+            _ = class_getInstanceMethod(cls, selector)
+            _ = class_respondsToSelector(cls, selector)
+        }
         return name
+    }
+
+    /// Classes that cannot be held in a Swift variable. Found by running the walk: `__NSGenericDeallocHandler`
+    /// aborted it (TES-343).
+    private static func isRuntimeInternal(name: String) -> Bool {
+        name.hasPrefix("__NSGenericDeallocHandler") || name.hasPrefix("_NSZombie_") || name.hasPrefix("NSZombie")
     }
 
     /// Walks the whole class list. `imageFilter` limits the touching to classes whose image path
@@ -62,10 +77,16 @@ struct ClassWalkTests {
         var count: UInt32 = 0
         guard let list = objc_copyClassList(&count) else { return walk }
         // The list is malloc'ed and owned by the caller.
-        defer { free(unsafeBitCast(list, to: UnsafeMutableRawPointer.self)) }
+        let rawList = UnsafeMutableRawPointer(list)
+        defer { free(rawList) }
         walk.classCount = Int(count)
+        let entries = rawList.assumingMemoryBound(to: UnsafeRawPointer?.self)
         for index in 0 ..< Int(count) {
-            let cls: AnyClass = list[index]
+            guard let entry = entries[index] else { continue }
+            // Skip the runtime's root classes that do not answer `retain`: holding one in a Swift
+            // variable sends it `retain` and aborts the process. The name is read without ARC.
+            if Self.isRuntimeInternal(name: String(cString: rawClassGetName(entry))) { continue }
+            let cls: AnyClass = unsafeBitCast(entry, to: AnyClass.self)
             let name = touch(cls, into: &walk, imageFilter: imageFilter)
             let image = class_getImageName(cls).map { String(cString: $0) } ?? ""
             if image.contains("TesseraUI") || name.contains("TesseraUI") {

@@ -255,3 +255,28 @@ struct ScannerStatePublishTests {
         #expect(!review.showsSameScreen(as: review))
     }
 }
+
+/// Which type the iOS 15 photo picker asks a picked photo for.
+struct LegacyPickerTypeTests {
+    @Test func aProviderWithOnlyAConcreteImageTypeIsAskedForThatType() {
+        #expect(legacyPickerImageTypeIdentifier(registered: ["public.heic"]) == "public.heic")
+    }
+
+    @Test func theFirstImageTypeWinsWhenJpegAndHeicAreBothRegistered() {
+        #expect(legacyPickerImageTypeIdentifier(registered: ["public.jpeg", "public.heic"]) == "public.jpeg")
+        #expect(legacyPickerImageTypeIdentifier(registered: ["public.heic", "public.jpeg"]) == "public.heic")
+    }
+
+    @Test func nonImageTypesAreSkipped() {
+        #expect(legacyPickerImageTypeIdentifier(registered: ["public.plain-text", "public.png"]) == "public.png")
+    }
+
+    @Test func noImageTypeFallsBackToTheAbstractImageType() {
+        #expect(legacyPickerImageTypeIdentifier(registered: ["public.plain-text"]) == "public.image")
+        #expect(legacyPickerImageTypeIdentifier(registered: []) == "public.image")
+    }
+
+    @Test func onlyTheAbstractImageTypeIsAskedForThatType() {
+        #expect(legacyPickerImageTypeIdentifier(registered: ["public.image"]) == "public.image")
+    }
+}
