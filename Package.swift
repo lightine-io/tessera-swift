@@ -38,9 +38,19 @@ let package = Package(
     products: [
         .library(name: "Tessera", targets: ["Tessera"]),
         .library(name: "TesseraUI", targets: ["TesseraUI"]),
+        // The headless Swift layer: `async` chip reading over the Kotlin reader. Draws nothing and
+        // imports no UI framework, so an app can read a chip without linking the scanner screen.
+        .library(name: "TesseraKit", targets: ["TesseraKit"]),
     ],
     targets: [
         tesseraBinary,
+        // TesseraKit (TES-346): hand-written Swift over the headless `Tessera` binary, no UI imports.
+        // TesseraUI may depend on it later, so the screen and the headless API share one adapter.
+        .target(
+            name: "TesseraKit",
+            dependencies: ["Tessera"],
+            path: "Sources/TesseraKit"
+        ),
         .target(
             name: "TesseraUI",
             dependencies: ["Tessera"],
@@ -79,6 +89,17 @@ let package = Package(
             path: "Samples/Tutorials/CameraHeadless",
             // TES-A-143 step 2 sets the app to the Swift 5 language mode.
             swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
+        // NEW, mirrors a documentation page that does not exist yet (TES-346).
+        .target(
+            name: "TesseraSamplesChipReading",
+            dependencies: ["Tessera", "TesseraKit"],
+            path: "Samples/HowToChipReading"
+        ),
+        .testTarget(
+            name: "TesseraKitTests",
+            dependencies: ["TesseraKit", "TesseraSamplesChipReading"],
+            path: "Tests/TesseraKitTests"
         ),
         .testTarget(
             name: "TesseraUITests",
