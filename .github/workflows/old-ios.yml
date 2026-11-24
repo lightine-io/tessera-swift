@@ -1,0 +1,232 @@
+name: old-ios
+
+# Runs the package's tests on real iOS 15, 16 and 17 simulators (TES-343: the minimum went from iOS 18
+# to iOS 15). No old simulator runs on the maintainer's Mac (Xcode 27), so this is the only place the
+# old-iOS code paths run. Not part of ci.yml: it downloads multi-GB runtimes and builds the framework.
+#
+# The package consumes a binary Tessera.xcframework. The release URL in Package.swift is built for
+# iOS 18, so the `framework` job builds the one that matches the ref from lightine-io/tessera and the
+# `test` job takes it through TESSERA_LOCAL_XCFRAMEWORK=1 (.local-xcframework/).
+#
+# Not a required check. Every action is pinned to a full commit SHA with a version comment.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tessera_ref:
+        description: "Branch, tag or SHA of lightine-io/tessera to build the XCFramework from"
+        required: false
+        default: main
+  # TEMPORARY: lets the workflow run from this branch before it exists on the default branch
+  # (workflow_dispatch only lists workflows that are on the default branch). Remove the push trigger
+  # when TES-343 is merged.
+  push:
+    branches:
+      - "feature/tes-343-*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: old-ios-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # The framework is built with the Xcode the main repository pins (Kotlin 2.4.20-2.4.21 lists Xcode 26.4).
+  FRAMEWORK_XCODE_VERSION: "26.4.1"
+  # On push runs the matching framework branch; on manual runs the input.
+  TESSERA_REF: ${{ github.event_name == 'push' && 'feature/tes-343-ios-15-minimum' || inputs.tessera_ref }}
+
+jobs:
+  framework:
+    name: XCFramework (${{ github.event_name == 'push' && 'feature/tes-343-ios-15-minimum' || inputs.tessera_ref }})
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - name: Check out the main repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: lightine-io/tessera
+          ref: ${{ env.TESSERA_REF }}
+          persist-credentials: false
+
+      - name: Select Xcode ${{ env.FRAMEWORK_XCODE_VERSION }}
+        run: |
+          XC="/Applications/Xcode_${FRAMEWORK_XCODE_VERSION}.app"
+          if [ ! -d "$XC" ]; then
+            echo "::error::$XC is missing on this runner image; no fallback to another Xcode."
+            exit 1
+          fi
+          sudo xcode-select -s "$XC"
+          xcodebuild -version
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Cache Kotlin/Native toolchain
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: konan-${{ runner.os }}-
+
+      - name: Cache the OpenSSL build
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: emrtd-core/build/openssl
+          key: openssl-${{ runner.os }}-xcode-${{ env.FRAMEWORK_XCODE_VERSION }}-${{ hashFiles('scripts/build-openssl-ios.sh') }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+        with:
+          # This workflow never writes the Gradle cache (it runs on feature branches and by hand).
+          cache-read-only: true
+
+      - name: Build the XCFramework
+        run: ./gradlew :mrz-camera-ios:packTesseraXCFramework
+
+      - name: Zip the XCFramework (keeps symlinks)
+        run: |
+          BUILT="mrz-camera-ios/build/XCFrameworks/release/Tessera.xcframework"
+          [ -d "$BUILT" ] || { echo "::error::$BUILT not found after the build."; exit 1; }
+          mkdir -p "$RUNNER_TEMP/fw"
+          # ditto keeps symlinks and extended attributes; upload-artifact would otherwise flatten them.
+          ditto -c -k --sequesterRsrc --keepParent "$BUILT" "$RUNNER_TEMP/fw/Tessera.xcframework.zip"
+          ls -l "$RUNNER_TEMP/fw"
+
+      - name: Upload the XCFramework
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: tessera-xcframework
+          path: ${{ runner.temp }}/fw/Tessera.xcframework.zip
+          if-no-files-found: error
+          retention-days: 7
+
+  test:
+    name: test · ${{ matrix.label }}
+    needs: framework
+    runs-on: macos-26
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Xcode 26.4.1 crashes XCTest's start-up on iOS 15 simulators (Apple forum thread 822916,
+          # "Tests fail to run on iOS 15 simulators", fixed in Xcode 26.5), so the old legs use the
+          # newest Xcode on the image. The control leg uses the Xcode and runtime ci.yml uses.
+          - { label: "iOS 15.5", ios: "15.5", device: "iPhone 13", xcode: "26.6", install: true }
+          - { label: "iOS 16.4", ios: "16.4", device: "iPhone 14", xcode: "26.6", install: true }
+          - { label: "iOS 17.5", ios: "17.5", device: "iPhone 15", xcode: "26.6", install: true }
+          - { label: "iOS 26.4.1 (control, on the image)", ios: "26.4.1", device: "iPhone 17", xcode: "26.4.1", install: false }
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Select Xcode ${{ matrix.xcode }}
+        run: |
+          XC="/Applications/Xcode_${{ matrix.xcode }}.app"
+          if [ ! -d "$XC" ]; then
+            echo "::error::$XC is missing on this runner image; no fallback to another Xcode."
+            exit 1
+          fi
+          sudo xcode-select -s "$XC"
+          xcodebuild -version
+
+      - name: Download the XCFramework
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: tessera-xcframework
+          path: ${{ runner.temp }}/fw
+
+      - name: Put the XCFramework in .local-xcframework
+        run: |
+          mkdir -p .local-xcframework
+          ditto -x -k "$RUNNER_TEMP/fw/Tessera.xcframework.zip" .local-xcframework
+          [ -d .local-xcframework/Tessera.xcframework ] || { echo "::error::The artifact did not hold Tessera.xcframework."; ls -la .local-xcframework; exit 1; }
+          ls .local-xcframework/Tessera.xcframework
+
+      - name: Simulator runtimes before
+        run: xcrun simctl list runtimes
+
+      # Apple documents `xcodebuild -downloadPlatform iOS -buildVersion <osversion> -architectureVariant <universal|arm64>`
+      # (https://developer.apple.com/documentation/xcode/downloading-and-installing-additional-xcode-components).
+      # The runner is Apple silicon, so the arm64 variant is used. Xcode 26.6 is known to install 16.4 and 17.5
+      # this way (Apple forum thread 847134); 15.5 is assumed to be offered too.
+      - name: Install the iOS ${{ matrix.ios }} simulator runtime
+        if: matrix.install
+        timeout-minutes: 60
+        run: |
+          set -euo pipefail
+          if xcrun simctl list -j runtimes | python3 -I -c 'import json,sys; v="${{ matrix.ios }}"; sys.exit(0 if any(r.get("version")==v and r.get("platform","iOS")=="iOS" and r.get("isAvailable") for r in json.load(sys.stdin)["runtimes"]) else 1)'; then
+            echo "iOS ${{ matrix.ios }} is already installed."
+          else
+            for attempt in 1 2 3; do
+              echo "Download attempt $attempt"
+              if xcodebuild -downloadPlatform iOS -buildVersion "${{ matrix.ios }}" -architectureVariant arm64; then break; fi
+              if [ "$attempt" = 3 ]; then
+                echo "::error::Could not download the iOS ${{ matrix.ios }} simulator runtime with xcodebuild -downloadPlatform. No other iOS version is used instead."
+                exit 1
+              fi
+              sleep 30
+            done
+          fi
+
+      - name: Simulator runtimes after
+        run: xcrun simctl list runtimes
+
+      - name: Create and boot the simulator
+        id: sim
+        run: |
+          set -euo pipefail
+          python3 -I - <<'PY' > "$RUNNER_TEMP/sim.env"
+          import json, subprocess, sys
+          ios = "${{ matrix.ios }}"
+          device = "${{ matrix.device }}"
+          runtimes = json.loads(subprocess.check_output(["xcrun", "simctl", "list", "-j", "runtimes"]))["runtimes"]
+          match = [r for r in runtimes if r.get("version") == ios and r.get("isAvailable") and "iOS" in r.get("name", "")]
+          if not match:
+              print("::error::No available iOS runtime with version exactly %s. Found: %s" % (ios, [(r["name"], r.get("version")) for r in runtimes]), file=sys.stderr)
+              sys.exit(1)
+          rt = match[0]
+          types = {t["name"]: t["identifier"] for t in rt.get("supportedDeviceTypes", [])}
+          if device not in types:
+              print("::error::%s is not a device type of %s. It has: %s" % (device, rt["name"], sorted(types)), file=sys.stderr)
+              sys.exit(1)
+          print("RUNTIME=%s" % rt["identifier"])
+          print("DEVICE_TYPE=%s" % types[device])
+          PY
+          cat "$RUNNER_TEMP/sim.env"
+          # shellcheck disable=SC1091
+          source "$RUNNER_TEMP/sim.env"
+          UDID=$(xcrun simctl create "old-ios-${{ matrix.ios }}" "$DEVICE_TYPE" "$RUNTIME")
+          echo "udid=$UDID" >> "$GITHUB_OUTPUT"
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl list devices | grep -F "$UDID"
+
+      - name: Test (iOS ${{ matrix.ios }})
+        timeout-minutes: 60
+        env:
+          TESSERA_LOCAL_XCFRAMEWORK: "1"
+          UDID: ${{ steps.sim.outputs.udid }}
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -scheme Tessera-Package \
+            -destination "platform=iOS Simulator,id=${UDID}" \
+            -resultBundlePath "$RUNNER_TEMP/result-${{ matrix.ios }}.xcresult" \
+            -skipPackagePluginValidation 2>&1 | tee "$RUNNER_TEMP/test-${{ matrix.ios }}.log"
+
+      - name: Upload the log and result bundle
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: old-ios-${{ matrix.ios }}-logs
+          path: |
+            ${{ runner.temp }}/test-${{ matrix.ios }}.log
+            ${{ runner.temp }}/result-${{ matrix.ios }}.xcresult
+          if-no-files-found: ignore
+          retention-days: 7
