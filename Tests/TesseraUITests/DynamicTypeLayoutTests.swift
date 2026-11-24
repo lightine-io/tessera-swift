@@ -12,8 +12,8 @@ import UIKit
 /// exempt by design: `MonoLine` scrolls it sideways rather than wrapping it, inside the screen's width.
 ///
 /// Not covered: the shared top bar and the "What's the MRZ?" sheet (both sit in a system navigation stack, which
-/// reports a fixed size here), the camera preview (it needs a camera), and how the result looks; that stays a
-/// manual check on a device.
+/// reports a fixed size here; the sheet's picture is covered in `MrzExplainerPictureTests`), the camera preview
+/// (it needs a camera), and how the result looks; that stays a manual check on a device.
 @MainActor
 struct DynamicTypeLayoutTests {
     /// The narrowest iPhone screen width the package's minimum, iOS 15, supports (iPhone SE, 1st generation),
