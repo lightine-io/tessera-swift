@@ -153,7 +153,7 @@ jobs:
 
       # Apple documents `xcodebuild -downloadPlatform iOS -buildVersion <osversion> -architectureVariant <universal|arm64>`
       # (https://developer.apple.com/documentation/xcode/downloading-and-installing-additional-xcode-components).
-      # The runner is Apple silicon, so the arm64 variant is used. Xcode 26.6 is known to install 16.4 and 17.5
+      # The universal variant is asked for first, then the default. Xcode 26.6 is known to install 16.4 and 17.5
       # this way (Apple forum thread 847134); 15.5 is assumed to be offered too.
       - name: Install the iOS ${{ matrix.ios }} simulator runtime
         if: matrix.install
@@ -165,7 +165,10 @@ jobs:
           else
             for attempt in 1 2 3; do
               echo "Download attempt $attempt"
-              if xcodebuild -downloadPlatform iOS -buildVersion "${{ matrix.ios }}" -architectureVariant arm64; then break; fi
+              # Runtimes before iOS 26 exist only as universal images; the arm64-only variant answers
+              # "not available for download" for them (seen on the first run).
+              if xcodebuild -downloadPlatform iOS -buildVersion "${{ matrix.ios }}" -architectureVariant universal; then break; fi
+              if xcodebuild -downloadPlatform iOS -buildVersion "${{ matrix.ios }}"; then break; fi
               if [ "$attempt" = 3 ]; then
                 echo "::error::Could not download the iOS ${{ matrix.ios }} simulator runtime with xcodebuild -downloadPlatform. No other iOS version is used instead."
                 exit 1
