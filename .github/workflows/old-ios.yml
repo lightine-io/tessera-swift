@@ -174,7 +174,7 @@ jobs:
             for variant in universal default arm64; do
               echo "::group::downloadPlatform iOS $v ($variant)"
               if [ "$variant" = default ]; then ARGS=(); else ARGS=(-architectureVariant "$variant"); fi
-              OUT=$(xcodebuild -downloadPlatform iOS -buildVersion "$v" ${ARGS[@]+"${ARGS[@]}"} 2>&1); RC=$?
+              RC=0; OUT=$(xcodebuild -downloadPlatform iOS -buildVersion "$v" ${ARGS[@]+"${ARGS[@]}"} 2>&1) || RC=$?  # the step runs with bash -e: a refused variant must not end it
               echo "$OUT"
               echo "::endgroup::"
               ANSWERS="$ANSWERS"$'\n'"iOS $v ($variant): rc=$RC: $(echo "$OUT" | tail -n 1)"
