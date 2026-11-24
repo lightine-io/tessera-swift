@@ -117,7 +117,7 @@ jobs:
           # Xcode 26.4.1 crashes XCTest's start-up on iOS 15 simulators (Apple forum thread 822916,
           # "Tests fail to run on iOS 15 simulators", fixed in Xcode 26.5), so the old legs use the
           # newest Xcode on the image. The control leg uses the Xcode and runtime ci.yml uses.
-          - { label: "iOS 15.5", ios: "15.5", device: "iPhone 13", xcode: "26.6", install: true }
+          - { label: "iOS 15", ios: "15.5 15.4 15.2 15.0", device: "iPhone 13", xcode: "26.6", install: true }
           - { label: "iOS 16.4", ios: "16.4", device: "iPhone 14", xcode: "26.6", install: true }
           - { label: "iOS 17.5", ios: "17.5", device: "iPhone 15", xcode: "26.6", install: true }
           - { label: "iOS 26.4.1 (control, on the image)", ios: "26.4.1", device: "iPhone 17", xcode: "26.4.1", install: false }
@@ -153,29 +153,48 @@ jobs:
 
       # Apple documents `xcodebuild -downloadPlatform iOS -buildVersion <osversion> -architectureVariant <universal|arm64>`
       # (https://developer.apple.com/documentation/xcode/downloading-and-installing-additional-xcode-components).
-      # The universal variant is asked for first, then the default. Xcode 26.6 is known to install 16.4 and 17.5
-      # this way (Apple forum thread 847134); 15.5 is assumed to be offered too.
-      - name: Install the iOS ${{ matrix.ios }} simulator runtime
+      # Xcode 26.6 installs 16.4 and 17.5 this way (Apple forum thread 847134). Its answer for 15.5 was
+      # "not available for download" (run 45470048797); Apple DTS says Xcode 26.2 offers iOS 15.0 and later
+      # (forum thread 814284), so `ios` lists candidates, newest first, and the first one that installs is used.
+      # Every answer is printed. If none installs, the step fails with all the answers.
+      - name: Install an iOS ${{ matrix.ios }} simulator runtime
+        id: rt
         if: matrix.install
         timeout-minutes: 60
         run: |
-          set -euo pipefail
-          if xcrun simctl list -j runtimes | python3 -I -c 'import json,sys; v="${{ matrix.ios }}"; sys.exit(0 if any(r.get("version")==v and r.get("platform","iOS")=="iOS" and r.get("isAvailable") for r in json.load(sys.stdin)["runtimes"]) else 1)'; then
-            echo "iOS ${{ matrix.ios }} is already installed."
-          else
-            for attempt in 1 2 3; do
-              echo "Download attempt $attempt"
-              # Runtimes before iOS 26 exist only as universal images; the arm64-only variant answers
-              # "not available for download" for them (seen on the first run).
-              if xcodebuild -downloadPlatform iOS -buildVersion "${{ matrix.ios }}" -architectureVariant universal; then break; fi
-              if xcodebuild -downloadPlatform iOS -buildVersion "${{ matrix.ios }}"; then break; fi
-              if [ "$attempt" = 3 ]; then
-                echo "::error::Could not download the iOS ${{ matrix.ios }} simulator runtime with xcodebuild -downloadPlatform. No other iOS version is used instead."
-                exit 1
-              fi
-              sleep 30
+          set -uo pipefail
+          has() {
+            xcrun simctl list -j runtimes | python3 -I -c 'import json,sys; v=sys.argv[1]; sys.exit(0 if any(r.get("version")==v and "iOS" in r.get("name","") and r.get("isAvailable") for r in json.load(sys.stdin)["runtimes"]) else 1)' "$1"
+          }
+          ANSWERS=""
+          for v in ${{ matrix.ios }}; do
+            if has "$v"; then echo "iOS $v is already installed."; echo "version=$v" >> "$GITHUB_OUTPUT"; exit 0; fi
+          done
+          for v in ${{ matrix.ios }}; do
+            for variant in universal default arm64; do
+              echo "::group::downloadPlatform iOS $v ($variant)"
+              if [ "$variant" = default ]; then ARGS=(); else ARGS=(-architectureVariant "$variant"); fi
+              OUT=$(xcodebuild -downloadPlatform iOS -buildVersion "$v" ${ARGS[@]+"${ARGS[@]}"} 2>&1); RC=$?
+              echo "$OUT"
+              echo "::endgroup::"
+              ANSWERS="$ANSWERS"$'\n'"iOS $v ($variant): rc=$RC: $(echo "$OUT" | tail -n 1)"
+              if [ "$RC" = 0 ] && has "$v"; then echo "version=$v" >> "$GITHUB_OUTPUT"; exit 0; fi
             done
-          fi
+          done
+          echo "::group::What the runner has"
+          xcrun simctl runtime list || true
+          xcrun simctl list runtimes || true
+          xcodebuild -showsdks || true
+          echo "::endgroup::"
+          echo "::error::No iOS ${{ matrix.ios }} runtime could be installed. Answers:$ANSWERS"
+          exit 1
+
+      - name: Use the installed runtime
+        id: ver
+        run: |
+          if [ -n "${{ steps.rt.outputs.version }}" ]; then V="${{ steps.rt.outputs.version }}"; else V="${{ matrix.ios }}"; fi
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "Testing on iOS $V"
 
       - name: Simulator runtimes after
         run: xcrun simctl list runtimes
@@ -186,7 +205,7 @@ jobs:
           set -euo pipefail
           python3 -I - <<'PY' > "$RUNNER_TEMP/sim.env"
           import json, subprocess, sys
-          ios = "${{ matrix.ios }}"
+          ios = "${{ steps.ver.outputs.version }}"
           device = "${{ matrix.device }}"
           runtimes = json.loads(subprocess.check_output(["xcrun", "simctl", "list", "-j", "runtimes"]))["runtimes"]
           match = [r for r in runtimes if r.get("version") == ios and r.get("isAvailable") and "iOS" in r.get("name", "")]
@@ -204,13 +223,13 @@ jobs:
           cat "$RUNNER_TEMP/sim.env"
           # shellcheck disable=SC1091
           source "$RUNNER_TEMP/sim.env"
-          UDID=$(xcrun simctl create "old-ios-${{ matrix.ios }}" "$DEVICE_TYPE" "$RUNTIME")
+          UDID=$(xcrun simctl create "old-ios-${{ steps.ver.outputs.version }}" "$DEVICE_TYPE" "$RUNTIME")
           echo "udid=$UDID" >> "$GITHUB_OUTPUT"
           xcrun simctl boot "$UDID"
           xcrun simctl bootstatus "$UDID" -b
           xcrun simctl list devices | grep -F "$UDID"
 
-      - name: Test (iOS ${{ matrix.ios }})
+      - name: Test (iOS ${{ steps.ver.outputs.version }})
         timeout-minutes: 60
         env:
           TESSERA_LOCAL_XCFRAMEWORK: "1"
@@ -220,16 +239,16 @@ jobs:
           xcodebuild test \
             -scheme Tessera-Package \
             -destination "platform=iOS Simulator,id=${UDID}" \
-            -resultBundlePath "$RUNNER_TEMP/result-${{ matrix.ios }}.xcresult" \
-            -skipPackagePluginValidation 2>&1 | tee "$RUNNER_TEMP/test-${{ matrix.ios }}.log"
+            -resultBundlePath "$RUNNER_TEMP/result-${{ matrix.label }}.xcresult" \
+            -skipPackagePluginValidation 2>&1 | tee "$RUNNER_TEMP/test-${{ matrix.label }}.log"
 
       - name: Upload the log and result bundle
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: old-ios-${{ matrix.ios }}-logs
+          name: old-ios-${{ matrix.label }}-logs
           path: |
-            ${{ runner.temp }}/test-${{ matrix.ios }}.log
-            ${{ runner.temp }}/result-${{ matrix.ios }}.xcresult
+            ${{ runner.temp }}/test-${{ matrix.label }}.log
+            ${{ runner.temp }}/result-${{ matrix.label }}.xcresult
           if-no-files-found: ignore
           retention-days: 7

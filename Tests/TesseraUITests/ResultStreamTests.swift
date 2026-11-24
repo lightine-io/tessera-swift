@@ -1,13 +1,12 @@
 import Foundation
-import Synchronization
 import Testing
 import Tessera
 @testable import TesseraUI
 
 /// `MrzCameraScanner.resultStream` and the `KotlinFlowStream` adapter behind it (TES-31): order, main-actor
 /// delivery to a main-actor loop, and that ending the loop ends the Kotlin collection.
-// The package supports iOS 15; `Mutex` (the tests' thread-safe state) needs iOS 18. Swift Testing takes
-// `@available` on each test, not on the suite.
+// The package supports iOS 15, so these tests run there: thread-safe state uses ``Locked`` (an `NSLock`),
+// not `Mutex` (iOS 18), and waits use `Task.sleep(nanoseconds:)`, not `Duration` (iOS 16).
 @MainActor
 struct ResultStreamTests {
     /// A result tagged with `tag` in `recognizedLineCount`, so a test can check the order.
@@ -19,20 +18,18 @@ struct ResultStreamTests {
     }
 
     /// Polls until `condition` holds or `limit` passes. A bounded wait, not a fixed sleep.
-    @available(iOS 18, *)
     private func waitUntil(
-        limit: Duration = .seconds(120),
+        limitSeconds: Double = 120,
         _ condition: @MainActor () -> Bool
     ) async throws -> Bool {
-        let deadline = ContinuousClock.now + limit
-        while ContinuousClock.now < deadline {
+        let deadline = Date().addingTimeInterval(limitSeconds)
+        while Date() < deadline {
             if condition() { return true }
-            try await Task.sleep(for: .milliseconds(10))
+            try await Task.sleep(nanoseconds: 10_000_000)
         }
         return condition()
     }
 
-    @available(iOS 18, *)
     @Test func elementsArriveInOrderOnTheMainActor() async throws {
         let flow = FakeFlow()
         let seen = Recorder()
@@ -50,7 +47,6 @@ struct ResultStreamTests {
         #expect(seen.allOnMain, "a main-actor loop gets every element on the main thread, with no hop of its own")
     }
 
-    @available(iOS 18, *)
     @Test func skipsValuesOfOtherTypes() async throws {
         let flow = FakeFlow()
         let seen = Recorder()
@@ -68,7 +64,6 @@ struct ResultStreamTests {
         #expect(seen.tags == [7])
     }
 
-    @available(iOS 18, *)
     @Test func cancellingTheLoopStopsTheKotlinCollection() async throws {
         let flow = FakeFlow()
         let ended = Flag()
@@ -93,7 +88,6 @@ struct ResultStreamTests {
         #expect(seen.tags == [1], "nothing reaches the loop after it is cancelled")
     }
 
-    @available(iOS 18, *)
     @Test func breakingOutOfTheLoopStopsTheKotlinCollection() async throws {
         let flow = FakeFlow()
         let consumer = Task { @MainActor in
@@ -105,7 +99,6 @@ struct ResultStreamTests {
         #expect(try await waitUntil { flow.collectEnded })
     }
 
-    @available(iOS 18, *)
     @Test func theStreamFinishesWhenTheFlowCompletes() async throws {
         let flow = FakeFlow()
         let seen = Recorder()
@@ -121,10 +114,21 @@ struct ResultStreamTests {
 }
 
 
+/// A value behind an `NSLock`, in place of `Mutex`, which needs iOS 18.
+private final class Locked<Value>: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value: Value
+    init(_ value: Value) { self.value = value }
+    func withLock<R>(_ body: (inout Value) -> R) -> R {
+        lock.lock()
+        defer { lock.unlock() }
+        return body(&value)
+    }
+}
+
 /// A thread-safe flag a `@Sendable` callback can set.
-@available(iOS 18, *)
 private final class Flag: Sendable {
-    private let value = Mutex(false)
+    private let value = Locked(false)
     var isSet: Bool { value.withLock { $0 } }
     func set() { value.withLock { $0 = true } }
 }
@@ -145,12 +149,11 @@ private final class Recorder {
 
 /// A Swift stand-in for a Kotlin `Flow`: values sent with ``send(_:)`` are emitted one at a time, in order,
 /// from the collecting task (off the main actor). Records the error the collector throws, if any.
-@available(iOS 18, *)
 private final class FakeFlow: NSObject, Kotlinx_coroutines_coreFlow, @unchecked Sendable {
     private enum Event: @unchecked Sendable { case value(Any?), complete }
     private let events: AsyncStream<Event>
     private let input: AsyncStream<Event>.Continuation
-    private let state = Mutex<(ended: Bool, error: NSError?)>((false, nil))
+    private let state = Locked<(ended: Bool, error: NSError?)>((false, nil))
 
     override init() {
         (events, input) = AsyncStream.makeStream(of: Event.self)
