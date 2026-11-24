@@ -37,10 +37,25 @@ final class ScannerModel: ObservableObject {
     /// ``handlePickedImage(load:)``, so the model holds no picker-specific type.
     @Published var photoPickerPresented = false
 
-    /// Whether the host has been handed a camera-permission request in this flow - the iOS analogue of the
-    /// Android `hasAsked`. On iOS a status of anything other than `.notDetermined` also means the user has
-    /// been asked, so the permanent-denial face is reached without a separate rationale signal.
-    private var hasAskedPermission = false
+    // No "has asked" flag (the Android `hasAsked`): on iOS the status itself says whether the person has
+    // answered. A tap on Continue is not an answer - the status stays `.notDetermined` while the system dialog
+    // is up and can still read so for a moment after the app becomes active again - so treating the tap as
+    // "asked" showed the Settings face for a request that was about to be granted (TES-343).
+
+    /// The camera authorization status, read and never requested. A seam so a host test can play a grant or a
+    /// denial; the screen always reads AVFoundation.
+    var authorizationStatus: () -> AVAuthorizationStatus = { AVCaptureDevice.authorizationStatus(for: .video) }
+
+    /// How often, in nanoseconds, the permission screen re-reads an undecided status (see
+    /// ``watchPermissionWhileUndecided()``). A seam so a host test need not wait.
+    var permissionPollInterval: UInt64 = 250_000_000
+
+    /// Watches an undecided camera permission while a permission screen shows; `nil` otherwise.
+    private var permissionWatchTask: Task<Void, Never>?
+
+    /// Test-only: when set, called instead of building and starting the real camera, so a host test can see
+    /// that the camera would start without AVFoundation.
+    var cameraStartOverride: (() -> Void)?
 
     /// The trigger for the accepted-read confirm haptic (TES-134): bumped exactly when the live-camera
     /// consensus gate confirms a read, observed by the root view's `.sensoryFeedback` (which gates on
@@ -200,6 +215,8 @@ final class ScannerModel: ObservableObject {
     /// session-level deadline tick loop. Called on disappear.
     func onDisappear() {
         teardownScanner()
+        permissionWatchTask?.cancel()
+        permissionWatchTask = nil
         deadlineTask?.cancel()
         deadlineTask = nil
     }
@@ -563,6 +580,7 @@ final class ScannerModel: ObservableObject {
             case .needsGrant:
                 teardownScanner()
                 state = .permissionNeeded
+                watchPermissionWhileUndecided()
             case .permanentlyDenied:
                 teardownScanner()
                 state = .permissionPermanentlyDenied
@@ -582,24 +600,25 @@ final class ScannerModel: ObservableObject {
 
     /// The permission face to show, computed from the read-only AVFoundation authorization status via the
     /// shared pure ``permissionScreenState(granted:hasAsked:showRationale:)``. iOS has no rationale signal, so
-    /// `showRationale` is always `false`; a determined status (`.denied`/`.restricted`) maps to `hasAsked` so
-    /// the pure function yields the permanently-denied face, and `.notDetermined` yields needs-grant.
+    /// `showRationale` is always `false`; a decided status (`.denied`/`.restricted`) maps to `hasAsked` so
+    /// the pure function yields the permanently-denied face; `.notDetermined` always yields needs-grant.
     private func evaluatePermission() -> PermissionScreenState {
-        let status = AVCaptureDevice.authorizationStatus(for: .video)
+        let status = authorizationStatus()
         return permissionScreenState(
             granted: status == .authorized,
-            hasAsked: hasAskedPermission || status != .notDetermined,
+            hasAsked: status != .notDetermined,
             showRationale: false
         )
     }
 
     /// The permission screen's primary "Continue" action: hand the request to the host (the SDK never
-    /// requests a permission itself). Marks that we've asked so a later denial reaches the permanent-denial
-    /// face on the next foreground re-check. No-op-safe when the host supplied no handler (the screen hides
-    /// the button in that case).
+    /// requests a permission itself), then re-read the status. No-op-safe when the host supplied no handler
+    /// (the screen hides the button in that case).
     func requestPermission() {
-        hasAskedPermission = true
         config.onRequestPermission?()
+        // The host's request may already have been answered (a status decided earlier), so re-read now; an
+        // undecided status keeps being watched until the person answers the system dialog.
+        recheckPermission()
     }
 
     /// Opens this app's Settings page so the user can turn Camera on after a denial - UI navigation, not a
@@ -613,19 +632,61 @@ final class ScannerModel: ObservableObject {
     /// request OR via the Settings screen takes effect without relaunching. Only acts while a permission face
     /// is showing: a fresh grant resumes scanning.
     func recheckPermissionOnForeground() {
+        recheckPermission()
+    }
+
+    /// Re-reads the status while a permission face shows and moves on when it is decided: a grant starts the
+    /// camera, a denial shows the Settings face. Assigns ``state`` directly, so no transition is skipped.
+    private func recheckPermission() {
         switch state {
         case .permissionNeeded, .permissionPermanentlyDenied:
             switch evaluatePermission() {
             case .granted:
+                stopPermissionWatch()
                 transition(to: .scanning(struggling: false, gathering: false))
             case .needsGrant:
                 state = .permissionNeeded
+                watchPermissionWhileUndecided()
             case .permanentlyDenied:
+                stopPermissionWatch()
                 state = .permissionPermanentlyDenied
             }
         default:
-            break
+            stopPermissionWatch()
         }
+    }
+
+    /// While the needs-grant face shows and the status is still undecided, re-reads it every
+    /// ``permissionPollInterval`` and moves on the moment the person answers the system dialog. The foreground
+    /// re-check alone is not enough: the screen cannot see the host's request finish (the callback returns
+    /// nothing), the dialog does not reliably make the scene inactive and active again, and when it does the
+    /// status can still read undecided at that moment. Reads only; never requests. Idempotent.
+    private func watchPermissionWhileUndecided() {
+        guard permissionWatchTask == nil else { return }
+        let interval = permissionPollInterval
+        permissionWatchTask = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: interval)
+                if Task.isCancelled { return }
+                guard let self else { return }
+                let keepWatching = await MainActor.run { () -> Bool in
+                    guard case .permissionNeeded = self.state else {
+                        self.permissionWatchTask = nil
+                        return false
+                    }
+                    guard self.authorizationStatus() != .notDetermined else { return true }
+                    self.permissionWatchTask = nil
+                    self.recheckPermission()
+                    return false
+                }
+                if !keepWatching { return }
+            }
+        }
+    }
+
+    private func stopPermissionWatch() {
+        permissionWatchTask?.cancel()
+        permissionWatchTask = nil
     }
 
     // MARK: - Camera wiring
@@ -637,6 +698,10 @@ final class ScannerModel: ObservableObject {
     /// camera-scoped timer this replaced, it lives at the whole-flow level (``beginSession()``, called once
     /// from ``onAppear()``) and runs independently of whether the camera is even the active method.
     private func startScanningIfNeeded() {
+        if let cameraStartOverride {
+            cameraStartOverride()
+            return
+        }
         if scanner != nil { return }
         struggleTimeoutArmed = false
 

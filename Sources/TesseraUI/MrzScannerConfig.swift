@@ -183,6 +183,9 @@ public struct MrzScannerConfig: Sendable {
     ///
     /// Default: `nil`. The screen reads the camera permission and never requests it. With `nil` the screen has no
     /// grant button and your app owns the request. The closure must be `@Sendable`.
+    /// Ask for the permission in the closure, for example with `AVCaptureDevice.requestAccess(for: .video)`; you
+    /// need not report the answer. The screen keeps reading the permission and starts the camera once it is
+    /// granted, or shows the Settings face once it is denied.
     /// iOS shows its permission dialog once; after a denial the screen offers Settings.
     public var onRequestPermission: (@Sendable () -> Void)?
 
