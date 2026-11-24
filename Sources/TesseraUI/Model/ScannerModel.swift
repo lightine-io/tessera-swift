@@ -50,8 +50,9 @@ final class ScannerModel: ObservableObject {
     /// ``watchPermissionWhileUndecided()``). A seam so a host test need not wait.
     var permissionPollInterval: UInt64 = 250_000_000
 
-    /// Watches an undecided camera permission while a permission screen shows; `nil` otherwise.
-    private var permissionWatchTask: Task<Void, Never>?
+    /// Watches an undecided camera permission while a permission screen shows; `nil` otherwise. Readable
+    /// inside the module so a host test can say whether the watcher runs.
+    private(set) var permissionWatchTask: Task<Void, Never>?
 
     /// Test-only: when set, called instead of building and starting the real camera, so a host test can see
     /// that the camera would start without AVFoundation.
