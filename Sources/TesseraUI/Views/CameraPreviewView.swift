@@ -326,8 +326,8 @@ struct InitializingContent: View {
                 .accessibilityHidden(true) // Decorative — the title carries the meaning.
             Text(TesseraStrings.string("tessera_scanner_initializing_title", bundle: stringsBundle))
                 .font(.title2)
+                .accessibilityAddTraits(.isHeader)
                 .multilineTextAlignment(.center)
-                .accessibilityAddTraits(.updatesFrequently)
             Text(TesseraStrings.string("tessera_scanner_initializing_body", bundle: stringsBundle))
                 .font(.callout)
                 .foregroundStyle(.secondary)

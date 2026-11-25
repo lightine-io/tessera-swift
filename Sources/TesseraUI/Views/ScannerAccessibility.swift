@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // What VoiceOver says for each control of the scanner screens (TES-58), kept in one place so a test can check it.
 //
@@ -136,5 +137,16 @@ extension View {
     /// Gives this control the spoken name from ``ScannerControl/spokenLabel(bundle:)``.
     func scannerControl(_ control: ScannerControl, bundle: Bundle?) -> some View {
         accessibilityLabel(control.spokenLabel(bundle: bundle))
+    }
+}
+
+/// Tells VoiceOver a new screen arrived (TES-298): it moves to the new content and, when `title` is given,
+/// speaks it. The scanner swaps screens inside one presented view, so the system sends no such signal itself.
+/// The post is deferred one turn so the new screen is in the accessibility tree when VoiceOver looks.
+@MainActor
+func postScreenChanged(title: String?) {
+    DispatchQueue.main.async {
+        // The UIKit call, not `AccessibilityNotification` (iOS 17): the package runs on iOS 15.
+        UIAccessibility.post(notification: .screenChanged, argument: title)
     }
 }

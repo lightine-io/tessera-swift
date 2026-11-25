@@ -362,7 +362,7 @@ func formatCountdown(_ remaining: TimeInterval) -> String {
     return "\(minutes):\(secsString)"
 }
 
-// MARK: - VoiceOver announce-on-arrival (TES-58)
+// MARK: - VoiceOver screen titles (TES-58, TES-298)
 
 /// The VoiceOver announcement key to post when the flow transitions INTO `state`, or `nil` when the state
 /// carries none - the iOS mirror of the Android live-region placements across `ReviewScreen.kt`
@@ -397,6 +397,61 @@ func announcementKey(for state: ScannerState) -> String? {
         return notAcceptedTitleKey(read)
     default:
         return nil
+    }
+}
+
+// MARK: - VoiceOver screen change (TES-298)
+
+/// Which full screen a ``ScannerState`` shows. States that differ only by an overlay or a toggle on one screen
+/// (the struggling / gathering / not-accepted overlays on the camera, the expanded review, the inline notes on
+/// manual entry) share one value, so they do not count as a new screen.
+enum ScannerScreen: Equatable {
+    case camera, permissionNeeded, permissionDenied, cameraInUse, cameraUnavailable
+    case review, readFailed
+    case awaitingPhoto, analyzingPhoto, photoEmpty, photoNotAccepted
+    case manualEntry
+}
+
+/// The screen `state` shows.
+func screen(of state: ScannerState) -> ScannerScreen {
+    switch state {
+    case .scanning: .camera
+    case .permissionNeeded: .permissionNeeded
+    case .permissionPermanentlyDenied: .permissionDenied
+    case .cameraInUse: .cameraInUse
+    case .cameraUnavailable: .cameraUnavailable
+    case .review: .review
+    case .readFailed: .readFailed
+    case .awaitingSavedImagePick: .awaitingPhoto
+    case .savedImageAnalyzing: .analyzingPhoto
+    case .savedImageEmpty: .photoEmpty
+    case .savedImageNotAccepted: .photoNotAccepted
+    case .manualRaw: .manualEntry
+    }
+}
+
+/// What VoiceOver should be told when the scanner switches from `old` to `new`: `nil` when it stays on the same
+/// screen, otherwise a screen-changed notification (the SwiftUI / UIKit "a new screen arrived" signal that moves
+/// VoiceOver to the new content) carrying the catalog key of the screen's title to speak, or no key for the live
+/// camera, which has no title. The Android mirror is the live region on each screen's title.
+struct ScreenChange: Equatable {
+    let titleKey: String?
+}
+
+func screenChange(from old: ScannerState, to new: ScannerState) -> ScreenChange? {
+    guard screen(of: old) != screen(of: new) else { return nil }
+    return ScreenChange(titleKey: screenTitleKey(for: new))
+}
+
+/// The catalog key of the title of the screen `state` shows, or `nil` for the live camera.
+func screenTitleKey(for state: ScannerState) -> String? {
+    if let key = announcementKey(for: state) { return key }
+    switch state {
+    case .permissionNeeded: return "tessera_scanner_permission_grant_title"
+    case .permissionPermanentlyDenied: return "tessera_scanner_permission_denied_title"
+    case .awaitingSavedImagePick: return "tessera_scanner_saved_image_prompt_title"
+    case .manualRaw: return "tessera_scanner_manual_title"
+    default: return nil
     }
 }
 

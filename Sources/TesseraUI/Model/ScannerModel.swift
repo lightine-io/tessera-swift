@@ -298,20 +298,14 @@ final class ScannerModel: ObservableObject {
         }
     }
 
-    // MARK: - VoiceOver announce-on-arrival (TES-58)
-
-    /// Posts a VoiceOver announcement for `state`'s arrival, if it carries one (``announcementKey(for:)`` in
-    /// ScannerDecisions.swift) - the iOS mirror of the Android live regions (`liveRegion =
-    /// Assertive`/`Polite`). `UIAccessibility.announcement` has no polite/assertive tier, so both groups are
-    /// posted identically here, immediately on arrival.
-    private func postAnnouncement(for state: ScannerState) {
-        guard let key = announcementKey(for: state) else { return }
-        postAnnouncement(key: key)
-    }
+    // MARK: - VoiceOver announcements (TES-58)
+    //
+    // A new screen is announced by the root view with a screen-changed notification (TES-298); the
+    // announcements here are for overlays and notices that appear on a screen that stays.
 
     /// Posts a plain-text VoiceOver announcement for a localization `key` directly - used for the
     /// struggling/gathering overlays, a rising-edge flag on `.scanning` rather than a distinct
-    /// ``ScannerState`` case, so they can't go through ``postAnnouncement(for:)``'s state-keyed mapping. Every
+    /// ``ScannerState`` case, so they are not a screen change. Every
     /// call site guards this to fire once, on the transition into the overlay - never on every recompute of
     /// an already-showing one, mirroring the Android `StrugglingHint`/`GatheringHint` polite live regions.
     private func postAnnouncement(key: String) {
@@ -447,7 +441,6 @@ final class ScannerModel: ObservableObject {
     /// `NSItemProvider` below), so the model needs neither type. Mirrors the Android `readPickedImage`.
     func handlePickedImage(load: @escaping @MainActor () async -> Data?) {
         state = .savedImageAnalyzing
-        postAnnouncement(for: .savedImageAnalyzing)
         Task { await readPickedPhoto(await load()) }
     }
 
@@ -465,7 +458,6 @@ final class ScannerModel: ObservableObject {
             let url = writeTempImage(data)
         else {
             state = .savedImageEmpty
-            postAnnouncement(for: .savedImageEmpty)
             return
         }
         defer { try? FileManager.default.removeItem(at: url) }
@@ -512,7 +504,6 @@ final class ScannerModel: ObservableObject {
         decodeRouted = false
         guard let result else {
             state = .savedImageEmpty
-            postAnnouncement(for: .savedImageEmpty)
             return
         }
         switch mapSavedImageResult(result) {
@@ -520,7 +511,6 @@ final class ScannerModel: ObservableObject {
             routeThroughDecode(decoded, source: .savedImage)
         case .empty:
             state = .savedImageEmpty
-            postAnnouncement(for: .savedImageEmpty)
         }
     }
 
@@ -565,7 +555,6 @@ final class ScannerModel: ObservableObject {
 
     private func transition(to newState: ScannerState) {
         state = newState
-        postAnnouncement(for: newState)
         applyStateEntry(newState)
     }
 
@@ -945,11 +934,11 @@ final class ScannerModel: ObservableObject {
                 showLiveNotAcceptedNotice(read)
             }
         case .goCameraInUse:
-            // Can arrive on every frame while another app holds the camera: publish and announce only the
-            // first, so the screen is not rebuilt and VoiceOver not re-told at frame rate.
-            if updateState(.cameraInUse) { postAnnouncement(for: .cameraInUse) }
+            // Can arrive on every frame while another app holds the camera: publish only the first, so the
+            // screen is not rebuilt at frame rate.
+            updateState(.cameraInUse)
         case .goCameraUnavailable:
-            if updateState(.cameraUnavailable) { postAnnouncement(for: .cameraUnavailable) }
+            updateState(.cameraUnavailable)
         case .stayScanning:
             // A transient miss. If a recoverable camera-in-use notice is showing, a clean frame proves the
             // camera reconnected — return to scanning.

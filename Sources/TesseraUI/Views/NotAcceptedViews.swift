@@ -25,7 +25,6 @@ internal struct NotAcceptedHint: View {
         .multilineTextAlignment(.center)
         .padding(24)
         .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.updatesFrequently)
         .accessibilityIdentifier("tessera-mrz-not-accepted-hint")
     }
 }

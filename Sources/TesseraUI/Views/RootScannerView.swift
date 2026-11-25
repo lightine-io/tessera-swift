@@ -52,6 +52,14 @@ struct RootScannerView: View {
             isPresented: $model.photoPickerPresented,
             onPick: { model.handlePickedImage(load: $0) }
         )
+        // VoiceOver: a new screen is announced when it arrives (TES-298). Keyed on the screen, so an overlay or a
+        // toggle on the same screen (struggling hint, expanded review) does not re-announce.
+        .compatOnChange(of: screen(of: model.state)) { _ in
+            let title = screenTitleKey(for: model.state).map {
+                TesseraStrings.string($0, bundle: config.stringsBundle)
+            }
+            postScreenChanged(title: title)
+        }
         .compatOnChange(of: scenePhase) { phase in
             // Forwards to the session-level scan deadline (TES-124/126) — it advances only while `.active`,
             // pausing on background/inactive and resuming from the accumulated elapsed time, never restarting.
@@ -108,7 +116,6 @@ struct RootScannerView: View {
                     }
                     .padding(16)
                     .scannerControl(.torch, bundle: config.stringsBundle)
-                    .accessibilityAddTraits(model.torchOn ? .isSelected : [])
                     .accessibilityValue(torchAccessibilityValue(on: model.torchOn, bundle: config.stringsBundle))
                     .accessibilityIdentifier("tessera-mrz-torch")
                 }

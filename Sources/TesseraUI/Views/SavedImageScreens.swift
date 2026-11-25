@@ -23,6 +23,7 @@ internal struct AwaitingSavedImagePickScreen: View {
                 Spacer()
                 Text(TesseraStrings.string("tessera_scanner_saved_image_prompt_title", bundle: stringsBundle))
                     .font(.title2.weight(.semibold))
+                    .accessibilityAddTraits(.isHeader)
                     .multilineTextAlignment(.center)
                 Text(TesseraStrings.string("tessera_scanner_saved_image_prompt_body", bundle: stringsBundle))
                     .font(.body)
@@ -63,7 +64,7 @@ internal struct SavedImageAnalyzingScreen: View {
         VStack(spacing: 16) {
             Text(TesseraStrings.string("tessera_scanner_saved_image_analyzing_title", bundle: stringsBundle))
                 .font(.title2.weight(.semibold))
-                .accessibilityAddTraits(.updatesFrequently)
+                .accessibilityAddTraits(.isHeader)
 
             ProgressView()
                 .controlSize(.large)
@@ -102,6 +103,7 @@ internal struct SavedImageEmptyScreen: View {
         VStack(alignment: .leading, spacing: 16) {
             Text(TesseraStrings.string("tessera_scanner_saved_image_empty_title", bundle: stringsBundle))
                 .font(.title2.weight(.semibold))
+                .accessibilityAddTraits(.isHeader)
             Text(TesseraStrings.string("tessera_scanner_saved_image_empty_body", bundle: stringsBundle))
                 .font(.body)
 
