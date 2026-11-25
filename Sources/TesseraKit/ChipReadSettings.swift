@@ -98,7 +98,9 @@ public enum ChipReadPolling: Sendable, Equatable, CaseIterable {
 /// - `maxSessionRenewals` below 0 becomes 0 (off);
 /// - `sessionRenew` of `nil` or 0 is off; any other value below 5 seconds (or not a number) becomes
 ///   5 seconds, and one above a day becomes a day;
-/// - `busyRetry` of `nil`, 0, below 0 or not a number is off; one above a day becomes a day.
+/// - `busyRetry` of `nil`, 0, below 0 or not a number is off; one above a day becomes a day;
+/// - `tagTimeLimit` of `nil` or 0 is off; any other value below 10 seconds (or not a number) becomes
+///   10 seconds, and one above 60 seconds becomes 60 seconds.
 ///
 /// Read ``normalized`` to see the values that will be used. Times are in seconds and are rounded to
 /// whole milliseconds for the reader.
@@ -135,17 +137,21 @@ public struct ChipReadSettings {
     public var searchRestart: TimeInterval?
     /// How many times one read may close its system session and open a new one while no document was
     /// reported (see ``ChipReadPhase/renewingSession(renewal:)``): after the system's own end with
-    /// code 202, or after ``sessionRenew`` passed. The system sheet closes and opens again. Default 2.
+    /// code 202, or after ``sessionRenew`` passed. The system sheet closes and opens again. Default 1.
     /// 0 turns renewals off. A value below 0 becomes 0.
     public var maxSessionRenewals: Int
     /// How long a system session may go with no document reported before the read opens a new one,
-    /// while ``maxSessionRenewals`` allows. Default 10 seconds, well before the system's own end at
-    /// about 22 seconds. `nil` (or 0) turns it off; the renewal after the system's code 202 still
-    /// happens. Any other value is at least 5 seconds.
+    /// while ``maxSessionRenewals`` allows. Default `nil`: off. The renewal after the system's code 202
+    /// still happens. Any other value is at least 5 seconds; 0 is also off.
     public var sessionRenew: TimeInterval?
     /// How long the read keeps trying to begin a system session that the system refuses as busy.
     /// Default 6 seconds. `nil` (or 0) turns the tries off.
     public var busyRetry: TimeInterval?
+    /// How long the read uses one connection to the document before it restarts the search on purpose,
+    /// before the system's own limit of about 20 seconds on one connection, and goes on from the same
+    /// byte. Nothing new is shown to the app. Default 18 seconds. `nil` (or 0) turns it off; any other
+    /// value is from 10 to 60 seconds.
+    public var tagTimeLimit: TimeInterval?
     /// Where the read's step events go (see ``ChipReadStepSink``); `nil` uses the sink registered in
     /// `TelemetrySinkRegistry`, which drops everything when none is registered.
     public var telemetry: (any TelemetrySink)?
@@ -162,9 +168,10 @@ public struct ChipReadSettings {
         readTimeout: TimeInterval = 2,
         searchRestart: TimeInterval? = 4,
         polling: ChipReadPolling = .automatic,
-        maxSessionRenewals: Int = 2,
-        sessionRenew: TimeInterval? = 10,
-        busyRetry: TimeInterval? = 6
+        maxSessionRenewals: Int = 1,
+        sessionRenew: TimeInterval? = nil,
+        busyRetry: TimeInterval? = 6,
+        tagTimeLimit: TimeInterval? = 18
     ) {
         self.linkLoss = linkLoss
         self.settleDelay = settleDelay
@@ -178,6 +185,7 @@ public struct ChipReadSettings {
         self.maxSessionRenewals = maxSessionRenewals
         self.sessionRenew = sessionRenew
         self.busyRetry = busyRetry
+        self.tagTimeLimit = tagTimeLimit
     }
 
     /// The Kotlin `searchRestartMillis`: 0 for off, otherwise 2000 or more.
@@ -190,6 +198,12 @@ public struct ChipReadSettings {
     private static func sessionRenewMillis(_ seconds: TimeInterval?) -> Int64 {
         guard let seconds, seconds != 0 else { return 0 }
         return millis(seconds, minimum: 5_000)
+    }
+
+    /// The Kotlin `tagTimeLimitMillis`: 0 for off, otherwise 10000 to 60000.
+    private static func tagTimeLimitMillis(_ seconds: TimeInterval?) -> Int64 {
+        guard let seconds, seconds != 0 else { return 0 }
+        return min(millis(seconds, minimum: 10_000), 60_000)
     }
 
     /// The Kotlin `busyRetryMillis`: 0 for off (also for a negative or missing number), otherwise at
@@ -226,7 +240,8 @@ public struct ChipReadSettings {
             polling: polling,
             maxSessionRenewals: Int(Self.renewalCount(maxSessionRenewals)),
             sessionRenew: sessionRenew.flatMap { $0 == 0 ? nil : TimeInterval(Self.sessionRenewMillis($0)) / 1000 },
-            busyRetry: Self.busyRetryMillis(busyRetry) == 0 ? nil : TimeInterval(Self.busyRetryMillis(busyRetry)) / 1000
+            busyRetry: Self.busyRetryMillis(busyRetry) == 0 ? nil : TimeInterval(Self.busyRetryMillis(busyRetry)) / 1000,
+            tagTimeLimit: Self.tagTimeLimitMillis(tagTimeLimit) == 0 ? nil : TimeInterval(Self.tagTimeLimitMillis(tagTimeLimit)) / 1000
         )
     }
 
@@ -247,6 +262,7 @@ public struct ChipReadSettings {
             .maxSessionRenewals(count: Self.renewalCount(maxSessionRenewals))
             .sessionRenewMillis(millis: Self.sessionRenewMillis(sessionRenew))
             .busyRetryMillis(millis: Self.busyRetryMillis(busyRetry))
+            .tagTimeLimitMillis(millis: Self.tagTimeLimitMillis(tagTimeLimit))
             // The Swift layer orders and buffers updates itself (see `ChipReadingCore`), so the
             // reader's own thread is enough: asking for the main queue would add one more hop.
             .observerOn(thread: .caller)
@@ -268,7 +284,8 @@ public struct ChipReadSettings {
             polling: ChipReadPolling(kotlin: settings.polling),
             maxSessionRenewals: Int(settings.maxSessionRenewals),
             sessionRenew: settings.sessionRenewMillis == 0 ? nil : TimeInterval(settings.sessionRenewMillis) / 1000,
-            busyRetry: settings.busyRetryMillis == 0 ? nil : TimeInterval(settings.busyRetryMillis) / 1000
+            busyRetry: settings.busyRetryMillis == 0 ? nil : TimeInterval(settings.busyRetryMillis) / 1000,
+            tagTimeLimit: settings.tagTimeLimitMillis == 0 ? nil : TimeInterval(settings.tagTimeLimitMillis) / 1000
         )
     }
 }

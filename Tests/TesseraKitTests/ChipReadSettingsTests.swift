@@ -169,17 +169,34 @@ struct ChipReadSettingsTests {
     @Test func theRenewalAndBusyRetryDefaultsAreTheKotlinDefaults() {
         let swift = ChipReadSettings()
         #expect(swift.maxSessionRenewals == Int(CoreNfcReadSettings.companion.DEFAULT_MAX_SESSION_RENEWALS))
-        #expect(swift.maxSessionRenewals == 2)
-        #expect(swift.sessionRenew == 10)
+        #expect(swift.maxSessionRenewals == 1)
+        #expect(swift.sessionRenew == nil)
         #expect(swift.busyRetry == 6)
+        #expect(swift.tagTimeLimit == 18)
         let kotlin = swift.kotlinSettings()
-        #expect(kotlin.maxSessionRenewals == 2)
-        #expect(kotlin.sessionRenewMillis == 10_000)
+        #expect(kotlin.maxSessionRenewals == 1)
+        #expect(kotlin.sessionRenewMillis == 0)
         #expect(kotlin.busyRetryMillis == 6_000)
+        #expect(kotlin.tagTimeLimitMillis == 18_000)
         let back = ChipReadSettings(CoreNfcReadSettings())
-        #expect(back.maxSessionRenewals == 2)
-        #expect(back.sessionRenew == 10)
+        #expect(back.maxSessionRenewals == 1)
+        #expect(back.sessionRenew == nil)
         #expect(back.busyRetry == 6)
+        #expect(back.tagTimeLimit == 18)
+    }
+
+    @Test func theTagTimeLimitIsClampedAndCanBeTurnedOff() {
+        #expect(ChipReadSettings(tagTimeLimit: nil).kotlinSettings().tagTimeLimitMillis == 0)
+        #expect(ChipReadSettings(tagTimeLimit: 0).kotlinSettings().tagTimeLimitMillis == 0)
+        #expect(ChipReadSettings(tagTimeLimit: 0).normalized.tagTimeLimit == nil)
+        #expect(ChipReadSettings(tagTimeLimit: 3).kotlinSettings().tagTimeLimitMillis == 10_000)
+        #expect(ChipReadSettings(tagTimeLimit: -3).normalized.tagTimeLimit == 10)
+        #expect(ChipReadSettings(tagTimeLimit: .nan).kotlinSettings().tagTimeLimitMillis == 10_000)
+        #expect(ChipReadSettings(tagTimeLimit: 25.5).kotlinSettings().tagTimeLimitMillis == 25_500)
+        #expect(ChipReadSettings(tagTimeLimit: 1e12).kotlinSettings().tagTimeLimitMillis == 60_000)
+        #expect(ChipReadSettings(tagTimeLimit: .infinity).normalized.tagTimeLimit == 60)
+        let kotlin = ChipReadSettings(tagTimeLimit: 30).kotlinSettings()
+        #expect(ChipReadSettings(kotlin).tagTimeLimit == 30)
     }
 
     @Test func renewalsAndBusyRetryCanBeTurnedOff() throws {

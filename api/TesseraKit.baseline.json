@@ -8302,6 +8302,124 @@
          {
           "children": [
            {
+            "children": [
+             {
+              "kind": "TypeNominal",
+              "name": "Double",
+              "printedName": "Swift.Double",
+              "usr": "s:Sd"
+             }
+            ],
+            "kind": "TypeNameAlias",
+            "name": "TimeInterval",
+            "printedName": "Foundation.TimeInterval"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Foundation.TimeInterval?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit16ChipReadSettingsV12tagTimeLimitSdSgvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit16ChipReadSettingsV12tagTimeLimitSdSgvg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "kind": "TypeNominal",
+              "name": "Double",
+              "printedName": "Swift.Double",
+              "usr": "s:Sd"
+             }
+            ],
+            "kind": "TypeNameAlias",
+            "name": "TimeInterval",
+            "printedName": "Foundation.TimeInterval"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Foundation.TimeInterval?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit16ChipReadSettingsV12tagTimeLimitSdSgvs",
+        "moduleName": "TesseraKit",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:10TesseraKit16ChipReadSettingsV12tagTimeLimitSdSgvs"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Double",
+            "printedName": "Swift.Double",
+            "usr": "s:Sd"
+           }
+          ],
+          "kind": "TypeNameAlias",
+          "name": "TimeInterval",
+          "printedName": "Foundation.TimeInterval"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Foundation.TimeInterval?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declAttributes": [
+       "HasInitialValue",
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit16ChipReadSettingsV12tagTimeLimitSdSgvp",
+      "moduleName": "TesseraKit",
+      "name": "tagTimeLimit",
+      "printedName": "tagTimeLimit",
+      "usr": "s:10TesseraKit16ChipReadSettingsV12tagTimeLimitSdSgvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
             "kind": "TypeNominal",
             "name": "TelemetrySink",
             "printedName": "any Tessera.TelemetrySink",
@@ -8642,16 +8760,38 @@
         "name": "Optional",
         "printedName": "Foundation.TimeInterval?",
         "usr": "s:Sq"
+       },
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Double",
+            "printedName": "Swift.Double",
+            "usr": "s:Sd"
+           }
+          ],
+          "kind": "TypeNameAlias",
+          "name": "TimeInterval",
+          "printedName": "Foundation.TimeInterval"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Foundation.TimeInterval?",
+        "usr": "s:Sq"
        }
       ],
       "declKind": "Constructor",
       "init_kind": "Designated",
       "kind": "Constructor",
-      "mangledName": "$s10TesseraKit16ChipReadSettingsV8linkLoss11settleDelay14commandTimeout0jK12BeforeAccess18waitAfterSystemEnd9telemetry04readK013searchRestart7polling18maxSessionRenewals12sessionRenew9busyRetryAcA04LinkG0O_S4dSo0A13TelemetrySink_pSgS2dSgAA0cD7PollingOSiA2Ttcfc",
+      "mangledName": "$s10TesseraKit16ChipReadSettingsV8linkLoss11settleDelay14commandTimeout0jK12BeforeAccess18waitAfterSystemEnd9telemetry04readK013searchRestart7polling18maxSessionRenewals12sessionRenew9busyRetry12tagTimeLimitAcA04LinkG0O_S4dSo0A13TelemetrySink_pSgS2dSgAA0cD7PollingOSiA3Utcfc",
       "moduleName": "TesseraKit",
       "name": "init",
-      "printedName": "init(linkLoss:settleDelay:commandTimeout:commandTimeoutBeforeAccess:waitAfterSystemEnd:telemetry:readTimeout:searchRestart:polling:maxSessionRenewals:sessionRenew:busyRetry:)",
-      "usr": "s:10TesseraKit16ChipReadSettingsV8linkLoss11settleDelay14commandTimeout0jK12BeforeAccess18waitAfterSystemEnd9telemetry04readK013searchRestart7polling18maxSessionRenewals12sessionRenew9busyRetryAcA04LinkG0O_S4dSo0A13TelemetrySink_pSgS2dSgAA0cD7PollingOSiA2Ttcfc"
+      "printedName": "init(linkLoss:settleDelay:commandTimeout:commandTimeoutBeforeAccess:waitAfterSystemEnd:telemetry:readTimeout:searchRestart:polling:maxSessionRenewals:sessionRenew:busyRetry:tagTimeLimit:)",
+      "usr": "s:10TesseraKit16ChipReadSettingsV8linkLoss11settleDelay14commandTimeout0jK12BeforeAccess18waitAfterSystemEnd9telemetry04readK013searchRestart7polling18maxSessionRenewals12sessionRenew9busyRetry12tagTimeLimitAcA04LinkG0O_S4dSo0A13TelemetrySink_pSgS2dSgAA0cD7PollingOSiA3Utcfc"
      },
      {
       "accessors": [
