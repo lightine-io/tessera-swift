@@ -132,6 +132,7 @@ public struct ChipProgress: @unchecked Sendable, Equatable {
     /// The Kotlin object, when this value came from the reader.
     var kotlin: ChipReadProgress? { raw }
 
+    /// Two values are equal when fraction, percent, files done and files planned are all equal.
     public static func == (lhs: ChipProgress, rhs: ChipProgress) -> Bool {
         lhs.fraction == rhs.fraction && lhs.percent == rhs.percent
             && lhs.filesDone == rhs.filesDone && lhs.filesPlanned == rhs.filesPlanned

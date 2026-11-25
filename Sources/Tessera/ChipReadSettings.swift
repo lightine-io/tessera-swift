@@ -158,6 +158,7 @@ public struct ChipReadSettings {
     /// What the system session polls for. Default ``ChipReadPolling/automatic``.
     public var polling: ChipReadPolling
 
+    /// Creates the settings. Every parameter has the default named on its property.
     public init(
         linkLoss: LinkLoss = .resume(2),
         settleDelay: TimeInterval = 0.4,
@@ -304,6 +305,7 @@ public struct ChipReadStepEvent: Sendable, Equatable {
     /// The step, as the Kotlin name of `ChipReadStep` (`READ_FILE`, `PACE`, `BAC`, ...). A string, so a
     /// step added later still comes through.
     public let step: String
+    /// How the step went.
     public let outcome: ChipReadStepResult
     /// The access protocol, for the steps that have one.
     public let `protocol`: String?
@@ -313,6 +315,7 @@ public struct ChipReadStepEvent: Sendable, Equatable {
     public let byteCount: Int?
     /// The chip's status word, when it answered with one.
     public let statusWord: Int?
+    /// How long the step took, in milliseconds.
     public let durationMillis: Int64
     /// The platform's own code, for a step that ended on one: the `SESSION_END` step, with Core NFC's
     /// `NFCReaderError` code, and the `SESSION_RENEW` step, with 202 when the system's end led to the
@@ -322,6 +325,7 @@ public struct ChipReadStepEvent: Sendable, Equatable {
     /// other step.
     public let renewal: Int?
 
+    /// Creates a step event. Only `step` and `outcome` are required.
     public init(
         step: String, outcome: ChipReadStepResult, protocol: String? = nil, fileId: Int? = nil,
         byteCount: Int? = nil, statusWord: Int? = nil, durationMillis: Int64 = 0, systemCode: Int? = nil,
@@ -375,10 +379,12 @@ public final class ChipReadStepSink: NSObject, TelemetrySink, @unchecked Sendabl
     // Immutable, and the closure is `@Sendable`: nothing here changes after init.
     private let handler: @Sendable (ChipReadStepEvent) -> Void
 
+    /// Creates the sink. `handler` receives each read step event.
     public init(_ handler: @escaping @Sendable (ChipReadStepEvent) -> Void) {
         self.handler = handler
     }
 
+    /// Receives an event from the reader and passes read steps to the closure; other events are ignored.
     public func record(event: any TelemetryEvent) {
         guard let step = event as? ChipReadEvent else { return }
         handler(ChipReadStepEvent(step))

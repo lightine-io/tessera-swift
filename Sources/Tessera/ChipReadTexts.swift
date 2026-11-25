@@ -82,11 +82,13 @@ public final class ChipReadTexts: NSObject, CoreNfcSheetTexts, @unchecked Sendab
 
     // MARK: CoreNfcSheetTexts
 
+    /// The system sheet text for one update: your own text when you gave one for updates, otherwise the default text.
     public func textFor(update: ChipReadUpdate) -> String {
         let snapshot = ChipReadSnapshot(update)
         return textForSnapshot(snapshot) ?? CoreNfcDefaultSheetTexts.shared.textFor(update: update)
     }
 
+    /// The system sheet text for the ending: your own text when you gave one for endings, otherwise the default text.
     public func textForEnding(ending: ChipReadEnding) -> String {
         textForFinish(ChipReadFinish(ending)) ?? CoreNfcDefaultSheetTexts.shared.textForEnding(ending: ending)
     }

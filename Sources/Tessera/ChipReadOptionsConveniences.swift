@@ -9,6 +9,7 @@ public enum ChipReadOptionsError: Error, Sendable, Equatable, CustomStringConver
     /// default ones.
     case noDataGroupsChosen
 
+    /// A short plain-text description of the error, with what to do instead.
     public var description: String {
         switch self {
         case .noDataGroupsChosen:

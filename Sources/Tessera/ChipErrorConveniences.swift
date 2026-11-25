@@ -82,9 +82,12 @@ public enum PrintedFieldMatch: String, Sendable, Equatable, CaseIterable {
 ///
 /// - Since: 1.0.0
 public struct PrintedFieldComparison: Sendable, Equatable {
+    /// The field that was compared.
     public let field: ChipKeyField
+    /// How the field came out: `same`, `different` or `notComparable`.
     public let match: PrintedFieldMatch
 
+    /// Creates the comparison of one field.
     public init(field: ChipKeyField, match: PrintedFieldMatch) {
         self.field = field
         self.match = match
@@ -109,6 +112,7 @@ public struct PrintedMrzComparison: Sendable, Equatable {
     /// `true` when the format is the same and no field is `different` or `notComparable`.
     public var allSame: Bool { sameFormat && fields.allSatisfy { $0.match == .same } }
 
+    /// Creates the comparison from the format result and the per-field results.
     public init(sameFormat: Bool, fields: [PrintedFieldComparison]) {
         self.sameFormat = sameFormat
         self.fields = fields

@@ -209,7 +209,7 @@ struct RootScannerView: View {
 typealias PickedImageLoader = @MainActor () async -> Data?
 
 /// Presents SwiftUI's photo picker while `isPresented` is true: images only, a single photo. A pick hands a
-/// loader to `onPick` (the selection is held here, not in the model); a cancel just dismisses. Below iOS 16
+/// loader to `onPick` (the selection is held here, not in the model); a cancel only dismisses. Below iOS 16
 /// ``View/compatSavedImagePicker(isPresented:onPick:)`` presents a `PHPickerViewController` instead.
 @available(iOS 16, *)
 struct SavedImagePhotosPicker: ViewModifier {

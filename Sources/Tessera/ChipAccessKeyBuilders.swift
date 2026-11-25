@@ -96,6 +96,7 @@ public enum ChipAccessKeyError: Error, Sendable, Equatable, CustomStringConverti
     /// character that is not a digit, counted from 0, for `.characterNotAllowed`; never the character.
     case canNotBuilt(problem: ChipCanProblem, characterIndex: Int?)
 
+    /// A short plain-text description of the error.
     public var description: String {
         switch self {
         case .checkDigitNotOneCharacter(let parameter): return "\(parameter) must be one character"
@@ -148,8 +149,11 @@ extension ChipAccessKeyError {
 ///
 /// - Since: 1.0.0
 public struct NormalizedTypedFields: Sendable, Equatable {
+    /// The document number after tidying.
     public let documentNumber: String
+    /// The date of birth after tidying.
     public let dateOfBirth: String
+    /// The date of expiry after tidying.
     public let dateOfExpiry: String
     /// The fields whose text changed, in the order document number, date of birth, date of expiry.
     public let changedFields: [ChipKeyField]
@@ -157,6 +161,7 @@ public struct NormalizedTypedFields: Sendable, Equatable {
     /// `true` when at least one field changed.
     public var wasChanged: Bool { !changedFields.isEmpty }
 
+    /// Creates the value from the three tidied fields and the list of fields that changed.
     public init(documentNumber: String, dateOfBirth: String, dateOfExpiry: String, changedFields: [ChipKeyField] = []) {
         self.documentNumber = documentNumber
         self.dateOfBirth = dateOfBirth

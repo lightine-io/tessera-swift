@@ -5,7 +5,7 @@ import TesseraCore
 ///
 /// The Kotlin reader owns the whole NFC session: the system sheet, the radio, link loss and the file
 /// reads. This type draws nothing. It turns the reader's callbacks into `async` Swift, so an app can
-/// read a chip without linking the scanner screen. You never touch a Kotlin boxing type on the easy
+/// read a chip without linking the scanner screen. You never touch a Kotlin boxing type on the plain
 /// path: updates and the ending are Swift values (``ChipReadSnapshot``, ``ChipReadFinish``).
 ///
 /// The shortest use, three lines:

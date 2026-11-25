@@ -289,9 +289,9 @@ internal struct ReviewScreen: View {
     // MARK: - Observations
 
     /// The observation set for the decoded reading (mockups 03 / 03b): the shared per-check verdict from
-    /// ``parseObservations`` plus a provenance INFO line naming the read method — and, when the reader
+    /// ``parseObservations`` plus a provenance INFO line naming the read method - and, when the reader
     /// padded the end of the name line (Kotlin `MrzScanResult.Decoded.fillerPadding`), a note stating that
-    /// right after it — slotted before the advisory so "some checks did not match" stays last. Mirrors the
+    /// right after it - slotted before the advisory so "some checks did not match" stays last. Mirrors the
     /// Android `reviewObservations`.
     var reviewObservations: [ReviewObservation] {
         let parse = decoded.parse
