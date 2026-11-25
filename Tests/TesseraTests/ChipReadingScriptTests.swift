@@ -44,6 +44,13 @@ struct ChipReadingScriptTests {
         #expect(finish.raw == nil)
     }
 
+    @Test(arguments: [TimeInterval.nan, .infinity, -.infinity, -1])
+    func aDelayThatIsNotAUsableNumberCountsAsNoDelay(delay: TimeInterval) async {
+        let ending = ChipReadFinish(outcome: .cancelled(byPerson: true), attempts: 1, progress: .zero)
+        let reading = ChipReading.makeForTesting(updates: [], ending: ending, delay: delay)
+        #expect(await reading.ending.attempts == 1)
+    }
+
     @Test func switchOverTheScriptedPhasesReachesEveryValueCase() async {
         let reading = ChipReading.makeForTesting(phases: phases, outcome: .cancelled(byPerson: false))
         var waited: TimeInterval?

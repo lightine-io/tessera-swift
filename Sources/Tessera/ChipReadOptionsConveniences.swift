@@ -25,12 +25,16 @@ extension ChipReadOptions.Builder {
     /// certificate's validity period and the issue date check need a time from you. Pass `Date()`
     /// for "now", or the time you trust (a server time, for example).
     ///
-    /// The time is passed to the reader in whole milliseconds.
+    /// The time is passed to the reader in whole milliseconds. A date too far from 1970 for that
+    /// (or an infinite one) is held at the nearest value that fits.
     ///
     /// - Returns: The builder, for chaining.
     @discardableResult
     public func checkTime(_ date: Date) -> ChipReadOptions.Builder {
-        let millis = Int64((date.timeIntervalSince1970 * 1000).rounded(.down))
+        let raw = (date.timeIntervalSince1970 * 1000).rounded(.down)
+        // An infinite or huge date would trap in `Int64(_:)`: keep it inside the range (NaN becomes 0).
+        let limit = 9_000_000_000_000_000.0 // below Int64.max, still exactly a Double
+        let millis = raw.isNaN ? 0 : Int64(min(max(raw, -limit), limit))
         return checkTime(time: KotlinInstant.companion.fromEpochMilliseconds(epochMilliseconds: millis))
     }
 

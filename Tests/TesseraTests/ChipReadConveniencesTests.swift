@@ -30,6 +30,19 @@ struct ChipReadConveniencesTests {
         #expect(options.checkTime?.toEpochMilliseconds() == 1_700_000_000_789)
     }
 
+    @Test func checkTimeHoldsAnExtremeDateInsteadOfTrapping() throws {
+        let dates = [Date.distantFuture, Date.distantPast, Date(timeIntervalSince1970: .infinity),
+                     Date(timeIntervalSince1970: -.infinity), Date(timeIntervalSince1970: .greatestFiniteMagnitude)]
+        for date in dates {
+            let options = try ChipReadOptions.Builder(accessKey: key()).checkTime(date).build()
+            #expect(options.checkTime != nil)
+        }
+        let future = try ChipReadOptions.Builder(accessKey: key()).checkTime(Date.distantFuture).build()
+        let past = try ChipReadOptions.Builder(accessKey: key()).checkTime(Date.distantPast).build()
+        #expect(try #require(future.checkTime).toEpochMilliseconds() > 0)
+        #expect(try #require(past.checkTime).toEpochMilliseconds() < 0)
+    }
+
     @Test func withoutACheckTimeThereIsNone() throws {
         #expect(try ChipReadOptions.Builder(accessKey: key()).build().checkTime == nil)
     }

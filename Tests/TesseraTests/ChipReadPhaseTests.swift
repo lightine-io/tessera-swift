@@ -201,4 +201,71 @@ struct ChipReadPhaseTests {
             #expect(got === reason)
         }
     }
+
+    // MARK: the readiness stream, with a fake listener seam
+
+    /// Counts adds and removes of the Kotlin listener, and lets a test send changes by hand.
+    private final class FakeReadinessSource: @unchecked Sendable {
+        private let lock = NSLock()
+        private var listener: TesseraCore.ChipReadReadinessListener?
+        private var removed = 0
+        private var added = 0
+        var now: Tessera.ChipReadReadiness = .ready
+        var removeCount: Int { lock.withLock { removed } }
+        var addCount: Int { lock.withLock { added } }
+
+        func stream() -> AsyncStream<Tessera.ChipReadReadiness> {
+            ChipReading.makeReadinessStream(
+                addListener: { listener in
+                    self.lock.withLock { self.listener = listener; self.added += 1 }
+                    return FakeRegistration { self.lock.withLock { self.removed += 1 } }
+                },
+                current: { self.now })
+        }
+
+        func send(_ value: TesseraCore.ChipReadReadiness) {
+            listener?.onReadinessChanged(readiness: value)
+        }
+    }
+
+    private final class FakeRegistration: NSObject, TesseraCore.ChipReadReadinessRegistration, @unchecked Sendable {
+        private let onRemove: @Sendable () -> Void
+        init(_ onRemove: @escaping @Sendable () -> Void) { self.onRemove = onRemove }
+        func remove() { onRemove() }
+    }
+
+    @Test func aSlowConsumerSeesEveryChangeOnceAndNeverTheSameValueTwice() async {
+        let source = FakeReadinessSource()
+        let stream = source.stream()
+        // The consumer has not started: the changes pile up, with repeats between them.
+        source.send(TesseraCore.ChipReadReadiness.ReadInProgress.shared)
+        source.send(TesseraCore.ChipReadReadiness.ReadInProgress.shared)
+        source.send(TesseraCore.ChipReadReadiness.Ready.shared)
+        source.send(TesseraCore.ChipReadReadiness.ReadInProgress.shared)
+        source.send(TesseraCore.ChipReadReadiness.Ready.shared)
+        source.send(TesseraCore.ChipReadReadiness.Ready.shared)
+        var seen: [Tessera.ChipReadReadiness] = []
+        for await value in stream {
+            seen.append(value)
+            if seen.count == 5 { break }
+        }
+        #expect(seen == [.ready, .readInProgress, .ready, .readInProgress, .ready])
+    }
+
+    @Test func aStreamThatIsNeverIteratedRemovesItsListenerWhenDropped() {
+        let source = FakeReadinessSource()
+        do {
+            let stream = source.stream()
+            _ = stream
+            #expect(source.addCount == 1)
+            #expect(source.removeCount == 0)
+        }
+        #expect(source.removeCount == 1)
+    }
+
+    @Test func aStreamEndedByItsLoopRemovesItsListenerOnce() async {
+        let source = FakeReadinessSource()
+        for await _ in source.stream() { break }
+        #expect(source.removeCount == 1)
+    }
 }

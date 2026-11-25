@@ -118,17 +118,30 @@ public final class ChipReading: Sendable {
     ///
     /// Each read of this property makes a new stream with its own listener.
     public static var readinessUpdates: AsyncStream<ChipReadReadiness> {
-        AsyncStream(bufferingPolicy: .bufferingNewest(1)) { continuation in
+        makeReadinessStream(
+            addListener: { CoreNfcChipRead.companion.addReadinessListener(listener: $0) },
+            current: { readiness })
+    }
+
+    /// Builds the readiness stream from a way to add a Kotlin listener and a way to read the value
+    /// now. Internal so the tests can count listeners and feed changes.
+    ///
+    /// The buffer is unbounded: changes are rare, and a slow consumer must still see each one once.
+    static func makeReadinessStream(
+        addListener: (TesseraCore.ChipReadReadinessListener) -> any TesseraCore.ChipReadReadinessRegistration,
+        current: () -> ChipReadReadiness
+    ) -> AsyncStream<ChipReadReadiness> {
+        AsyncStream(bufferingPolicy: .unbounded) { continuation in
             let changes = ReadinessChanges()
             let listener = ReadinessListener { value in
                 if changes.isNew(value) { continuation.yield(value) }
             }
             // Listen first, then ask for the value now, so no change falls between the two.
-            let registration = CoreNfcChipRead.companion.addReadinessListener(listener: listener)
-            let now = readiness
-            if changes.isNew(now) { continuation.yield(now) }
-            let box = RegistrationBox(registration)
+            let box = RegistrationBox(addListener(listener))
+            // Set before the first yield, so a stream dropped at once still removes the listener.
             continuation.onTermination = { _ in box.remove() }
+            let now = current()
+            if changes.isNew(now) { continuation.yield(now) }
         }
     }
 
@@ -141,7 +154,7 @@ public final class ChipReading: Sendable {
     ///   - texts: The words on the system sheet. `nil` uses the built-in English texts.
     ///     Use ``ChipReadTexts`` for your own.
     ///   - settings: How the read behaves around the radio. The default is
-    ///     ``ChipReadSettings/init(linkLoss:settleDelay:commandTimeout:commandTimeoutBeforeAccess:waitAfterSystemEnd:telemetry:readTimeout:searchRestart:polling:maxSessionRenewals:sessionRenew:busyRetry:)``
+    ///     ``ChipReadSettings/init(linkLoss:settleDelay:commandTimeout:commandTimeoutBeforeAccess:waitAfterSystemEnd:telemetry:readTimeout:searchRestart:polling:maxSessionRenewals:sessionRenew:busyRetry:tagTimeLimit:)``
     ///     with no arguments.
     /// - Returns: The running read. A read that cannot start still returns: its ending says why.
     public static func start(
@@ -237,7 +250,7 @@ final class ChipReadObserverBridge: NSObject, ChipReadObserver, Sendable {
 }
 
 /// Passes each Kotlin readiness change to a closure. The Kotlin side calls it on the main queue.
-private final class ReadinessListener: NSObject, TesseraCore.ChipReadReadinessListener, @unchecked Sendable {
+final class ReadinessListener: NSObject, TesseraCore.ChipReadReadinessListener, @unchecked Sendable {
     // Immutable after init, and the closure is `@Sendable`.
     private let handler: @Sendable (ChipReadReadiness) -> Void
     init(_ handler: @escaping @Sendable (ChipReadReadiness) -> Void) { self.handler = handler }
@@ -265,7 +278,7 @@ final class ReadinessChanges: @unchecked Sendable {
 
 /// Holds the Kotlin registration so the stream can remove it from any thread; the Kotlin `remove()`
 /// is safe to call more than once and from any thread.
-private final class RegistrationBox: @unchecked Sendable {
+final class RegistrationBox: @unchecked Sendable {
     private let registration: any TesseraCore.ChipReadReadinessRegistration
     init(_ registration: any TesseraCore.ChipReadReadinessRegistration) { self.registration = registration }
     func remove() { registration.remove() }

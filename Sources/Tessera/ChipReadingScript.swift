@@ -68,7 +68,7 @@ extension ChipReading {
             outcome: .cancelled(byPerson: false),
             attempts: updates.last?.attempt ?? 1, progress: last)
         core.attach(ScriptHandle { core.finish(cancelled) })
-        if delay <= 0 {
+        if !delay.isFinite || delay <= 0 {
             for update in updates { core.deliver(update) }
             core.finish(ending)
         } else {

@@ -93,4 +93,6 @@ jobs:
             -skipPackagePluginValidation
 
       - name: Public-API guard (ADR-007 freeze)
-        run: ./scripts/check-public-api.sh
+        run: |
+          ./scripts/check-public-api.sh
+          ./scripts/check-public-api.sh Tessera
