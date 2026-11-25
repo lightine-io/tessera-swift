@@ -31,6 +31,7 @@ on:
   push:
     branches:
       - "feature/tes-343-*"
+      - "feature/tes-346-*"
 
 permissions:
   contents: read
@@ -43,13 +44,13 @@ env:
   # The framework is built with the Xcode the main repository pins (Kotlin 2.4.20-2.4.21 lists Xcode 26.4).
   FRAMEWORK_XCODE_VERSION: "26.4.1"
   # On push runs the matching framework branch; on manual runs the input.
-  TESSERA_REF: ${{ github.event_name == 'push' && 'feature/tes-343-ios-15-minimum' || inputs.tessera_ref }}
+  TESSERA_REF: ${{ github.event_name == 'push' && (startsWith(github.ref_name, 'feature/tes-346-') && 'feature/tes-346-chip-read-lifecycle' || 'feature/tes-343-ios-15-minimum') || inputs.tessera_ref }}
   # `permission`: only the permission-watcher suite on iOS 16.4 (TES-343 diagnosis). `full`: everything.
   FOCUS: ${{ (inputs.focus == 'permission' || (github.event_name == 'push' && endsWith(github.ref_name, '-perm-trace'))) && 'permission' || 'full' }}
 
 jobs:
   framework:
-    name: XCFramework (${{ github.event_name == 'push' && 'feature/tes-343-ios-15-minimum' || inputs.tessera_ref }})
+    name: XCFramework (${{ github.event_name == 'push' && (startsWith(github.ref_name, 'feature/tes-346-') && 'feature/tes-346-chip-read-lifecycle' || 'feature/tes-343-ios-15-minimum') || inputs.tessera_ref }})
     runs-on: macos-26
     timeout-minutes: 60
     steps:
