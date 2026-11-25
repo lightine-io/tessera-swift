@@ -9,8 +9,10 @@ extension ChipError {
     public var statusWordInt: Int? { statusWord.map { Int($0.int32Value) } }
 }
 
-/// How one check came out, as a Swift `enum`. The reason is the stable Kotlin name of the reason
-/// (`HASH_DIFFERS`, `NO_TIME_GIVEN`, ...), or `nil` when the Kotlin side gives none.
+/// How one check came out, as a Swift `enum`. The reason is the stable `code` of the reason (a
+/// module prefix and the reason in lower-case words, for example `chip.hash-differs`), or `nil` when
+/// the Kotlin side gives none. The codes never change once released, so they are safe to log and to
+/// use as keys of your own texts.
 ///
 /// - Since: 1.0.0
 public enum ChipCheckResult: Sendable, Equatable {
@@ -28,18 +30,14 @@ public enum ChipCheckResult: Sendable, Equatable {
     static func from(_ outcome: any CheckOutcome) -> ChipCheckResult {
         switch outcome {
         case is CheckOutcomePassed: return .passed
-        case let failed as CheckOutcomeFailed: return .failed(reason: reasonName(failed.reason))
-        case let notRun as CheckOutcomeNotRun: return .notRun(reason: reasonName(notRun.reason))
-        case let notApplicable as CheckOutcomeNotApplicable: return .notApplicable(reason: reasonName(notApplicable.reason))
+        case let failed as CheckOutcomeFailed: return .failed(reason: reasonCode(failed.reason))
+        case let notRun as CheckOutcomeNotRun: return .notRun(reason: reasonCode(notRun.reason))
+        case let notApplicable as CheckOutcomeNotApplicable: return .notApplicable(reason: reasonCode(notApplicable.reason))
         default: return .unknown
         }
     }
 
-    // `CheckReason` is a marker protocol with no `code`; its implementations are Kotlin enums, whose
-    // `name` is stable. A reason of another shape has no name here.
-    private static func reasonName(_ reason: (any CheckReason)?) -> String? {
-        (reason as? KotlinEnum<AnyObject>)?.name
-    }
+    private static func reasonCode(_ reason: (any CheckReason)?) -> String? { reason?.code }
 }
 
 extension ChipCheck {
@@ -48,4 +46,80 @@ extension ChipCheck {
 
     /// How the check came out, as a Swift `enum`. The Kotlin `outcome` is the raw object.
     public var result: ChipCheckResult { ChipCheckResult.from(outcome) }
+
+    /// The per-field comparison, for the `Dg1MatchesPrintedMrz` check; `nil` for every other check
+    /// and when the check did not run (no `printedDocument`, or no DG1).
+    public var printedComparison: PrintedMrzComparison? { PrintedMrzComparison(detail) }
+}
+
+/// How one MRZ field of the chip's DG1 compares with the printed MRZ. A fact about the characters,
+/// never a verdict on the document.
+///
+/// - Since: 1.0.0
+public enum PrintedFieldMatch: String, Sendable, Equatable, CaseIterable {
+    case same
+    case different
+    /// The two sides cannot be compared, for example a field the printed format does not have.
+    case notComparable
+    /// A result this version does not know.
+    case unknown
+
+    init(_ match: ChipFieldMatch) {
+        switch match {
+        case .same: self = .same
+        case .different: self = .different
+        case .notComparable: self = .notComparable
+        default: self = .unknown
+        }
+    }
+}
+
+/// One field of the printed-MRZ comparison: its name and how it came out. No values.
+///
+/// - Since: 1.0.0
+public struct PrintedFieldComparison: Sendable, Equatable {
+    public let field: ChipKeyField
+    public let match: PrintedFieldMatch
+
+    public init(field: ChipKeyField, match: PrintedFieldMatch) {
+        self.field = field
+        self.match = match
+    }
+}
+
+/// The `Dg1MatchesPrintedMrz` check as Swift values: for each field, `same`, `different` or
+/// `notComparable`, and whether the two MRZs have the same format. Never a value of the document.
+///
+/// Ask for it with `ChipReadOptions.Builder.printedDocument(_:)`, then read it from the check:
+/// `read.checks.compactMap(\.printedComparison).first`.
+///
+/// - Since: 1.0.0
+public struct PrintedMrzComparison: Sendable, Equatable {
+    /// `true` when both MRZs have the same format (for example both TD3).
+    public let sameFormat: Bool
+    /// Every field the comparison covers, in the order of ``ChipKeyField/allCases``.
+    public let fields: [PrintedFieldComparison]
+
+    /// The fields that came out `different`.
+    public var differingFields: [ChipKeyField] { fields.filter { $0.match == .different }.map(\.field) }
+    /// `true` when the format is the same and no field is `different` or `notComparable`.
+    public var allSame: Bool { sameFormat && fields.allSatisfy { $0.match == .same } }
+
+    public init(sameFormat: Bool, fields: [PrintedFieldComparison]) {
+        self.sameFormat = sameFormat
+        self.fields = fields
+    }
+
+    /// The Swift view of the check's detail; `nil` for a detail of another kind.
+    public init?(_ detail: ChipCheckDetail?) {
+        guard let printed = detail as? ChipCheckDetail.PrintedMrzFields else { return nil }
+        let byField = Dictionary(
+            printed.fields.map { (ChipKeyField($0.key), PrintedFieldMatch($0.value)) },
+            uniquingKeysWith: { first, _ in first })
+        self.init(
+            sameFormat: printed.sameFormat,
+            fields: ChipKeyField.allCases.compactMap { field in
+                byField[field].map { PrintedFieldComparison(field: field, match: $0) }
+            })
+    }
 }

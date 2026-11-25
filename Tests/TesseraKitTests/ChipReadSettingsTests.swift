@@ -90,4 +90,9 @@ struct ChipReadSettingsTests {
         #expect(event.statusWord == 0x6982)
         #expect(event.outcome == .failed)
     }
+
+    @Test func theSwiftLayerAsksTheReaderForItsOwnThread() {
+        #expect(ChipReadSettings().kotlinSettings().observerOn === ObserverThread.caller)
+        #expect(ChipReadSettings(linkLoss: .end).kotlinSettings().observerOn === ObserverThread.caller)
+    }
 }

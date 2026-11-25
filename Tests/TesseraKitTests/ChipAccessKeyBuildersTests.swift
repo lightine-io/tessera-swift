@@ -11,18 +11,28 @@ struct ChipAccessKeyBuildersTests {
         #expect(!key.isCleared)
     }
 
-    @Test func emptyCanAndLetterCanThrowOurError() {
-        for bad in ["", "12a456"] {
-            do {
-                _ = try ChipAccessKey.fromCan(bad)
-                Issue.record("expected an error for a bad CAN")
-            } catch let error as ChipAccessKeyError {
-                guard case .invalid(let message) = error else { Issue.record("wrong case"); continue }
-                if !bad.isEmpty { #expect(!message.contains(bad)) }
-            } catch {
-                Issue.record("not a ChipAccessKeyError: \(error)")
-            }
+    @Test func emptyCanThrowsProblemEmpty() {
+        #expect(throws: ChipAccessKeyError.canNotBuilt(problem: .empty, characterIndex: nil)) {
+            _ = try ChipAccessKey.fromCan("")
         }
+    }
+
+    @Test func aLetterInTheCanNamesTheIndexButNotTheCharacter() {
+        do {
+            _ = try ChipAccessKey.fromCan("12a456")
+            Issue.record("expected an error")
+        } catch let error as ChipAccessKeyError {
+            #expect(error == .canNotBuilt(problem: .characterNotAllowed, characterIndex: 2))
+            #expect(!error.description.contains("12a456"))
+            #expect(!error.description.contains("a45"))
+            #expect(error.description.contains("index 2"))
+        } catch {
+            Issue.record("not a ChipAccessKeyError: \(error)")
+        }
+    }
+
+    @Test func everyKotlinCanProblemHasASwiftCase() {
+        for problem in CanKeyProblem.entries { #expect(ChipCanProblem(problem) != .unknown) }
     }
 
     @Test func mrzKeyIsMadeFromTypedFields() throws {
@@ -126,5 +136,44 @@ struct ChipAccessKeyBuildersTests {
     @Test func everyKotlinProblemAndFieldHasASwiftCase() {
         for problem in MrzKeyProblem.entries { #expect(ChipKeyProblem(problem) != .unknown) }
         for field in MrzField.entries { #expect(ChipKeyField(field) != .unknown) }
+    }
+
+    // MARK: the typed-field normaliser
+
+    @Test func theNormaliserTrimsAndUpperCasesAndSaysWhatItChanged() {
+        let typed = ChipAccessKey.normalizeTypedFields(
+            documentNumber: "  l898902c3 ", dateOfBirth: "740812", dateOfExpiry: " 120415")
+        #expect(typed.documentNumber == "L898902C3")
+        #expect(typed.dateOfBirth == "740812")
+        #expect(typed.dateOfExpiry == "120415")
+        #expect(typed.changedFields == [.documentNumber, .dateOfExpiry])
+        #expect(typed.wasChanged)
+    }
+
+    @Test func theNormaliserLeavesCleanTextAlone() {
+        let typed = ChipAccessKey.normalizeTypedFields(
+            documentNumber: "L898902C3", dateOfBirth: "740812", dateOfExpiry: "120415")
+        #expect(typed.changedFields.isEmpty)
+        #expect(!typed.wasChanged)
+    }
+
+    @Test func normalisedTextMakesAKeyWhereTheStrictCallRefuses() throws {
+        #expect(throws: ChipAccessKeyError.self) {
+            _ = try ChipAccessKey.fromTypedFields(documentNumber: " l898902c3", dateOfBirth: "740812", dateOfExpiry: "120415")
+        }
+        let typed = ChipAccessKey.normalizeTypedFields(
+            documentNumber: " l898902c3", dateOfBirth: "740812", dateOfExpiry: "120415")
+        let key = try ChipAccessKey.fromTypedFields(
+            documentNumber: typed.documentNumber, dateOfBirth: typed.dateOfBirth, dateOfExpiry: typed.dateOfExpiry)
+        #expect(key.checkDigitFindings.isEmpty)
+    }
+
+    @Test func theNormaliserDoesNotTouchInnerSpacesOrDigits() {
+        let typed = ChipAccessKey.normalizeTypedFields(
+            documentNumber: "ab 12", dateOfBirth: "7408 12", dateOfExpiry: "")
+        #expect(typed.documentNumber == "AB 12")
+        #expect(typed.dateOfBirth == "7408 12")
+        #expect(typed.dateOfExpiry.isEmpty)
+        #expect(typed.changedFields == [.documentNumber])
     }
 }

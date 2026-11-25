@@ -1270,6 +1270,394 @@
        {
         "children": [
          {
+          "kind": "TypeNominal",
+          "name": "ChipCanProblem",
+          "printedName": "TesseraKit.ChipCanProblem",
+          "usr": "s:10TesseraKit14ChipCanProblemO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipCanProblem",
+            "printedName": "TesseraKit.ChipCanProblem",
+            "usr": "s:10TesseraKit14ChipCanProblemO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.ChipCanProblem.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.ChipCanProblem.Type) -> TesseraKit.ChipCanProblem"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit14ChipCanProblemO5emptyyA2CmF",
+      "moduleName": "TesseraKit",
+      "name": "empty",
+      "printedName": "empty",
+      "usr": "s:10TesseraKit14ChipCanProblemO5emptyyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipCanProblem",
+          "printedName": "TesseraKit.ChipCanProblem",
+          "usr": "s:10TesseraKit14ChipCanProblemO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipCanProblem",
+            "printedName": "TesseraKit.ChipCanProblem",
+            "usr": "s:10TesseraKit14ChipCanProblemO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.ChipCanProblem.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.ChipCanProblem.Type) -> TesseraKit.ChipCanProblem"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit14ChipCanProblemO19characterNotAllowedyA2CmF",
+      "moduleName": "TesseraKit",
+      "name": "characterNotAllowed",
+      "printedName": "characterNotAllowed",
+      "usr": "s:10TesseraKit14ChipCanProblemO19characterNotAllowedyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipCanProblem",
+          "printedName": "TesseraKit.ChipCanProblem",
+          "usr": "s:10TesseraKit14ChipCanProblemO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipCanProblem",
+            "printedName": "TesseraKit.ChipCanProblem",
+            "usr": "s:10TesseraKit14ChipCanProblemO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.ChipCanProblem.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.ChipCanProblem.Type) -> TesseraKit.ChipCanProblem"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit14ChipCanProblemO7unknownyA2CmF",
+      "moduleName": "TesseraKit",
+      "name": "unknown",
+      "printedName": "unknown",
+      "usr": "s:10TesseraKit14ChipCanProblemO7unknownyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipCanProblem",
+          "printedName": "TesseraKit.ChipCanProblem",
+          "usr": "s:10TesseraKit14ChipCanProblemO"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "TesseraKit.ChipCanProblem?",
+        "usr": "s:Sq"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       }
+      ],
+      "declAttributes": [
+       "Inlinable"
+      ],
+      "declKind": "Constructor",
+      "implicit": true,
+      "init_kind": "Designated",
+      "kind": "Constructor",
+      "mangledName": "$s10TesseraKit14ChipCanProblemO8rawValueACSgSS_tcfc",
+      "moduleName": "TesseraKit",
+      "name": "init",
+      "printedName": "init(rawValue:)",
+      "usr": "s:10TesseraKit14ChipCanProblemO8rawValueACSgSS_tcfc"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipCanProblem",
+          "printedName": "TesseraKit.ChipCanProblem",
+          "usr": "s:10TesseraKit14ChipCanProblemO"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Array",
+        "printedName": "[TesseraKit.ChipCanProblem]",
+        "usr": "s:Sa"
+       }
+      ],
+      "declKind": "TypeAlias",
+      "implicit": true,
+      "kind": "TypeAlias",
+      "mangledName": "$s10TesseraKit14ChipCanProblemO8AllCasesa",
+      "moduleName": "TesseraKit",
+      "name": "AllCases",
+      "printedName": "AllCases",
+      "usr": "s:10TesseraKit14ChipCanProblemO8AllCasesa"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       }
+      ],
+      "declKind": "TypeAlias",
+      "implicit": true,
+      "kind": "TypeAlias",
+      "mangledName": "$s10TesseraKit14ChipCanProblemO8RawValuea",
+      "moduleName": "TesseraKit",
+      "name": "RawValue",
+      "printedName": "RawValue",
+      "usr": "s:10TesseraKit14ChipCanProblemO8RawValuea"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipCanProblem",
+            "printedName": "TesseraKit.ChipCanProblem",
+            "usr": "s:10TesseraKit14ChipCanProblemO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Array",
+          "printedName": "[TesseraKit.ChipCanProblem]",
+          "usr": "s:Sa"
+         }
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit14ChipCanProblemO8allCasesSayACGvgZ",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "static": true,
+        "usr": "s:10TesseraKit14ChipCanProblemO8allCasesSayACGvgZ"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipCanProblem",
+          "printedName": "TesseraKit.ChipCanProblem",
+          "usr": "s:10TesseraKit14ChipCanProblemO"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Array",
+        "printedName": "[TesseraKit.ChipCanProblem]",
+        "usr": "s:Sa"
+       }
+      ],
+      "declAttributes": [
+       "Nonisolated"
+      ],
+      "declKind": "Var",
+      "implicit": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit14ChipCanProblemO8allCasesSayACGvpZ",
+      "moduleName": "TesseraKit",
+      "name": "allCases",
+      "printedName": "allCases",
+      "static": true,
+      "usr": "s:10TesseraKit14ChipCanProblemO8allCasesSayACGvpZ"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "String",
+          "printedName": "Swift.String",
+          "usr": "s:SS"
+         }
+        ],
+        "declAttributes": [
+         "Inlinable"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit14ChipCanProblemO8rawValueSSvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit14ChipCanProblemO8rawValueSSvg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       }
+      ],
+      "declKind": "Var",
+      "implicit": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit14ChipCanProblemO8rawValueSSvp",
+      "moduleName": "TesseraKit",
+      "name": "rawValue",
+      "printedName": "rawValue",
+      "usr": "s:10TesseraKit14ChipCanProblemO8rawValueSSvp"
+     }
+    ],
+    "conformances": [
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipCanProblem",
+            "printedName": "TesseraKit.ChipCanProblem",
+            "usr": "s:10TesseraKit14ChipCanProblemO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Array",
+          "printedName": "[TesseraKit.ChipCanProblem]",
+          "usr": "s:Sa"
+         }
+        ],
+        "kind": "TypeWitness",
+        "name": "AllCases",
+        "printedName": "AllCases"
+       }
+      ],
+      "kind": "Conformance",
+      "mangledName": "$ss12CaseIterableP",
+      "name": "CaseIterable",
+      "printedName": "CaseIterable",
+      "usr": "s:s12CaseIterableP"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "String",
+          "printedName": "Swift.String",
+          "usr": "s:SS"
+         }
+        ],
+        "kind": "TypeWitness",
+        "name": "RawValue",
+        "printedName": "RawValue"
+       }
+      ],
+      "kind": "Conformance",
+      "mangledName": "$sSY",
+      "name": "RawRepresentable",
+      "printedName": "RawRepresentable",
+      "usr": "s:SY"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSH",
+      "name": "Hashable",
+      "printedName": "Hashable",
+      "usr": "s:SH"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss16SendableMetatypeP",
+      "name": "SendableMetatype",
+      "printedName": "SendableMetatype",
+      "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
+     }
+    ],
+    "declKind": "Enum",
+    "enumRawTypeName": "String",
+    "isEnumExhaustive": true,
+    "kind": "TypeDecl",
+    "mangledName": "$s10TesseraKit14ChipCanProblemO",
+    "moduleName": "TesseraKit",
+    "name": "ChipCanProblem",
+    "printedName": "ChipCanProblem",
+    "usr": "s:10TesseraKit14ChipCanProblemO"
+   },
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "children": [
+         {
           "children": [
            {
             "kind": "TypeNominal",
@@ -1451,6 +1839,77 @@
       "usr": "s:10TesseraKit18ChipAccessKeyErrorO8notBuiltyAcA0cE5FieldOSg_AA0cE7ProblemOtcACmF"
      },
      {
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipAccessKeyError",
+            "printedName": "TesseraKit.ChipAccessKeyError",
+            "usr": "s:10TesseraKit18ChipAccessKeyErrorO"
+           },
+           {
+            "children": [
+             {
+              "kind": "TypeNominal",
+              "name": "ChipCanProblem",
+              "printedName": "TesseraKit.ChipCanProblem",
+              "usr": "s:10TesseraKit14ChipCanProblemO"
+             },
+             {
+              "children": [
+               {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+               }
+              ],
+              "kind": "TypeNominal",
+              "name": "Optional",
+              "printedName": "Swift.Int?",
+              "usr": "s:Sq"
+             }
+            ],
+            "kind": "TypeNominal",
+            "name": "Tuple",
+            "printedName": "(problem: TesseraKit.ChipCanProblem, characterIndex: Swift.Int?)"
+           }
+          ],
+          "kind": "TypeFunc",
+          "name": "Function",
+          "printedName": "(TesseraKit.ChipCanProblem, Swift.Int?) -> TesseraKit.ChipAccessKeyError"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipAccessKeyError",
+            "printedName": "TesseraKit.ChipAccessKeyError",
+            "usr": "s:10TesseraKit18ChipAccessKeyErrorO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.ChipAccessKeyError.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.ChipAccessKeyError.Type) -> (TesseraKit.ChipCanProblem, Swift.Int?) -> TesseraKit.ChipAccessKeyError"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit18ChipAccessKeyErrorO11canNotBuiltyAcA0C10CanProblemO_SiSgtcACmF",
+      "moduleName": "TesseraKit",
+      "name": "canNotBuilt",
+      "printedName": "canNotBuilt",
+      "usr": "s:10TesseraKit18ChipAccessKeyErrorO11canNotBuiltyAcA0C10CanProblemO_SiSgtcACmF"
+     },
+     {
       "accessors": [
        {
         "accessorKind": "get",
@@ -1568,6 +2027,363 @@
     "name": "ChipAccessKeyError",
     "printedName": "ChipAccessKeyError",
     "usr": "s:10TesseraKit18ChipAccessKeyErrorO"
+   },
+   {
+    "children": [
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "String",
+          "printedName": "Swift.String",
+          "usr": "s:SS"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit21NormalizedTypedFieldsV14documentNumberSSvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit21NormalizedTypedFieldsV14documentNumberSSvg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "isLet": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit21NormalizedTypedFieldsV14documentNumberSSvp",
+      "moduleName": "TesseraKit",
+      "name": "documentNumber",
+      "printedName": "documentNumber",
+      "usr": "s:10TesseraKit21NormalizedTypedFieldsV14documentNumberSSvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "String",
+          "printedName": "Swift.String",
+          "usr": "s:SS"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit21NormalizedTypedFieldsV11dateOfBirthSSvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit21NormalizedTypedFieldsV11dateOfBirthSSvg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "isLet": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit21NormalizedTypedFieldsV11dateOfBirthSSvp",
+      "moduleName": "TesseraKit",
+      "name": "dateOfBirth",
+      "printedName": "dateOfBirth",
+      "usr": "s:10TesseraKit21NormalizedTypedFieldsV11dateOfBirthSSvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "String",
+          "printedName": "Swift.String",
+          "usr": "s:SS"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit21NormalizedTypedFieldsV12dateOfExpirySSvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit21NormalizedTypedFieldsV12dateOfExpirySSvg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "isLet": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit21NormalizedTypedFieldsV12dateOfExpirySSvp",
+      "moduleName": "TesseraKit",
+      "name": "dateOfExpiry",
+      "printedName": "dateOfExpiry",
+      "usr": "s:10TesseraKit21NormalizedTypedFieldsV12dateOfExpirySSvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipKeyField",
+            "printedName": "TesseraKit.ChipKeyField",
+            "usr": "s:10TesseraKit12ChipKeyFieldO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Array",
+          "printedName": "[TesseraKit.ChipKeyField]",
+          "usr": "s:Sa"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit21NormalizedTypedFieldsV07changedE0SayAA12ChipKeyFieldOGvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit21NormalizedTypedFieldsV07changedE0SayAA12ChipKeyFieldOGvg"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipKeyField",
+          "printedName": "TesseraKit.ChipKeyField",
+          "usr": "s:10TesseraKit12ChipKeyFieldO"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Array",
+        "printedName": "[TesseraKit.ChipKeyField]",
+        "usr": "s:Sa"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "isLet": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit21NormalizedTypedFieldsV07changedE0SayAA12ChipKeyFieldOGvp",
+      "moduleName": "TesseraKit",
+      "name": "changedFields",
+      "printedName": "changedFields",
+      "usr": "s:10TesseraKit21NormalizedTypedFieldsV07changedE0SayAA12ChipKeyFieldOGvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Bool",
+          "printedName": "Swift.Bool",
+          "usr": "s:Sb"
+         }
+        ],
+        "declKind": "Accessor",
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit21NormalizedTypedFieldsV10wasChangedSbvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit21NormalizedTypedFieldsV10wasChangedSbvg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       }
+      ],
+      "declKind": "Var",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit21NormalizedTypedFieldsV10wasChangedSbvp",
+      "moduleName": "TesseraKit",
+      "name": "wasChanged",
+      "printedName": "wasChanged",
+      "usr": "s:10TesseraKit21NormalizedTypedFieldsV10wasChangedSbvp"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "NormalizedTypedFields",
+        "printedName": "TesseraKit.NormalizedTypedFields",
+        "usr": "s:10TesseraKit21NormalizedTypedFieldsV"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipKeyField",
+          "printedName": "TesseraKit.ChipKeyField",
+          "usr": "s:10TesseraKit12ChipKeyFieldO"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Array",
+        "printedName": "[TesseraKit.ChipKeyField]",
+        "usr": "s:Sa"
+       }
+      ],
+      "declKind": "Constructor",
+      "init_kind": "Designated",
+      "kind": "Constructor",
+      "mangledName": "$s10TesseraKit21NormalizedTypedFieldsV14documentNumber11dateOfBirth0hI6Expiry07changedE0ACSS_S2SSayAA12ChipKeyFieldOGtcfc",
+      "moduleName": "TesseraKit",
+      "name": "init",
+      "printedName": "init(documentNumber:dateOfBirth:dateOfExpiry:changedFields:)",
+      "usr": "s:10TesseraKit21NormalizedTypedFieldsV14documentNumber11dateOfBirth0hI6Expiry07changedE0ACSS_S2SSayAA12ChipKeyFieldOGtcfc"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "NormalizedTypedFields",
+        "printedName": "TesseraKit.NormalizedTypedFields",
+        "usr": "s:10TesseraKit21NormalizedTypedFieldsV"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "NormalizedTypedFields",
+        "printedName": "TesseraKit.NormalizedTypedFields",
+        "usr": "s:10TesseraKit21NormalizedTypedFieldsV"
+       }
+      ],
+      "declAttributes": [
+       "Implements"
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "implicit": true,
+      "kind": "Function",
+      "mangledName": "$s10TesseraKit21NormalizedTypedFieldsV23__derived_struct_equalsySbAC_ACtFZ",
+      "moduleName": "TesseraKit",
+      "name": "__derived_struct_equals",
+      "printedName": "__derived_struct_equals(_:_:)",
+      "static": true,
+      "usr": "s:10TesseraKit21NormalizedTypedFieldsV23__derived_struct_equalsySbAC_ACtFZ"
+     }
+    ],
+    "conformances": [
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss16SendableMetatypeP",
+      "name": "SendableMetatype",
+      "printedName": "SendableMetatype",
+      "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
+     }
+    ],
+    "declKind": "Struct",
+    "kind": "TypeDecl",
+    "mangledName": "$s10TesseraKit21NormalizedTypedFieldsV",
+    "moduleName": "TesseraKit",
+    "name": "NormalizedTypedFields",
+    "printedName": "NormalizedTypedFields",
+    "usr": "s:10TesseraKit21NormalizedTypedFieldsV"
    },
    {
     "children": [
@@ -1931,6 +2747,1196 @@
     "name": "ChipCheckResult",
     "printedName": "ChipCheckResult",
     "usr": "s:10TesseraKit15ChipCheckResultO"
+   },
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "PrintedFieldMatch",
+          "printedName": "TesseraKit.PrintedFieldMatch",
+          "usr": "s:10TesseraKit17PrintedFieldMatchO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "PrintedFieldMatch",
+            "printedName": "TesseraKit.PrintedFieldMatch",
+            "usr": "s:10TesseraKit17PrintedFieldMatchO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.PrintedFieldMatch.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.PrintedFieldMatch.Type) -> TesseraKit.PrintedFieldMatch"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit17PrintedFieldMatchO4sameyA2CmF",
+      "moduleName": "TesseraKit",
+      "name": "same",
+      "printedName": "same",
+      "usr": "s:10TesseraKit17PrintedFieldMatchO4sameyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "PrintedFieldMatch",
+          "printedName": "TesseraKit.PrintedFieldMatch",
+          "usr": "s:10TesseraKit17PrintedFieldMatchO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "PrintedFieldMatch",
+            "printedName": "TesseraKit.PrintedFieldMatch",
+            "usr": "s:10TesseraKit17PrintedFieldMatchO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.PrintedFieldMatch.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.PrintedFieldMatch.Type) -> TesseraKit.PrintedFieldMatch"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit17PrintedFieldMatchO9differentyA2CmF",
+      "moduleName": "TesseraKit",
+      "name": "different",
+      "printedName": "different",
+      "usr": "s:10TesseraKit17PrintedFieldMatchO9differentyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "PrintedFieldMatch",
+          "printedName": "TesseraKit.PrintedFieldMatch",
+          "usr": "s:10TesseraKit17PrintedFieldMatchO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "PrintedFieldMatch",
+            "printedName": "TesseraKit.PrintedFieldMatch",
+            "usr": "s:10TesseraKit17PrintedFieldMatchO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.PrintedFieldMatch.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.PrintedFieldMatch.Type) -> TesseraKit.PrintedFieldMatch"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit17PrintedFieldMatchO13notComparableyA2CmF",
+      "moduleName": "TesseraKit",
+      "name": "notComparable",
+      "printedName": "notComparable",
+      "usr": "s:10TesseraKit17PrintedFieldMatchO13notComparableyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "PrintedFieldMatch",
+          "printedName": "TesseraKit.PrintedFieldMatch",
+          "usr": "s:10TesseraKit17PrintedFieldMatchO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "PrintedFieldMatch",
+            "printedName": "TesseraKit.PrintedFieldMatch",
+            "usr": "s:10TesseraKit17PrintedFieldMatchO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.PrintedFieldMatch.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.PrintedFieldMatch.Type) -> TesseraKit.PrintedFieldMatch"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit17PrintedFieldMatchO7unknownyA2CmF",
+      "moduleName": "TesseraKit",
+      "name": "unknown",
+      "printedName": "unknown",
+      "usr": "s:10TesseraKit17PrintedFieldMatchO7unknownyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "PrintedFieldMatch",
+          "printedName": "TesseraKit.PrintedFieldMatch",
+          "usr": "s:10TesseraKit17PrintedFieldMatchO"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "TesseraKit.PrintedFieldMatch?",
+        "usr": "s:Sq"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       }
+      ],
+      "declAttributes": [
+       "Inlinable"
+      ],
+      "declKind": "Constructor",
+      "implicit": true,
+      "init_kind": "Designated",
+      "kind": "Constructor",
+      "mangledName": "$s10TesseraKit17PrintedFieldMatchO8rawValueACSgSS_tcfc",
+      "moduleName": "TesseraKit",
+      "name": "init",
+      "printedName": "init(rawValue:)",
+      "usr": "s:10TesseraKit17PrintedFieldMatchO8rawValueACSgSS_tcfc"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "PrintedFieldMatch",
+          "printedName": "TesseraKit.PrintedFieldMatch",
+          "usr": "s:10TesseraKit17PrintedFieldMatchO"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Array",
+        "printedName": "[TesseraKit.PrintedFieldMatch]",
+        "usr": "s:Sa"
+       }
+      ],
+      "declKind": "TypeAlias",
+      "implicit": true,
+      "kind": "TypeAlias",
+      "mangledName": "$s10TesseraKit17PrintedFieldMatchO8AllCasesa",
+      "moduleName": "TesseraKit",
+      "name": "AllCases",
+      "printedName": "AllCases",
+      "usr": "s:10TesseraKit17PrintedFieldMatchO8AllCasesa"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       }
+      ],
+      "declKind": "TypeAlias",
+      "implicit": true,
+      "kind": "TypeAlias",
+      "mangledName": "$s10TesseraKit17PrintedFieldMatchO8RawValuea",
+      "moduleName": "TesseraKit",
+      "name": "RawValue",
+      "printedName": "RawValue",
+      "usr": "s:10TesseraKit17PrintedFieldMatchO8RawValuea"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "PrintedFieldMatch",
+            "printedName": "TesseraKit.PrintedFieldMatch",
+            "usr": "s:10TesseraKit17PrintedFieldMatchO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Array",
+          "printedName": "[TesseraKit.PrintedFieldMatch]",
+          "usr": "s:Sa"
+         }
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit17PrintedFieldMatchO8allCasesSayACGvgZ",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "static": true,
+        "usr": "s:10TesseraKit17PrintedFieldMatchO8allCasesSayACGvgZ"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "PrintedFieldMatch",
+          "printedName": "TesseraKit.PrintedFieldMatch",
+          "usr": "s:10TesseraKit17PrintedFieldMatchO"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Array",
+        "printedName": "[TesseraKit.PrintedFieldMatch]",
+        "usr": "s:Sa"
+       }
+      ],
+      "declAttributes": [
+       "Nonisolated"
+      ],
+      "declKind": "Var",
+      "implicit": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit17PrintedFieldMatchO8allCasesSayACGvpZ",
+      "moduleName": "TesseraKit",
+      "name": "allCases",
+      "printedName": "allCases",
+      "static": true,
+      "usr": "s:10TesseraKit17PrintedFieldMatchO8allCasesSayACGvpZ"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "String",
+          "printedName": "Swift.String",
+          "usr": "s:SS"
+         }
+        ],
+        "declAttributes": [
+         "Inlinable"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit17PrintedFieldMatchO8rawValueSSvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit17PrintedFieldMatchO8rawValueSSvg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       }
+      ],
+      "declKind": "Var",
+      "implicit": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit17PrintedFieldMatchO8rawValueSSvp",
+      "moduleName": "TesseraKit",
+      "name": "rawValue",
+      "printedName": "rawValue",
+      "usr": "s:10TesseraKit17PrintedFieldMatchO8rawValueSSvp"
+     }
+    ],
+    "conformances": [
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "PrintedFieldMatch",
+            "printedName": "TesseraKit.PrintedFieldMatch",
+            "usr": "s:10TesseraKit17PrintedFieldMatchO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Array",
+          "printedName": "[TesseraKit.PrintedFieldMatch]",
+          "usr": "s:Sa"
+         }
+        ],
+        "kind": "TypeWitness",
+        "name": "AllCases",
+        "printedName": "AllCases"
+       }
+      ],
+      "kind": "Conformance",
+      "mangledName": "$ss12CaseIterableP",
+      "name": "CaseIterable",
+      "printedName": "CaseIterable",
+      "usr": "s:s12CaseIterableP"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "String",
+          "printedName": "Swift.String",
+          "usr": "s:SS"
+         }
+        ],
+        "kind": "TypeWitness",
+        "name": "RawValue",
+        "printedName": "RawValue"
+       }
+      ],
+      "kind": "Conformance",
+      "mangledName": "$sSY",
+      "name": "RawRepresentable",
+      "printedName": "RawRepresentable",
+      "usr": "s:SY"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSH",
+      "name": "Hashable",
+      "printedName": "Hashable",
+      "usr": "s:SH"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss16SendableMetatypeP",
+      "name": "SendableMetatype",
+      "printedName": "SendableMetatype",
+      "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
+     }
+    ],
+    "declKind": "Enum",
+    "enumRawTypeName": "String",
+    "isEnumExhaustive": true,
+    "kind": "TypeDecl",
+    "mangledName": "$s10TesseraKit17PrintedFieldMatchO",
+    "moduleName": "TesseraKit",
+    "name": "PrintedFieldMatch",
+    "printedName": "PrintedFieldMatch",
+    "usr": "s:10TesseraKit17PrintedFieldMatchO"
+   },
+   {
+    "children": [
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipKeyField",
+          "printedName": "TesseraKit.ChipKeyField",
+          "usr": "s:10TesseraKit12ChipKeyFieldO"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit22PrintedFieldComparisonV5fieldAA07ChipKeyD0Ovg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit22PrintedFieldComparisonV5fieldAA07ChipKeyD0Ovg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "ChipKeyField",
+        "printedName": "TesseraKit.ChipKeyField",
+        "usr": "s:10TesseraKit12ChipKeyFieldO"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "isLet": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit22PrintedFieldComparisonV5fieldAA07ChipKeyD0Ovp",
+      "moduleName": "TesseraKit",
+      "name": "field",
+      "printedName": "field",
+      "usr": "s:10TesseraKit22PrintedFieldComparisonV5fieldAA07ChipKeyD0Ovp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "PrintedFieldMatch",
+          "printedName": "TesseraKit.PrintedFieldMatch",
+          "usr": "s:10TesseraKit17PrintedFieldMatchO"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit22PrintedFieldComparisonV5matchAA0cD5MatchOvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit22PrintedFieldComparisonV5matchAA0cD5MatchOvg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "PrintedFieldMatch",
+        "printedName": "TesseraKit.PrintedFieldMatch",
+        "usr": "s:10TesseraKit17PrintedFieldMatchO"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "isLet": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit22PrintedFieldComparisonV5matchAA0cD5MatchOvp",
+      "moduleName": "TesseraKit",
+      "name": "match",
+      "printedName": "match",
+      "usr": "s:10TesseraKit22PrintedFieldComparisonV5matchAA0cD5MatchOvp"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "PrintedFieldComparison",
+        "printedName": "TesseraKit.PrintedFieldComparison",
+        "usr": "s:10TesseraKit22PrintedFieldComparisonV"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "ChipKeyField",
+        "printedName": "TesseraKit.ChipKeyField",
+        "usr": "s:10TesseraKit12ChipKeyFieldO"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "PrintedFieldMatch",
+        "printedName": "TesseraKit.PrintedFieldMatch",
+        "usr": "s:10TesseraKit17PrintedFieldMatchO"
+       }
+      ],
+      "declKind": "Constructor",
+      "init_kind": "Designated",
+      "kind": "Constructor",
+      "mangledName": "$s10TesseraKit22PrintedFieldComparisonV5field5matchAcA07ChipKeyD0O_AA0cD5MatchOtcfc",
+      "moduleName": "TesseraKit",
+      "name": "init",
+      "printedName": "init(field:match:)",
+      "usr": "s:10TesseraKit22PrintedFieldComparisonV5field5matchAcA07ChipKeyD0O_AA0cD5MatchOtcfc"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "PrintedFieldComparison",
+        "printedName": "TesseraKit.PrintedFieldComparison",
+        "usr": "s:10TesseraKit22PrintedFieldComparisonV"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "PrintedFieldComparison",
+        "printedName": "TesseraKit.PrintedFieldComparison",
+        "usr": "s:10TesseraKit22PrintedFieldComparisonV"
+       }
+      ],
+      "declAttributes": [
+       "Implements"
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "implicit": true,
+      "kind": "Function",
+      "mangledName": "$s10TesseraKit22PrintedFieldComparisonV23__derived_struct_equalsySbAC_ACtFZ",
+      "moduleName": "TesseraKit",
+      "name": "__derived_struct_equals",
+      "printedName": "__derived_struct_equals(_:_:)",
+      "static": true,
+      "usr": "s:10TesseraKit22PrintedFieldComparisonV23__derived_struct_equalsySbAC_ACtFZ"
+     }
+    ],
+    "conformances": [
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss16SendableMetatypeP",
+      "name": "SendableMetatype",
+      "printedName": "SendableMetatype",
+      "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
+     }
+    ],
+    "declKind": "Struct",
+    "kind": "TypeDecl",
+    "mangledName": "$s10TesseraKit22PrintedFieldComparisonV",
+    "moduleName": "TesseraKit",
+    "name": "PrintedFieldComparison",
+    "printedName": "PrintedFieldComparison",
+    "usr": "s:10TesseraKit22PrintedFieldComparisonV"
+   },
+   {
+    "children": [
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Bool",
+          "printedName": "Swift.Bool",
+          "usr": "s:Sb"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit20PrintedMrzComparisonV10sameFormatSbvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit20PrintedMrzComparisonV10sameFormatSbvg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "isLet": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit20PrintedMrzComparisonV10sameFormatSbvp",
+      "moduleName": "TesseraKit",
+      "name": "sameFormat",
+      "printedName": "sameFormat",
+      "usr": "s:10TesseraKit20PrintedMrzComparisonV10sameFormatSbvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "PrintedFieldComparison",
+            "printedName": "TesseraKit.PrintedFieldComparison",
+            "usr": "s:10TesseraKit22PrintedFieldComparisonV"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Array",
+          "printedName": "[TesseraKit.PrintedFieldComparison]",
+          "usr": "s:Sa"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit20PrintedMrzComparisonV6fieldsSayAA0c5FieldE0VGvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit20PrintedMrzComparisonV6fieldsSayAA0c5FieldE0VGvg"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "PrintedFieldComparison",
+          "printedName": "TesseraKit.PrintedFieldComparison",
+          "usr": "s:10TesseraKit22PrintedFieldComparisonV"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Array",
+        "printedName": "[TesseraKit.PrintedFieldComparison]",
+        "usr": "s:Sa"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "isLet": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit20PrintedMrzComparisonV6fieldsSayAA0c5FieldE0VGvp",
+      "moduleName": "TesseraKit",
+      "name": "fields",
+      "printedName": "fields",
+      "usr": "s:10TesseraKit20PrintedMrzComparisonV6fieldsSayAA0c5FieldE0VGvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipKeyField",
+            "printedName": "TesseraKit.ChipKeyField",
+            "usr": "s:10TesseraKit12ChipKeyFieldO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Array",
+          "printedName": "[TesseraKit.ChipKeyField]",
+          "usr": "s:Sa"
+         }
+        ],
+        "declKind": "Accessor",
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit20PrintedMrzComparisonV15differingFieldsSayAA12ChipKeyFieldOGvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit20PrintedMrzComparisonV15differingFieldsSayAA12ChipKeyFieldOGvg"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipKeyField",
+          "printedName": "TesseraKit.ChipKeyField",
+          "usr": "s:10TesseraKit12ChipKeyFieldO"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Array",
+        "printedName": "[TesseraKit.ChipKeyField]",
+        "usr": "s:Sa"
+       }
+      ],
+      "declKind": "Var",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit20PrintedMrzComparisonV15differingFieldsSayAA12ChipKeyFieldOGvp",
+      "moduleName": "TesseraKit",
+      "name": "differingFields",
+      "printedName": "differingFields",
+      "usr": "s:10TesseraKit20PrintedMrzComparisonV15differingFieldsSayAA12ChipKeyFieldOGvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Bool",
+          "printedName": "Swift.Bool",
+          "usr": "s:Sb"
+         }
+        ],
+        "declKind": "Accessor",
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit20PrintedMrzComparisonV7allSameSbvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit20PrintedMrzComparisonV7allSameSbvg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       }
+      ],
+      "declKind": "Var",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit20PrintedMrzComparisonV7allSameSbvp",
+      "moduleName": "TesseraKit",
+      "name": "allSame",
+      "printedName": "allSame",
+      "usr": "s:10TesseraKit20PrintedMrzComparisonV7allSameSbvp"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "PrintedMrzComparison",
+        "printedName": "TesseraKit.PrintedMrzComparison",
+        "usr": "s:10TesseraKit20PrintedMrzComparisonV"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "PrintedFieldComparison",
+          "printedName": "TesseraKit.PrintedFieldComparison",
+          "usr": "s:10TesseraKit22PrintedFieldComparisonV"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Array",
+        "printedName": "[TesseraKit.PrintedFieldComparison]",
+        "usr": "s:Sa"
+       }
+      ],
+      "declKind": "Constructor",
+      "init_kind": "Designated",
+      "kind": "Constructor",
+      "mangledName": "$s10TesseraKit20PrintedMrzComparisonV10sameFormat6fieldsACSb_SayAA0c5FieldE0VGtcfc",
+      "moduleName": "TesseraKit",
+      "name": "init",
+      "printedName": "init(sameFormat:fields:)",
+      "usr": "s:10TesseraKit20PrintedMrzComparisonV10sameFormat6fieldsACSb_SayAA0c5FieldE0VGtcfc"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "PrintedMrzComparison",
+          "printedName": "TesseraKit.PrintedMrzComparison",
+          "usr": "s:10TesseraKit20PrintedMrzComparisonV"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "TesseraKit.PrintedMrzComparison?",
+        "usr": "s:Sq"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipCheckDetail",
+          "printedName": "Tessera.ChipCheckDetail",
+          "usr": "c:objc(cs)TesseraChipCheckDetail"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Tessera.ChipCheckDetail?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declKind": "Constructor",
+      "init_kind": "Designated",
+      "kind": "Constructor",
+      "mangledName": "$s10TesseraKit20PrintedMrzComparisonVyACSgSo0A15ChipCheckDetailCSgcfc",
+      "moduleName": "TesseraKit",
+      "name": "init",
+      "printedName": "init(_:)",
+      "usr": "s:10TesseraKit20PrintedMrzComparisonVyACSgSo0A15ChipCheckDetailCSgcfc"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "PrintedMrzComparison",
+        "printedName": "TesseraKit.PrintedMrzComparison",
+        "usr": "s:10TesseraKit20PrintedMrzComparisonV"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "PrintedMrzComparison",
+        "printedName": "TesseraKit.PrintedMrzComparison",
+        "usr": "s:10TesseraKit20PrintedMrzComparisonV"
+       }
+      ],
+      "declAttributes": [
+       "Implements"
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "implicit": true,
+      "kind": "Function",
+      "mangledName": "$s10TesseraKit20PrintedMrzComparisonV23__derived_struct_equalsySbAC_ACtFZ",
+      "moduleName": "TesseraKit",
+      "name": "__derived_struct_equals",
+      "printedName": "__derived_struct_equals(_:_:)",
+      "static": true,
+      "usr": "s:10TesseraKit20PrintedMrzComparisonV23__derived_struct_equalsySbAC_ACtFZ"
+     }
+    ],
+    "conformances": [
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss16SendableMetatypeP",
+      "name": "SendableMetatype",
+      "printedName": "SendableMetatype",
+      "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
+     }
+    ],
+    "declKind": "Struct",
+    "kind": "TypeDecl",
+    "mangledName": "$s10TesseraKit20PrintedMrzComparisonV",
+    "moduleName": "TesseraKit",
+    "name": "PrintedMrzComparison",
+    "printedName": "PrintedMrzComparison",
+    "usr": "s:10TesseraKit20PrintedMrzComparisonV"
+   },
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipReadOptionsError",
+          "printedName": "TesseraKit.ChipReadOptionsError",
+          "usr": "s:10TesseraKit20ChipReadOptionsErrorO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipReadOptionsError",
+            "printedName": "TesseraKit.ChipReadOptionsError",
+            "usr": "s:10TesseraKit20ChipReadOptionsErrorO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.ChipReadOptionsError.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.ChipReadOptionsError.Type) -> TesseraKit.ChipReadOptionsError"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit20ChipReadOptionsErrorO18noDataGroupsChosenyA2CmF",
+      "moduleName": "TesseraKit",
+      "name": "noDataGroupsChosen",
+      "printedName": "noDataGroupsChosen",
+      "usr": "s:10TesseraKit20ChipReadOptionsErrorO18noDataGroupsChosenyA2CmF"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "String",
+          "printedName": "Swift.String",
+          "usr": "s:SS"
+         }
+        ],
+        "declKind": "Accessor",
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit20ChipReadOptionsErrorO11descriptionSSvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit20ChipReadOptionsErrorO11descriptionSSvg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       }
+      ],
+      "declKind": "Var",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit20ChipReadOptionsErrorO11descriptionSSvp",
+      "moduleName": "TesseraKit",
+      "name": "description",
+      "printedName": "description",
+      "usr": "s:10TesseraKit20ChipReadOptionsErrorO11descriptionSSvp"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "ChipReadOptionsError",
+        "printedName": "TesseraKit.ChipReadOptionsError",
+        "usr": "s:10TesseraKit20ChipReadOptionsErrorO"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "ChipReadOptionsError",
+        "printedName": "TesseraKit.ChipReadOptionsError",
+        "usr": "s:10TesseraKit20ChipReadOptionsErrorO"
+       }
+      ],
+      "declAttributes": [
+       "Implements"
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "implicit": true,
+      "kind": "Function",
+      "mangledName": "$s10TesseraKit20ChipReadOptionsErrorO21__derived_enum_equalsySbAC_ACtFZ",
+      "moduleName": "TesseraKit",
+      "name": "__derived_enum_equals",
+      "printedName": "__derived_enum_equals(_:_:)",
+      "static": true,
+      "usr": "s:10TesseraKit20ChipReadOptionsErrorO21__derived_enum_equalsySbAC_ACtFZ"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Void",
+        "printedName": "()"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "Hasher",
+        "paramValueOwnership": "InOut",
+        "printedName": "Swift.Hasher",
+        "usr": "s:s6HasherV"
+       }
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "implicit": true,
+      "kind": "Function",
+      "mangledName": "$s10TesseraKit20ChipReadOptionsErrorO4hash4intoys6HasherVz_tF",
+      "moduleName": "TesseraKit",
+      "name": "hash",
+      "printedName": "hash(into:)",
+      "usr": "s:10TesseraKit20ChipReadOptionsErrorO4hash4intoys6HasherVz_tF"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit20ChipReadOptionsErrorO9hashValueSivg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit20ChipReadOptionsErrorO9hashValueSivg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Int",
+        "printedName": "Swift.Int",
+        "usr": "s:Si"
+       }
+      ],
+      "declKind": "Var",
+      "implicit": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit20ChipReadOptionsErrorO9hashValueSivp",
+      "moduleName": "TesseraKit",
+      "name": "hashValue",
+      "printedName": "hashValue",
+      "usr": "s:10TesseraKit20ChipReadOptionsErrorO9hashValueSivp"
+     }
+    ],
+    "conformances": [
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSH",
+      "name": "Hashable",
+      "printedName": "Hashable",
+      "usr": "s:SH"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss16SendableMetatypeP",
+      "name": "SendableMetatype",
+      "printedName": "SendableMetatype",
+      "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss23CustomStringConvertibleP",
+      "name": "CustomStringConvertible",
+      "printedName": "CustomStringConvertible",
+      "usr": "s:s23CustomStringConvertibleP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss5ErrorP",
+      "name": "Error",
+      "printedName": "Error",
+      "usr": "s:s5ErrorP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
+     }
+    ],
+    "declKind": "Enum",
+    "isEnumExhaustive": true,
+    "kind": "TypeDecl",
+    "mangledName": "$s10TesseraKit20ChipReadOptionsErrorO",
+    "moduleName": "TesseraKit",
+    "name": "ChipReadOptionsError",
+    "printedName": "ChipReadOptionsError",
+    "usr": "s:10TesseraKit20ChipReadOptionsErrorO"
    },
    {
     "children": [
@@ -7140,6 +9146,47 @@
       "children": [
        {
         "kind": "TypeNominal",
+        "name": "NormalizedTypedFields",
+        "printedName": "TesseraKit.NormalizedTypedFields",
+        "usr": "s:10TesseraKit21NormalizedTypedFieldsV"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       }
+      ],
+      "declAttributes": [
+       "Final"
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "isFromExtension": true,
+      "kind": "Function",
+      "mangledName": "$sSo20TesseraChipAccessKeyC0A3KitE20normalizeTypedFields14documentNumber11dateOfBirth0kL6ExpiryAC010NormalizedgH0VSS_S2StFZ",
+      "moduleName": "TesseraKit",
+      "name": "normalizeTypedFields",
+      "printedName": "normalizeTypedFields(documentNumber:dateOfBirth:dateOfExpiry:)",
+      "static": true,
+      "usr": "s:So20TesseraChipAccessKeyC0A3KitE20normalizeTypedFields14documentNumber11dateOfBirth0kL6ExpiryAC010NormalizedgH0VSS_S2StFZ"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
         "name": "Mrz",
         "printedName": "Tessera.ChipAccessKey.Mrz",
         "usr": "c:objc(cs)TesseraChipAccessKeyMrz"
@@ -7544,6 +9591,61 @@
       "name": "result",
       "printedName": "result",
       "usr": "s:So16TesseraChipCheckC0A3KitE6resultAC0bC6ResultOvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "PrintedMrzComparison",
+            "printedName": "TesseraKit.PrintedMrzComparison",
+            "usr": "s:10TesseraKit20PrintedMrzComparisonV"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "TesseraKit.PrintedMrzComparison?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declKind": "Accessor",
+        "isFromExtension": true,
+        "kind": "Accessor",
+        "mangledName": "$sSo16TesseraChipCheckC0A3KitE17printedComparisonAC010PrintedMrzF0VSgvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:So16TesseraChipCheckC0A3KitE17printedComparisonAC010PrintedMrzF0VSgvg"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "PrintedMrzComparison",
+          "printedName": "TesseraKit.PrintedMrzComparison",
+          "usr": "s:10TesseraKit20PrintedMrzComparisonV"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "TesseraKit.PrintedMrzComparison?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declKind": "Var",
+      "isFromExtension": true,
+      "kind": "Var",
+      "mangledName": "$sSo16TesseraChipCheckC0A3KitE17printedComparisonAC010PrintedMrzF0VSgvp",
+      "moduleName": "TesseraKit",
+      "name": "printedComparison",
+      "printedName": "printedComparison",
+      "usr": "s:So16TesseraChipCheckC0A3KitE17printedComparisonAC010PrintedMrzF0VSgvp"
      }
     ],
     "conformances": [
@@ -7613,6 +9715,1074 @@
     ],
     "superclassUsr": "c:objc(cs)TesseraBase",
     "usr": "c:objc(cs)TesseraChipCheck"
+   },
+   {
+    "children": [
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Int",
+            "printedName": "Swift.Int",
+            "usr": "s:Si"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Swift.Int?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declKind": "Accessor",
+        "isFromExtension": true,
+        "kind": "Accessor",
+        "mangledName": "$sSo15TesseraChipFileC0A3KitE12dataGroupIntSiSgvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:So15TesseraChipFileC0A3KitE12dataGroupIntSiSgvg"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Swift.Int?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declKind": "Var",
+      "isFromExtension": true,
+      "kind": "Var",
+      "mangledName": "$sSo15TesseraChipFileC0A3KitE12dataGroupIntSiSgvp",
+      "moduleName": "TesseraKit",
+      "name": "dataGroupInt",
+      "printedName": "dataGroupInt",
+      "usr": "s:So15TesseraChipFileC0A3KitE12dataGroupIntSiSgvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Int",
+            "printedName": "Swift.Int",
+            "usr": "s:Si"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Swift.Int?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declKind": "Accessor",
+        "isFromExtension": true,
+        "kind": "Accessor",
+        "mangledName": "$sSo15TesseraChipFileC0A3KitE14continuedAtIntSiSgvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:So15TesseraChipFileC0A3KitE14continuedAtIntSiSgvg"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Swift.Int?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declKind": "Var",
+      "isFromExtension": true,
+      "kind": "Var",
+      "mangledName": "$sSo15TesseraChipFileC0A3KitE14continuedAtIntSiSgvp",
+      "moduleName": "TesseraKit",
+      "name": "continuedAtInt",
+      "printedName": "continuedAtInt",
+      "usr": "s:So15TesseraChipFileC0A3KitE14continuedAtIntSiSgvp"
+     }
+    ],
+    "conformances": [
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSH",
+      "name": "Hashable",
+      "printedName": "Hashable",
+      "usr": "s:SH"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss23CustomStringConvertibleP",
+      "name": "CustomStringConvertible",
+      "printedName": "CustomStringConvertible",
+      "usr": "s:s23CustomStringConvertibleP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss28CustomDebugStringConvertibleP",
+      "name": "CustomDebugStringConvertible",
+      "printedName": "CustomDebugStringConvertible",
+      "usr": "s:s28CustomDebugStringConvertibleP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss7CVarArgP",
+      "name": "CVarArg",
+      "printedName": "CVarArg",
+      "usr": "s:s7CVarArgP"
+     },
+     {
+      "kind": "Conformance",
+      "name": "NSCopying",
+      "printedName": "NSCopying",
+      "usr": "c:objc(pl)NSCopying"
+     },
+     {
+      "kind": "Conformance",
+      "name": "NSObjectProtocol",
+      "printedName": "NSObjectProtocol",
+      "usr": "c:objc(pl)NSObject"
+     }
+    ],
+    "declAttributes": [
+     "Dynamic",
+     "ObjC"
+    ],
+    "declKind": "Class",
+    "inheritsConvenienceInitializers": true,
+    "isExternal": true,
+    "kind": "TypeDecl",
+    "moduleName": "Tessera",
+    "name": "ChipFile",
+    "objc_name": "TesseraChipFile",
+    "printedName": "ChipFile",
+    "superclassNames": [
+     "Tessera.KotlinBase",
+     "ObjectiveC.NSObject"
+    ],
+    "superclassUsr": "c:objc(cs)TesseraBase",
+    "usr": "c:objc(cs)TesseraChipFile"
+   },
+   {
+    "children": [
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Int",
+            "printedName": "Swift.Int",
+            "usr": "s:Si"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Swift.Int?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declKind": "Accessor",
+        "isFromExtension": true,
+        "kind": "Accessor",
+        "mangledName": "$sSo18TesseraChipFileRefC0A3KitE12dataGroupIntSiSgvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:So18TesseraChipFileRefC0A3KitE12dataGroupIntSiSgvg"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Swift.Int?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declKind": "Var",
+      "isFromExtension": true,
+      "kind": "Var",
+      "mangledName": "$sSo18TesseraChipFileRefC0A3KitE12dataGroupIntSiSgvp",
+      "moduleName": "TesseraKit",
+      "name": "dataGroupInt",
+      "printedName": "dataGroupInt",
+      "usr": "s:So18TesseraChipFileRefC0A3KitE12dataGroupIntSiSgvp"
+     }
+    ],
+    "conformances": [
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSH",
+      "name": "Hashable",
+      "printedName": "Hashable",
+      "usr": "s:SH"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss23CustomStringConvertibleP",
+      "name": "CustomStringConvertible",
+      "printedName": "CustomStringConvertible",
+      "usr": "s:s23CustomStringConvertibleP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss28CustomDebugStringConvertibleP",
+      "name": "CustomDebugStringConvertible",
+      "printedName": "CustomDebugStringConvertible",
+      "usr": "s:s28CustomDebugStringConvertibleP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss7CVarArgP",
+      "name": "CVarArg",
+      "printedName": "CVarArg",
+      "usr": "s:s7CVarArgP"
+     },
+     {
+      "kind": "Conformance",
+      "name": "NSCopying",
+      "printedName": "NSCopying",
+      "usr": "c:objc(pl)NSCopying"
+     },
+     {
+      "kind": "Conformance",
+      "name": "NSObjectProtocol",
+      "printedName": "NSObjectProtocol",
+      "usr": "c:objc(pl)NSObject"
+     }
+    ],
+    "declAttributes": [
+     "Dynamic",
+     "ObjC"
+    ],
+    "declKind": "Class",
+    "inheritsConvenienceInitializers": true,
+    "isExternal": true,
+    "kind": "TypeDecl",
+    "moduleName": "Tessera",
+    "name": "ChipFileRef",
+    "objc_name": "TesseraChipFileRef",
+    "printedName": "ChipFileRef",
+    "superclassNames": [
+     "Tessera.KotlinBase",
+     "ObjectiveC.NSObject"
+    ],
+    "superclassUsr": "c:objc(cs)TesseraBase",
+    "usr": "c:objc(cs)TesseraChipFileRef"
+   },
+   {
+    "children": [
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "String",
+          "printedName": "Swift.String",
+          "usr": "s:SS"
+         }
+        ],
+        "declKind": "Accessor",
+        "isFromExtension": true,
+        "kind": "Accessor",
+        "mangledName": "$sSo19TesseraAccessReportC0A3KitE12protocolNameSSvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:So19TesseraAccessReportC0A3KitE12protocolNameSSvg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       }
+      ],
+      "declKind": "Var",
+      "isFromExtension": true,
+      "kind": "Var",
+      "mangledName": "$sSo19TesseraAccessReportC0A3KitE12protocolNameSSvp",
+      "moduleName": "TesseraKit",
+      "name": "protocolName",
+      "printedName": "protocolName",
+      "usr": "s:So19TesseraAccessReportC0A3KitE12protocolNameSSvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Swift.String?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declKind": "Accessor",
+        "isFromExtension": true,
+        "kind": "Accessor",
+        "mangledName": "$sSo19TesseraAccessReportC0A3KitE12passwordNameSSSgvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:So19TesseraAccessReportC0A3KitE12passwordNameSSSgvg"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "String",
+          "printedName": "Swift.String",
+          "usr": "s:SS"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Swift.String?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declKind": "Var",
+      "isFromExtension": true,
+      "kind": "Var",
+      "mangledName": "$sSo19TesseraAccessReportC0A3KitE12passwordNameSSSgvp",
+      "moduleName": "TesseraKit",
+      "name": "passwordName",
+      "printedName": "passwordName",
+      "usr": "s:So19TesseraAccessReportC0A3KitE12passwordNameSSSgvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Int",
+            "printedName": "Swift.Int",
+            "usr": "s:Si"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Swift.Int?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declKind": "Accessor",
+        "isFromExtension": true,
+        "kind": "Accessor",
+        "mangledName": "$sSo19TesseraAccessReportC0A3KitE18paceParameterIdIntSiSgvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:So19TesseraAccessReportC0A3KitE18paceParameterIdIntSiSgvg"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Swift.Int?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declKind": "Var",
+      "isFromExtension": true,
+      "kind": "Var",
+      "mangledName": "$sSo19TesseraAccessReportC0A3KitE18paceParameterIdIntSiSgvp",
+      "moduleName": "TesseraKit",
+      "name": "paceParameterIdInt",
+      "printedName": "paceParameterIdInt",
+      "usr": "s:So19TesseraAccessReportC0A3KitE18paceParameterIdIntSiSgvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "String",
+            "printedName": "Swift.String",
+            "usr": "s:SS"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Swift.String?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declKind": "Accessor",
+        "isFromExtension": true,
+        "kind": "Accessor",
+        "mangledName": "$sSo19TesseraAccessReportC0A3KitE15paceMappingNameSSSgvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:So19TesseraAccessReportC0A3KitE15paceMappingNameSSSgvg"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "String",
+          "printedName": "Swift.String",
+          "usr": "s:SS"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Swift.String?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declKind": "Var",
+      "isFromExtension": true,
+      "kind": "Var",
+      "mangledName": "$sSo19TesseraAccessReportC0A3KitE15paceMappingNameSSSgvp",
+      "moduleName": "TesseraKit",
+      "name": "paceMappingName",
+      "printedName": "paceMappingName",
+      "usr": "s:So19TesseraAccessReportC0A3KitE15paceMappingNameSSSgvp"
+     }
+    ],
+    "conformances": [
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSH",
+      "name": "Hashable",
+      "printedName": "Hashable",
+      "usr": "s:SH"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss23CustomStringConvertibleP",
+      "name": "CustomStringConvertible",
+      "printedName": "CustomStringConvertible",
+      "usr": "s:s23CustomStringConvertibleP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss28CustomDebugStringConvertibleP",
+      "name": "CustomDebugStringConvertible",
+      "printedName": "CustomDebugStringConvertible",
+      "usr": "s:s28CustomDebugStringConvertibleP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss7CVarArgP",
+      "name": "CVarArg",
+      "printedName": "CVarArg",
+      "usr": "s:s7CVarArgP"
+     },
+     {
+      "kind": "Conformance",
+      "name": "NSCopying",
+      "printedName": "NSCopying",
+      "usr": "c:objc(pl)NSCopying"
+     },
+     {
+      "kind": "Conformance",
+      "name": "NSObjectProtocol",
+      "printedName": "NSObjectProtocol",
+      "usr": "c:objc(pl)NSObject"
+     }
+    ],
+    "declAttributes": [
+     "Dynamic",
+     "ObjC"
+    ],
+    "declKind": "Class",
+    "inheritsConvenienceInitializers": true,
+    "isExternal": true,
+    "kind": "TypeDecl",
+    "moduleName": "Tessera",
+    "name": "AccessReport",
+    "objc_name": "TesseraAccessReport",
+    "printedName": "AccessReport",
+    "superclassNames": [
+     "Tessera.KotlinBase",
+     "ObjectiveC.NSObject"
+    ],
+    "superclassUsr": "c:objc(cs)TesseraBase",
+    "usr": "c:objc(cs)TesseraAccessReport"
+   },
+   {
+    "children": [
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "String",
+          "printedName": "Swift.String",
+          "usr": "s:SS"
+         }
+        ],
+        "declKind": "Accessor",
+        "isFromExtension": true,
+        "kind": "Accessor",
+        "mangledName": "$sSo22TesseraMasterListCheckC0A3KitE8kindNameSSvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:So22TesseraMasterListCheckC0A3KitE8kindNameSSvg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       }
+      ],
+      "declKind": "Var",
+      "isFromExtension": true,
+      "kind": "Var",
+      "mangledName": "$sSo22TesseraMasterListCheckC0A3KitE8kindNameSSvp",
+      "moduleName": "TesseraKit",
+      "name": "kindName",
+      "printedName": "kindName",
+      "usr": "s:So22TesseraMasterListCheckC0A3KitE8kindNameSSvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipCheckResult",
+          "printedName": "TesseraKit.ChipCheckResult",
+          "usr": "s:10TesseraKit15ChipCheckResultO"
+         }
+        ],
+        "declKind": "Accessor",
+        "isFromExtension": true,
+        "kind": "Accessor",
+        "mangledName": "$sSo22TesseraMasterListCheckC0A3KitE6resultAC04ChipD6ResultOvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:So22TesseraMasterListCheckC0A3KitE6resultAC04ChipD6ResultOvg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "ChipCheckResult",
+        "printedName": "TesseraKit.ChipCheckResult",
+        "usr": "s:10TesseraKit15ChipCheckResultO"
+       }
+      ],
+      "declKind": "Var",
+      "isFromExtension": true,
+      "kind": "Var",
+      "mangledName": "$sSo22TesseraMasterListCheckC0A3KitE6resultAC04ChipD6ResultOvp",
+      "moduleName": "TesseraKit",
+      "name": "result",
+      "printedName": "result",
+      "usr": "s:So22TesseraMasterListCheckC0A3KitE6resultAC04ChipD6ResultOvp"
+     }
+    ],
+    "conformances": [
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSH",
+      "name": "Hashable",
+      "printedName": "Hashable",
+      "usr": "s:SH"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss23CustomStringConvertibleP",
+      "name": "CustomStringConvertible",
+      "printedName": "CustomStringConvertible",
+      "usr": "s:s23CustomStringConvertibleP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss28CustomDebugStringConvertibleP",
+      "name": "CustomDebugStringConvertible",
+      "printedName": "CustomDebugStringConvertible",
+      "usr": "s:s28CustomDebugStringConvertibleP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss7CVarArgP",
+      "name": "CVarArg",
+      "printedName": "CVarArg",
+      "usr": "s:s7CVarArgP"
+     },
+     {
+      "kind": "Conformance",
+      "name": "NSCopying",
+      "printedName": "NSCopying",
+      "usr": "c:objc(pl)NSCopying"
+     },
+     {
+      "kind": "Conformance",
+      "name": "NSObjectProtocol",
+      "printedName": "NSObjectProtocol",
+      "usr": "c:objc(pl)NSObject"
+     }
+    ],
+    "declAttributes": [
+     "Dynamic",
+     "ObjC"
+    ],
+    "declKind": "Class",
+    "inheritsConvenienceInitializers": true,
+    "isExternal": true,
+    "kind": "TypeDecl",
+    "moduleName": "Tessera",
+    "name": "MasterListCheck",
+    "objc_name": "TesseraMasterListCheck",
+    "printedName": "MasterListCheck",
+    "superclassNames": [
+     "Tessera.KotlinBase",
+     "ObjectiveC.NSObject"
+    ],
+    "superclassUsr": "c:objc(cs)TesseraBase",
+    "usr": "c:objc(cs)TesseraMasterListCheck"
+   },
+   {
+    "children": [
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "declKind": "Accessor",
+        "isFromExtension": true,
+        "kind": "Accessor",
+        "mangledName": "$sSo34TesseraUnreadableSignerCertificateC0A3KitE11positionIntSivg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:So34TesseraUnreadableSignerCertificateC0A3KitE11positionIntSivg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Int",
+        "printedName": "Swift.Int",
+        "usr": "s:Si"
+       }
+      ],
+      "declKind": "Var",
+      "isFromExtension": true,
+      "kind": "Var",
+      "mangledName": "$sSo34TesseraUnreadableSignerCertificateC0A3KitE11positionIntSivp",
+      "moduleName": "TesseraKit",
+      "name": "positionInt",
+      "printedName": "positionInt",
+      "usr": "s:So34TesseraUnreadableSignerCertificateC0A3KitE11positionIntSivp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "declKind": "Accessor",
+        "isFromExtension": true,
+        "kind": "Accessor",
+        "mangledName": "$sSo34TesseraUnreadableSignerCertificateC0A3KitE9lengthIntSivg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:So34TesseraUnreadableSignerCertificateC0A3KitE9lengthIntSivg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Int",
+        "printedName": "Swift.Int",
+        "usr": "s:Si"
+       }
+      ],
+      "declKind": "Var",
+      "isFromExtension": true,
+      "kind": "Var",
+      "mangledName": "$sSo34TesseraUnreadableSignerCertificateC0A3KitE9lengthIntSivp",
+      "moduleName": "TesseraKit",
+      "name": "lengthInt",
+      "printedName": "lengthInt",
+      "usr": "s:So34TesseraUnreadableSignerCertificateC0A3KitE9lengthIntSivp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "declKind": "Accessor",
+        "isFromExtension": true,
+        "kind": "Accessor",
+        "mangledName": "$sSo34TesseraUnreadableSignerCertificateC0A3KitE9offsetIntSivg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:So34TesseraUnreadableSignerCertificateC0A3KitE9offsetIntSivg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Int",
+        "printedName": "Swift.Int",
+        "usr": "s:Si"
+       }
+      ],
+      "declKind": "Var",
+      "isFromExtension": true,
+      "kind": "Var",
+      "mangledName": "$sSo34TesseraUnreadableSignerCertificateC0A3KitE9offsetIntSivp",
+      "moduleName": "TesseraKit",
+      "name": "offsetInt",
+      "printedName": "offsetInt",
+      "usr": "s:So34TesseraUnreadableSignerCertificateC0A3KitE9offsetIntSivp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "String",
+          "printedName": "Swift.String",
+          "usr": "s:SS"
+         }
+        ],
+        "declKind": "Accessor",
+        "isFromExtension": true,
+        "kind": "Accessor",
+        "mangledName": "$sSo34TesseraUnreadableSignerCertificateC0A3KitE11problemNameSSvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:So34TesseraUnreadableSignerCertificateC0A3KitE11problemNameSSvg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "String",
+        "printedName": "Swift.String",
+        "usr": "s:SS"
+       }
+      ],
+      "declKind": "Var",
+      "isFromExtension": true,
+      "kind": "Var",
+      "mangledName": "$sSo34TesseraUnreadableSignerCertificateC0A3KitE11problemNameSSvp",
+      "moduleName": "TesseraKit",
+      "name": "problemName",
+      "printedName": "problemName",
+      "usr": "s:So34TesseraUnreadableSignerCertificateC0A3KitE11problemNameSSvp"
+     }
+    ],
+    "conformances": [
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSH",
+      "name": "Hashable",
+      "printedName": "Hashable",
+      "usr": "s:SH"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss23CustomStringConvertibleP",
+      "name": "CustomStringConvertible",
+      "printedName": "CustomStringConvertible",
+      "usr": "s:s23CustomStringConvertibleP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss28CustomDebugStringConvertibleP",
+      "name": "CustomDebugStringConvertible",
+      "printedName": "CustomDebugStringConvertible",
+      "usr": "s:s28CustomDebugStringConvertibleP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss7CVarArgP",
+      "name": "CVarArg",
+      "printedName": "CVarArg",
+      "usr": "s:s7CVarArgP"
+     },
+     {
+      "kind": "Conformance",
+      "name": "NSCopying",
+      "printedName": "NSCopying",
+      "usr": "c:objc(pl)NSCopying"
+     },
+     {
+      "kind": "Conformance",
+      "name": "NSObjectProtocol",
+      "printedName": "NSObjectProtocol",
+      "usr": "c:objc(pl)NSObject"
+     }
+    ],
+    "declAttributes": [
+     "Dynamic",
+     "ObjC"
+    ],
+    "declKind": "Class",
+    "inheritsConvenienceInitializers": true,
+    "isExternal": true,
+    "kind": "TypeDecl",
+    "moduleName": "Tessera",
+    "name": "UnreadableSignerCertificate",
+    "objc_name": "TesseraUnreadableSignerCertificate",
+    "printedName": "UnreadableSignerCertificate",
+    "superclassNames": [
+     "Tessera.KotlinBase",
+     "ObjectiveC.NSObject"
+    ],
+    "superclassUsr": "c:objc(cs)TesseraBase",
+    "usr": "c:objc(cs)TesseraUnreadableSignerCertificate"
+   },
+   {
+    "children": [
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "declKind": "Accessor",
+        "isFromExtension": true,
+        "kind": "Accessor",
+        "mangledName": "$sSo25TesseraSecurityObjectViewC0A3KitE26unreadableCertificateTotalSivg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:So25TesseraSecurityObjectViewC0A3KitE26unreadableCertificateTotalSivg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Int",
+        "printedName": "Swift.Int",
+        "usr": "s:Si"
+       }
+      ],
+      "declKind": "Var",
+      "isFromExtension": true,
+      "kind": "Var",
+      "mangledName": "$sSo25TesseraSecurityObjectViewC0A3KitE26unreadableCertificateTotalSivp",
+      "moduleName": "TesseraKit",
+      "name": "unreadableCertificateTotal",
+      "printedName": "unreadableCertificateTotal",
+      "usr": "s:So25TesseraSecurityObjectViewC0A3KitE26unreadableCertificateTotalSivp"
+     }
+    ],
+    "conformances": [
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSH",
+      "name": "Hashable",
+      "printedName": "Hashable",
+      "usr": "s:SH"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss23CustomStringConvertibleP",
+      "name": "CustomStringConvertible",
+      "printedName": "CustomStringConvertible",
+      "usr": "s:s23CustomStringConvertibleP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss28CustomDebugStringConvertibleP",
+      "name": "CustomDebugStringConvertible",
+      "printedName": "CustomDebugStringConvertible",
+      "usr": "s:s28CustomDebugStringConvertibleP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss7CVarArgP",
+      "name": "CVarArg",
+      "printedName": "CVarArg",
+      "usr": "s:s7CVarArgP"
+     },
+     {
+      "kind": "Conformance",
+      "name": "NSCopying",
+      "printedName": "NSCopying",
+      "usr": "c:objc(pl)NSCopying"
+     },
+     {
+      "kind": "Conformance",
+      "name": "NSObjectProtocol",
+      "printedName": "NSObjectProtocol",
+      "usr": "c:objc(pl)NSObject"
+     }
+    ],
+    "declAttributes": [
+     "Dynamic",
+     "ObjC"
+    ],
+    "declKind": "Class",
+    "inheritsConvenienceInitializers": true,
+    "isExternal": true,
+    "kind": "TypeDecl",
+    "moduleName": "Tessera",
+    "name": "SecurityObjectView",
+    "objc_name": "TesseraSecurityObjectView",
+    "printedName": "SecurityObjectView",
+    "superclassNames": [
+     "Tessera.KotlinBase",
+     "ObjectiveC.NSObject"
+    ],
+    "superclassUsr": "c:objc(cs)TesseraBase",
+    "usr": "c:objc(cs)TesseraSecurityObjectView"
    },
    {
     "children": [
@@ -7696,11 +10866,68 @@
       "funcSelfKind": "NonMutating",
       "isFromExtension": true,
       "kind": "Function",
-      "mangledName": "$sSo29TesseraChipReadOptionsBuilderC0A3KitE10dataGroupsyABSaySiGF",
+      "mangledName": "$sSo29TesseraChipReadOptionsBuilderC0A3KitE10dataGroupsyABSaySiGKF",
       "moduleName": "TesseraKit",
       "name": "dataGroups",
       "printedName": "dataGroups(_:)",
-      "usr": "s:So29TesseraChipReadOptionsBuilderC0A3KitE10dataGroupsyABSaySiGF"
+      "throwing": true,
+      "usr": "s:So29TesseraChipReadOptionsBuilderC0A3KitE10dataGroupsyABSaySiGKF"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Builder",
+        "printedName": "Tessera.ChipReadOptions.Builder",
+        "usr": "c:objc(cs)TesseraChipReadOptionsBuilder"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "MrzDocument",
+        "printedName": "Tessera.MrzDocument",
+        "usr": "c:objc(cs)TesseraMrzDocument"
+       }
+      ],
+      "declAttributes": [
+       "DiscardableResult"
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "isFromExtension": true,
+      "kind": "Function",
+      "mangledName": "$sSo29TesseraChipReadOptionsBuilderC0A3KitE15printedDocumentyABSo0a3MrzH0CF",
+      "moduleName": "TesseraKit",
+      "name": "printedDocument",
+      "printedName": "printedDocument(_:)",
+      "usr": "s:So29TesseraChipReadOptionsBuilderC0A3KitE15printedDocumentyABSo0a3MrzH0CF"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Builder",
+        "printedName": "Tessera.ChipReadOptions.Builder",
+        "usr": "c:objc(cs)TesseraChipReadOptionsBuilder"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "ParseResult",
+        "printedName": "Tessera.ParseResult",
+        "usr": "c:objc(cs)TesseraParseResult"
+       }
+      ],
+      "declAttributes": [
+       "DiscardableResult"
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "isFromExtension": true,
+      "kind": "Function",
+      "mangledName": "$sSo29TesseraChipReadOptionsBuilderC0A3KitE15printedDocument5parseABSo0A11ParseResultC_tF",
+      "moduleName": "TesseraKit",
+      "name": "printedDocument",
+      "printedName": "printedDocument(parse:)",
+      "usr": "s:So29TesseraChipReadOptionsBuilderC0A3KitE15printedDocument5parseABSo0A11ParseResultC_tF"
      },
      {
       "children": [

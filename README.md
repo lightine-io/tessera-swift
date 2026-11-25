@@ -1,6 +1,6 @@
 # tessera-swift
 
-This repository is the Swift package for Tessera, the open-source SDK that reads, validates, and generates MRZ data. An MRZ (machine-readable zone) is the block of text lines printed at the bottom of a passport or ID card page. The package vends two products: `Tessera`, the XCFramework with the Kotlin core and the headless readers, and `TesseraUI`, the SwiftUI scanner screen. The current release is 0.7.0. The Kotlin source and the releases live in the [main repository](https://github.com/lightine-io/tessera). The SDK reports what it read, and your app decides what to do with it.
+This repository is the Swift package for Tessera, the open-source SDK that reads, validates, and generates MRZ data. An MRZ (machine-readable zone) is the block of text lines printed at the bottom of a passport or ID card page. The package vends three products: `Tessera`, the XCFramework with the Kotlin core and the headless readers, `TesseraKit`, the headless Swift layer for reading a chip, and `TesseraUI`, the SwiftUI scanner screen. The current release is 0.7.0. The Kotlin source and the releases live in the [main repository](https://github.com/lightine-io/tessera). The SDK reports what it read, and your app decides what to do with it.
 
 ## Install
 
@@ -49,9 +49,21 @@ struct ScannerApp: App {
 
 For the full walkthrough, with the output you should see, read [Read your first MRZ on iOS with the ready-made screen](https://lightine.youtrack.cloud/articles/TES-A-77). To parse an MRZ string in Swift, read [Parse an MRZ string on iOS](https://lightine.youtrack.cloud/articles/TES-A-113).
 
+## Read a chip (headless)
+
+`TesseraKit` reads the chip of a document with no screen of its own: the system NFC sheet is the only interface. Add the `TesseraKit` product to your target, and import `Tessera` and `TesseraKit`. Three lines:
+
+```swift
+let options = try ChipReadOptions.Builder(accessKey: key).build()
+let reading = ChipReading.start(options: options)
+let finish = await reading.ending
+```
+
+`key` comes from the scanner result (`try ChipAccessKey.from(parse: scanned)`), from typed values (`ChipAccessKey.fromTypedFields(...)`, after `ChipAccessKey.normalizeTypedFields(...)`), or from the card access number (`ChipAccessKey.fromCan(...)`). A key is used up by one read, so build a new one for the next read. `reading.updates` is an `AsyncStream` of progress for your own UI, and `finish.outcome` says how the read ended. Your app needs the NFC entitlement and an `NFCReaderUsageDescription` entry in its Info.plist.
+
 ## Requirements
 
-- An iOS 18 or higher deployment target.
+- An iOS 15 or higher deployment target. This is the package minimum, set in `Package.swift`. Reading a chip needs a device with NFC; the simulator has none.
 - Xcode 16 or higher.
 - An `NSCameraUsageDescription` entry in your target's Info.plist, or iOS ends the app when it opens the camera:
 

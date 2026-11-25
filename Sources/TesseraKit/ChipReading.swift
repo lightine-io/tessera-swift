@@ -47,8 +47,15 @@ import Tessera
 /// starts its `for await` later still sees all of them, in order. The buffer has no limit: a slow
 /// consumer never makes the reader wait and never misses a state change or the finish.
 ///
-/// **Threads.** The reader calls back on a background queue. The loop over `updates` runs on the
-/// actor of the task that runs it, so in a `@MainActor` function you can update the UI directly.
+/// **Threads and order.** The Kotlin reader can deliver its calls on the main queue (its default) or
+/// on its own thread (`CALLER`); with both, calls never overlap, come in order, and the ending comes
+/// last. This package asks for its own thread (`CALLER`) in the settings it builds, because the
+/// stream already does what the main queue would: the updates are queued in the order they arrive,
+/// from one call at a time, and the ending is recorded after the last of them. Nothing hops queues
+/// on the way, so nothing can reorder. A call may come before ``start(options:texts:settings:)``
+/// returns; that is covered. The loop over `updates` runs on the actor of the task that runs it, so
+/// in a `@MainActor` function you can update the UI directly. If you pass your own Kotlin settings
+/// (``start(options:texts:coreSettings:)``) either `observerOn` value is safe.
 ///
 /// **Sendable.** The Kotlin update and ending objects are not made `Sendable` (this package does
 /// not add a conformance to types it does not own). ``ChipReadSnapshot`` and ``ChipReadFinish`` are

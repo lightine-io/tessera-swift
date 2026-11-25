@@ -114,7 +114,9 @@ public struct ChipReadSettings {
         )
     }
 
-    /// The Kotlin settings these values stand for (clamped as described above).
+    /// The Kotlin settings these values stand for (clamped as described above). The observer thread is
+    /// `CALLER`: updates reach ``ChipReading`` on the reader's own thread, in order and never
+    /// overlapping, and ``ChipReading/updates`` hands them on from there.
     public func kotlinSettings() -> CoreNfcReadSettings {
         let builder = CoreNfcReadSettings.Builder()
             .linkLoss(policy: linkLoss.kotlinPolicy())
@@ -122,6 +124,9 @@ public struct ChipReadSettings {
             .commandTimeoutMillis(millis: Self.millis(commandTimeout, minimum: 1))
             .waitAfterSystemEndMillis(millis: Self.millis(waitAfterSystemEnd, minimum: 0))
             .telemetry(sink: telemetry)
+            // The Swift layer orders and buffers updates itself (see `ChipReadingCore`), so the
+            // reader's own thread is enough: asking for the main queue would add one more hop.
+            .observerOn(thread: .caller)
         // Every value is in range, so the build cannot be refused; the defaults are the fallback.
         return (try? builder.build()) ?? CoreNfcReadSettings()
     }
@@ -201,6 +206,10 @@ public struct ChipReadStepEvent: Sendable, Equatable {
 /// ```
 ///
 /// The closure runs on the reader's background queue. Events that are not read steps are ignored.
+///
+/// This class stays a `TelemetrySink` that filters for `ChipReadEvent` itself. The Kotlin
+/// `ChipReadEventSink` is the same filter as a protocol, but a Swift type that adopts it must still
+/// write `record(event:)` for the general sink, so adopting it would not make this class shorter.
 ///
 /// - Since: 1.0.0
 public final class ChipReadStepSink: NSObject, TelemetrySink, @unchecked Sendable {

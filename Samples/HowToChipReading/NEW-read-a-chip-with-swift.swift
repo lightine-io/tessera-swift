@@ -17,9 +17,13 @@ func readChipShortest(key: ChipAccessKey) async throws -> ChipRead? {
 // typed, from the printed values with their check digits, or from the card access number. Every
 // one throws a Swift error that names the field and the problem, never the value.
 func makeKeys(scanned: ParseResult) throws -> [ChipAccessKey] {
-    [
+    // Text from a text field: let the SDK trim the spaces and upper-case the letters, and see what it did.
+    let typed = ChipAccessKey.normalizeTypedFields(documentNumber: " l898902c3", dateOfBirth: "740812", dateOfExpiry: "120415")
+    if typed.wasChanged { print("tidied: \(typed.changedFields.map(\.rawValue))") } // field names, never values
+    return [
         try ChipAccessKey.from(parse: scanned),
-        try ChipAccessKey.fromTypedFields(documentNumber: "L898902C3", dateOfBirth: "740812", dateOfExpiry: "120415"),
+        try ChipAccessKey.fromTypedFields(
+            documentNumber: typed.documentNumber, dateOfBirth: typed.dateOfBirth, dateOfExpiry: typed.dateOfExpiry),
         try ChipAccessKey.fromMrz(
             documentNumber: "L898902C3", documentNumberCheckDigit: "6",
             dateOfBirth: "740812", dateOfBirthCheckDigit: "2",
@@ -27,6 +31,15 @@ func makeKeys(scanned: ParseResult) throws -> [ChipAccessKey] {
         ),
         try ChipAccessKey.fromCan("123456"),
     ]
+}
+
+// Compare the chip's DG1 with the MRZ the scanner read. The answer is a fact per field, never a value.
+func readAndCompare(scanned: ParseResult) async throws -> [PrintedFieldComparison] {
+    let key = try ChipAccessKey.from(parse: scanned)
+    let options = try ChipReadOptions.Builder(accessKey: key).printedDocument(parse: scanned).build()
+    let finish = await ChipReading.start(options: options).ending
+    let check = finish.read?.checks.compactMap(\.printedComparison).first
+    return check?.fields ?? [] // each field: .same, .different or .notComparable
 }
 
 // The full use: a scanned document as the key, root certificates from a file, a check time, custom
@@ -49,6 +62,7 @@ final class ChipReadModel: ObservableObject {
             let options = try ChipReadOptions.Builder(accessKey: key)
                 .dataGroups([1, 2])
                 .trustAnchors(roots)
+                .printedDocument(parse: scanned) // adds the printed-versus-chip comparison
                 .checkTime(Date()) // without it the validity checks are reported as not run
                 .build()
             let texts = ChipReadTexts(

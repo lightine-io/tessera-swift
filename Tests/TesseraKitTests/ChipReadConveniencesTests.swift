@@ -51,6 +51,92 @@ struct ChipReadConveniencesTests {
         #expect(throws: Error.self) { _ = try builder.build() }
     }
 
+    @Test func anEmptyDataGroupListIsASwiftErrorThatReadsWell() throws {
+        let builder = try ChipReadOptions.Builder(accessKey: key())
+        #expect(throws: ChipReadOptionsError.noDataGroupsChosen) { _ = try builder.dataGroups([]) }
+        #expect(ChipReadOptionsError.noDataGroupsChosen.description.contains("at least one"))
+    }
+
+    @Test func theKotlinCollectionFormOfDataGroupsIsStillThereAndAnEmptyOneFailsAtBuild() throws {
+        let numbers: Set<KotlinInt> = [KotlinInt(int: 1)]
+        let built = try ChipReadOptions.Builder(accessKey: key()).dataGroups(numbers: numbers).build()
+        #expect(built.dataGroups.count == 1)
+        let empty = try ChipReadOptions.Builder(accessKey: key()).dataGroups(numbers: [])
+        #expect(throws: Error.self) { _ = try empty.build() }
+    }
+
+    // MARK: printed document
+
+    private static let specimenLines = [
+        "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<",
+        "L898902C36UTO7408122F1204159ZE184226B<<<<<10",
+    ]
+
+    private func parsedSpecimen() -> ParseResult {
+        MrzParser.shared.parse(
+            lines: Self.specimenLines,
+            referenceTime: KotlinInstant.companion.fromEpochMilliseconds(epochMilliseconds: 1_700_000_000_000))
+    }
+
+    @Test func printedDocumentIsPassedToTheOptions() throws {
+        let result = parsedSpecimen()
+        let document = try #require((result as? ParseResult.Success)?.document)
+        let options = try ChipReadOptions.Builder(accessKey: key()).printedDocument(document).build()
+        #expect(options.printedDocument === document)
+        #expect(try ChipReadOptions.Builder(accessKey: key()).build().printedDocument == nil)
+    }
+
+    @Test func printedDocumentTakesAParseResultAndIgnoresAFailure() throws {
+        let result = parsedSpecimen()
+        let options = try ChipReadOptions.Builder(accessKey: key()).printedDocument(parse: result).build()
+        #expect(options.printedDocument != nil)
+        let failed = MrzParser.shared.parse(
+            lines: ["not", "an mrz"],
+            referenceTime: KotlinInstant.companion.fromEpochMilliseconds(epochMilliseconds: 1_700_000_000_000))
+        let none = try ChipReadOptions.Builder(accessKey: key()).printedDocument(parse: failed).build()
+        #expect(none.printedDocument == nil)
+    }
+
+    @Test func thePerFieldComparisonIsASwiftValueWithNoValues() throws {
+        let detail = ChipCheckDetail.PrintedMrzFields(
+            sameFormat: true,
+            fields: [.documentNumber: .same, .dateOfBirth: .different, .optionalData: .notComparable])
+        let comparison = try #require(PrintedMrzComparison(detail))
+        #expect(comparison.sameFormat)
+        #expect(comparison.fields == [
+            PrintedFieldComparison(field: .documentNumber, match: .same),
+            PrintedFieldComparison(field: .dateOfBirth, match: .different),
+            PrintedFieldComparison(field: .optionalData, match: .notComparable),
+        ])
+        #expect(comparison.differingFields == [.dateOfBirth])
+        #expect(!comparison.allSame)
+        #expect(PrintedMrzComparison(nil) == nil)
+        for match in ChipFieldMatch.entries { #expect(PrintedFieldMatch(match) != .unknown) }
+    }
+
+    @Test func aComparisonOfSameFieldsIsAllSame() throws {
+        let detail = ChipCheckDetail.PrintedMrzFields(sameFormat: true, fields: [.documentNumber: .same, .sex: .same])
+        #expect(try #require(PrintedMrzComparison(detail)).allSame)
+        let otherFormat = ChipCheckDetail.PrintedMrzFields(sameFormat: false, fields: [.documentNumber: .same])
+        #expect(try !#require(PrintedMrzComparison(otherFormat)).allSame)
+    }
+
+    // MARK: facts as Swift numbers and names
+
+    @Test func theFactAccessorsExist() {
+        // The Kotlin types below have no public constructors, so their values cannot be built here;
+        // a key path proves the Swift accessors compile with the types the header gives.
+        let paths: [AnyKeyPath] = [
+            \ChipFile.dataGroupInt, \ChipFile.continuedAtInt, \ChipFileRef.dataGroupInt,
+            \AccessReport.protocolName, \AccessReport.passwordName, \AccessReport.paceParameterIdInt,
+            \AccessReport.paceMappingName, \MasterListCheck.kindName, \MasterListCheck.result,
+            \UnreadableSignerCertificate.positionInt, \UnreadableSignerCertificate.lengthInt,
+            \UnreadableSignerCertificate.offsetInt, \UnreadableSignerCertificate.problemName,
+            \SecurityObjectView.unreadableCertificateTotal,
+        ]
+        #expect(paths.count == 14)
+    }
+
     @Test func trustAnchorsTakeALoadOrAnArray() throws {
         let load = TrustAnchors.shared.load(data: Data(Self.pem.utf8))
         let fromLoad = try ChipReadOptions.Builder(accessKey: key()).trustAnchors(load).build()
@@ -171,9 +257,20 @@ struct ChipReadConveniencesTests {
 
     @Test func aCheckOutcomeBecomesASwiftEnum() {
         #expect(ChipCheckResult.from(CheckOutcomePassed.shared) == .passed)
-        #expect(ChipCheckResult.from(CheckOutcomeFailed(reason: ChipCheckReason.hashDiffers)) == .failed(reason: "HASH_DIFFERS"))
-        #expect(ChipCheckResult.from(CheckOutcomeNotRun(reason: ChipCheckReason.noTimeGiven)) == .notRun(reason: "NO_TIME_GIVEN"))
+        #expect(ChipCheckResult.from(CheckOutcomeFailed(reason: ChipCheckReason.hashDiffers)) == .failed(reason: ChipCheckReason.hashDiffers.code))
+        #expect(ChipCheckResult.from(CheckOutcomeNotRun(reason: ChipCheckReason.noTimeGiven)) == .notRun(reason: ChipCheckReason.noTimeGiven.code))
         #expect(ChipCheckResult.from(CheckOutcomeNotApplicable(reason: nil)) == .notApplicable(reason: nil))
         #expect(ChipCheckResult(CheckOutcomePassed.shared) == .passed)
+    }
+
+    @Test func aReasonIsGivenByItsStableCode() {
+        let failed = ChipCheckResult.from(CheckOutcomeFailed(reason: ChipCheckReason.hashDiffers))
+        guard case .failed(let code?) = failed else { Issue.record("no code"); return }
+        #expect(code.contains("hash-differs"))
+        #expect(code != "HASH_DIFFERS")
+        for reason in ChipCheckReason.entries { #expect(!reason.code.isEmpty) }
+        for reason in MasterListCheckReason.entries {
+            #expect(ChipCheckResult.from(CheckOutcomeNotRun(reason: reason)) == .notRun(reason: reason.code))
+        }
     }
 }

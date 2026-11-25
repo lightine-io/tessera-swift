@@ -106,4 +106,24 @@ struct ChipReadingTests {
         reading.cancel()
         #expect(handle.cancelCount == 0)
     }
+
+    @Test func callsFromAnotherQueueKeepTheirOrderAndTheEndingIsLast() async throws {
+        let real = try await RealReading.sample()
+        let fake = Fake()
+        let reading = ChipReading(starter: fake.starter)
+        let observer = fake.observer
+        // The reader's own thread (`CALLER`) is not the main queue: deliver from a serial queue, as it does.
+        let queue = DispatchQueue(label: "test.reader")
+        let raw = real.rawUpdates
+        let repeated = (0..<20).flatMap { _ in raw }
+        queue.async {
+            for update in repeated { observer.onUpdate(update: update) }
+            observer.onEnding(ending: real.rawEnding)
+        }
+        var received: [ChipReadSnapshot] = []
+        for await update in reading.updates { received.append(update) }
+        #expect(received.count == repeated.count)
+        #expect(zip(received, repeated).allSatisfy { $0.raw === $1 })
+        #expect(await reading.ending.raw === real.rawEnding)
+    }
 }
