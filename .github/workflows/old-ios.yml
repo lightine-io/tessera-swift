@@ -17,9 +17,17 @@ on:
         description: "Branch, tag or SHA of lightine-io/tessera to build the XCFramework from"
         required: false
         default: main
+      focus:
+        description: "full: every test on every leg. permission: only ScannerModelPermissionTests, only on iOS 16.4, with a trace"
+        required: false
+        type: choice
+        default: full
+        options:
+          - full
+          - permission
   # TEMPORARY: lets the workflow run from this branch before it exists on the default branch
   # (workflow_dispatch only lists workflows that are on the default branch). Remove the push trigger
-  # when TES-343 is merged.
+  # when TES-343 is merged. A pushed branch whose name ends in `-perm-trace` runs the `permission` focus.
   push:
     branches:
       - "feature/tes-343-*"
@@ -36,6 +44,8 @@ env:
   FRAMEWORK_XCODE_VERSION: "26.4.1"
   # On push runs the matching framework branch; on manual runs the input.
   TESSERA_REF: ${{ github.event_name == 'push' && 'feature/tes-343-ios-15-minimum' || inputs.tessera_ref }}
+  # `permission`: only the permission-watcher suite on iOS 16.4 (TES-343 diagnosis). `full`: everything.
+  FOCUS: ${{ (inputs.focus == 'permission' || (github.event_name == 'push' && endsWith(github.ref_name, '-perm-trace'))) && 'permission' || 'full' }}
 
 jobs:
   framework:
@@ -112,15 +122,14 @@ jobs:
     timeout-minutes: 120
     strategy:
       fail-fast: false
+      # `optional`: a leg whose runtime this runner's Xcode may not offer. If none of its versions installs, the
+      # leg ends with a warning and runs no test, so the run stays green; if one installs, its tests count.
+      # The `permission` focus keeps only the iOS 16.4 leg. (`env` is not readable here, hence the repeat.)
       matrix:
-        include:
-          # Xcode 26.4.1 crashes XCTest's start-up on iOS 15 simulators (Apple forum thread 822916,
-          # "Tests fail to run on iOS 15 simulators", fixed in Xcode 26.5), so the old legs use the
-          # newest Xcode on the image. The control leg uses the Xcode and runtime ci.yml uses.
-          - { label: "iOS 15", ios: "15.5 15.4 15.2 15.0", device: "iPhone 13", xcode: "26.6", install: true }
-          - { label: "iOS 16.4", ios: "16.4", device: "iPhone 14", xcode: "26.6", install: true }
-          - { label: "iOS 17.5", ios: "17.5", device: "iPhone 15", xcode: "26.6", install: true }
-          - { label: "iOS 26.4.1 (control, on the image)", ios: "26.4.1", device: "iPhone 17", xcode: "26.4.1", install: false }
+        include: ${{ fromJSON((inputs.focus == 'permission' || (github.event_name == 'push' && endsWith(github.ref_name, '-perm-trace'))) && '[{"label":"iOS 16.4","ios":"16.4","device":"iPhone 14","xcode":"26.6","install":true,"optional":false}]' || '[{"label":"iOS 15","ios":"15.5 15.4 15.2 15.0","device":"iPhone 13","xcode":"26.6","install":true,"optional":true},{"label":"iOS 16.4","ios":"16.4","device":"iPhone 14","xcode":"26.6","install":true,"optional":false},{"label":"iOS 17.5","ios":"17.5","device":"iPhone 15","xcode":"26.6","install":true,"optional":false},{"label":"iOS 26.4.1 (control, on the image)","ios":"26.4.1","device":"iPhone 17","xcode":"26.4.1","install":false,"optional":false}]') }}
+        # Xcode 26.4.1 crashes XCTest's start-up on iOS 15 simulators (Apple forum thread 822916,
+        # "Tests fail to run on iOS 15 simulators", fixed in Xcode 26.5), so the old legs use the
+        # newest Xcode on the image. The control leg uses the Xcode and runtime ci.yml uses.
     steps:
       - name: Check out
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -174,7 +183,7 @@ jobs:
             for variant in universal default arm64; do
               echo "::group::downloadPlatform iOS $v ($variant)"
               if [ "$variant" = default ]; then ARGS=(); else ARGS=(-architectureVariant "$variant"); fi
-              OUT=$(xcodebuild -downloadPlatform iOS -buildVersion "$v" ${ARGS[@]+"${ARGS[@]}"} 2>&1); RC=$?
+              RC=0; OUT=$(xcodebuild -downloadPlatform iOS -buildVersion "$v" ${ARGS[@]+"${ARGS[@]}"} 2>&1) || RC=$?  # the step runs with bash -e: a refused variant must not end it
               echo "$OUT"
               echo "::endgroup::"
               ANSWERS="$ANSWERS"$'\n'"iOS $v ($variant): rc=$RC: $(echo "$OUT" | tail -n 1)"
@@ -186,10 +195,17 @@ jobs:
           xcrun simctl list runtimes || true
           xcodebuild -showsdks || true
           echo "::endgroup::"
+          if [ "${{ matrix.optional }}" = true ]; then
+            # Run 45492838701: every iOS 15 version and variant answered "not available for download".
+            echo "::warning title=No iOS ${{ matrix.label }} runtime on this runner::No version of ${{ matrix.ios }} is available for download to this Xcode on this runner, so no test ran on ${{ matrix.label }}. Answers:$ANSWERS"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           echo "::error::No iOS ${{ matrix.ios }} runtime could be installed. Answers:$ANSWERS"
           exit 1
 
       - name: Use the installed runtime
+        if: steps.rt.outputs.skip != 'true'
         id: ver
         run: |
           if [ -n "${{ steps.rt.outputs.version }}" ]; then V="${{ steps.rt.outputs.version }}"; else V="${{ matrix.ios }}"; fi
@@ -197,9 +213,11 @@ jobs:
           echo "Testing on iOS $V"
 
       - name: Simulator runtimes after
+        if: steps.rt.outputs.skip != 'true'
         run: xcrun simctl list runtimes
 
       - name: Create and boot the simulator
+        if: steps.rt.outputs.skip != 'true'
         id: sim
         run: |
           set -euo pipefail
@@ -230,17 +248,35 @@ jobs:
           xcrun simctl list devices | grep -F "$UDID"
 
       - name: Test (iOS ${{ steps.ver.outputs.version }})
+        if: steps.rt.outputs.skip != 'true'
         timeout-minutes: 60
         env:
           TESSERA_LOCAL_XCFRAMEWORK: "1"
           UDID: ${{ steps.sim.outputs.udid }}
+          # xcodebuild hands TEST_RUNNER_<name> to the test process as <name>. The permission tests then print
+          # `permission-trace` lines: status reads, camera starts, how long each 10 ms wait sleep really took,
+          # and each wait's outcome. Test names, status codes, counts and times only.
+          TEST_RUNNER_TESSERA_PERMISSION_TRACE: "1"
         run: |
           set -o pipefail
+          ONLY=()
+          if [ "$FOCUS" = permission ]; then
+            ONLY=(-only-testing:TesseraUITests/ScannerModelPermissionTests)
+            echo "Focus: permission - only ScannerModelPermissionTests"
+          fi
           xcodebuild test \
             -scheme Tessera-Package \
             -destination "platform=iOS Simulator,id=${UDID}" \
             -resultBundlePath "$RUNNER_TEMP/result-${{ matrix.label }}.xcresult" \
+            ${ONLY[@]+"${ONLY[@]}"} \
             -skipPackagePluginValidation 2>&1 | tee "$RUNNER_TEMP/test-${{ matrix.label }}.log"
+
+      - name: Permission trace (iOS ${{ steps.ver.outputs.version }})
+        if: always() && steps.rt.outputs.skip != 'true'
+        run: |
+          LOG="$RUNNER_TEMP/test-${{ matrix.label }}.log"
+          [ -f "$LOG" ] || { echo "No test log."; exit 0; }
+          grep -E 'permission-trace|ScannerModelPermissionTests|Test run with' "$LOG" || echo "No permission-trace lines."
 
       - name: Upload the log and result bundle
         if: failure()
