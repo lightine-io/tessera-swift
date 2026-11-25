@@ -12,8 +12,8 @@
     "declKind": "Import",
     "kind": "Import",
     "moduleName": "TesseraUI",
-    "name": "Foundation",
-    "printedName": "Foundation"
+    "name": "Combine",
+    "printedName": "Combine"
    },
    {
     "declKind": "Import",
@@ -40,8 +40,8 @@
     "declKind": "Import",
     "kind": "Import",
     "moduleName": "TesseraUI",
-    "name": "Observation",
-    "printedName": "Observation"
+    "name": "Foundation",
+    "printedName": "Foundation"
    },
    {
     "declKind": "Import",
@@ -70,6 +70,13 @@
     "moduleName": "TesseraUI",
     "name": "UIKit",
     "printedName": "UIKit"
+   },
+   {
+    "declKind": "Import",
+    "kind": "Import",
+    "moduleName": "TesseraUI",
+    "name": "UniformTypeIdentifiers",
+    "printedName": "UniformTypeIdentifiers"
    },
    {
     "declKind": "Import",
@@ -1388,11 +1395,7 @@
           "usr": "s:Sq"
          }
         ],
-        "declAttributes": [
-         "Transparent"
-        ],
         "declKind": "Accessor",
-        "implicit": true,
         "kind": "Accessor",
         "mangledName": "$s9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVSgvg",
         "moduleName": "TesseraUI",
@@ -1423,11 +1426,7 @@
           "usr": "s:Sq"
          }
         ],
-        "declAttributes": [
-         "Transparent"
-        ],
         "declKind": "Accessor",
-        "implicit": true,
         "kind": "Accessor",
         "mangledName": "$s9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVSgvs",
         "moduleName": "TesseraUI",
@@ -1453,11 +1452,10 @@
        }
       ],
       "declAttributes": [
-       "HasInitialValue",
-       "HasStorage"
+       "Available"
       ],
       "declKind": "Var",
-      "hasStorage": true,
+      "intro_iOS": "16",
       "kind": "Var",
       "mangledName": "$s9TesseraUI16MrzScannerConfigV15struggleTimeouts8DurationVSgvp",
       "moduleName": "TesseraUI",
@@ -1485,11 +1483,7 @@
           "usr": "s:Sq"
          }
         ],
-        "declAttributes": [
-         "Transparent"
-        ],
         "declKind": "Accessor",
-        "implicit": true,
         "kind": "Accessor",
         "mangledName": "$s9TesseraUI16MrzScannerConfigV11scanTimeouts8DurationVSgvg",
         "moduleName": "TesseraUI",
@@ -1520,11 +1514,7 @@
           "usr": "s:Sq"
          }
         ],
-        "declAttributes": [
-         "Transparent"
-        ],
         "declKind": "Accessor",
-        "implicit": true,
         "kind": "Accessor",
         "mangledName": "$s9TesseraUI16MrzScannerConfigV11scanTimeouts8DurationVSgvs",
         "moduleName": "TesseraUI",
@@ -1550,17 +1540,252 @@
        }
       ],
       "declAttributes": [
-       "HasInitialValue",
-       "HasStorage"
+       "Available"
       ],
       "declKind": "Var",
-      "hasStorage": true,
+      "intro_iOS": "16",
       "kind": "Var",
       "mangledName": "$s9TesseraUI16MrzScannerConfigV11scanTimeouts8DurationVSgvp",
       "moduleName": "TesseraUI",
       "name": "scanTimeout",
       "printedName": "scanTimeout",
       "usr": "s:9TesseraUI16MrzScannerConfigV11scanTimeouts8DurationVSgvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "kind": "TypeNominal",
+              "name": "Double",
+              "printedName": "Swift.Double",
+              "usr": "s:Sd"
+             }
+            ],
+            "kind": "TypeNameAlias",
+            "name": "TimeInterval",
+            "printedName": "Foundation.TimeInterval"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Foundation.TimeInterval?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV23struggleTimeoutIntervalSdSgvg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV23struggleTimeoutIntervalSdSgvg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "kind": "TypeNominal",
+              "name": "Double",
+              "printedName": "Swift.Double",
+              "usr": "s:Sd"
+             }
+            ],
+            "kind": "TypeNameAlias",
+            "name": "TimeInterval",
+            "printedName": "Foundation.TimeInterval"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Foundation.TimeInterval?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV23struggleTimeoutIntervalSdSgvs",
+        "moduleName": "TesseraUI",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV23struggleTimeoutIntervalSdSgvs"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Double",
+            "printedName": "Swift.Double",
+            "usr": "s:Sd"
+           }
+          ],
+          "kind": "TypeNameAlias",
+          "name": "TimeInterval",
+          "printedName": "Foundation.TimeInterval"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Foundation.TimeInterval?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declAttributes": [
+       "HasInitialValue",
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI16MrzScannerConfigV23struggleTimeoutIntervalSdSgvp",
+      "moduleName": "TesseraUI",
+      "name": "struggleTimeoutInterval",
+      "printedName": "struggleTimeoutInterval",
+      "usr": "s:9TesseraUI16MrzScannerConfigV23struggleTimeoutIntervalSdSgvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "kind": "TypeNominal",
+              "name": "Double",
+              "printedName": "Swift.Double",
+              "usr": "s:Sd"
+             }
+            ],
+            "kind": "TypeNameAlias",
+            "name": "TimeInterval",
+            "printedName": "Foundation.TimeInterval"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Foundation.TimeInterval?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV19scanTimeoutIntervalSdSgvg",
+        "moduleName": "TesseraUI",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV19scanTimeoutIntervalSdSgvg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "kind": "TypeNominal",
+              "name": "Double",
+              "printedName": "Swift.Double",
+              "usr": "s:Sd"
+             }
+            ],
+            "kind": "TypeNameAlias",
+            "name": "TimeInterval",
+            "printedName": "Foundation.TimeInterval"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Foundation.TimeInterval?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s9TesseraUI16MrzScannerConfigV19scanTimeoutIntervalSdSgvs",
+        "moduleName": "TesseraUI",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:9TesseraUI16MrzScannerConfigV19scanTimeoutIntervalSdSgvs"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Double",
+            "printedName": "Swift.Double",
+            "usr": "s:Sd"
+           }
+          ],
+          "kind": "TypeNameAlias",
+          "name": "TimeInterval",
+          "printedName": "Foundation.TimeInterval"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Foundation.TimeInterval?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declAttributes": [
+       "HasInitialValue",
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s9TesseraUI16MrzScannerConfigV19scanTimeoutIntervalSdSgvp",
+      "moduleName": "TesseraUI",
+      "name": "scanTimeoutInterval",
+      "printedName": "scanTimeoutInterval",
+      "usr": "s:9TesseraUI16MrzScannerConfigV19scanTimeoutIntervalSdSgvp"
      },
      {
       "accessors": [
@@ -2091,13 +2316,187 @@
        {
         "children": [
          {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Double",
+            "printedName": "Swift.Double",
+            "usr": "s:Sd"
+           }
+          ],
+          "kind": "TypeNameAlias",
+          "name": "TimeInterval",
+          "printedName": "Foundation.TimeInterval"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Foundation.TimeInterval?",
+        "usr": "s:Sq"
+       },
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Double",
+            "printedName": "Swift.Double",
+            "usr": "s:Sd"
+           }
+          ],
+          "kind": "TypeNameAlias",
+          "name": "TimeInterval",
+          "printedName": "Foundation.TimeInterval"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Foundation.TimeInterval?",
+        "usr": "s:Sq"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "MrzScannerTheme",
+        "printedName": "TesseraUI.MrzScannerTheme",
+        "usr": "s:9TesseraUI15MrzScannerThemeV"
+       },
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "kind": "TypeNominal",
+              "name": "Void",
+              "printedName": "()"
+             }
+            ],
+            "kind": "TypeNameAlias",
+            "name": "Void",
+            "printedName": "Swift.Void"
+           },
+           {
+            "kind": "TypeNominal",
+            "name": "Void",
+            "printedName": "()"
+           }
+          ],
+          "kind": "TypeFunc",
+          "name": "Function",
+          "printedName": "() -> Swift.Void"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "(() -> Swift.Void)?",
+        "usr": "s:Sq"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Bundle",
+          "printedName": "Foundation.Bundle",
+          "usr": "c:objc(cs)NSBundle"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Foundation.Bundle?",
+        "usr": "s:Sq"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "DocumentCategory",
+          "printedName": "Tessera.DocumentCategory",
+          "usr": "c:objc(cs)TesseraDocumentCategory"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Set",
+        "printedName": "Swift.Set<Tessera.DocumentCategory>",
+        "usr": "s:Sh"
+       }
+      ],
+      "declKind": "Constructor",
+      "init_kind": "Designated",
+      "kind": "Constructor",
+      "mangledName": "$s9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault23struggleTimeoutInterval04scanrS014hapticFeedback5theme19onRequestPermission13stringsBundle21acceptedDocumentTypesACShyAA10ScanMethodOG_AA06ReviewI0OS2bSdSgATSbAA0cD5ThemeVyyYbcSgSo8NSBundleCSgShySo0A16DocumentCategoryCGtcfc",
+      "moduleName": "TesseraUI",
+      "name": "init",
+      "printedName": "init(enabledMethods:reviewMode:showTorchButton:torchOnByDefault:struggleTimeoutInterval:scanTimeoutInterval:hapticFeedback:theme:onRequestPermission:stringsBundle:acceptedDocumentTypes:)",
+      "usr": "s:9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault23struggleTimeoutInterval04scanrS014hapticFeedback5theme19onRequestPermission13stringsBundle21acceptedDocumentTypesACShyAA10ScanMethodOG_AA06ReviewI0OS2bSdSgATSbAA0cD5ThemeVyyYbcSgSo8NSBundleCSgShySo0A16DocumentCategoryCGtcfc"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "MrzScannerConfig",
+        "printedName": "TesseraUI.MrzScannerConfig",
+        "usr": "s:9TesseraUI16MrzScannerConfigV"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ScanMethod",
+          "printedName": "TesseraUI.ScanMethod",
+          "usr": "s:9TesseraUI10ScanMethodO"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Set",
+        "printedName": "Swift.Set<TesseraUI.ScanMethod>",
+        "usr": "s:Sh"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "ReviewMode",
+        "printedName": "TesseraUI.ReviewMode",
+        "usr": "s:9TesseraUI10ReviewModeO"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "children": [
+         {
           "kind": "TypeNominal",
           "name": "Duration",
           "printedName": "Swift.Duration",
           "usr": "s:s8DurationV"
          }
         ],
-        "hasDefaultArg": true,
         "kind": "TypeNominal",
         "name": "Optional",
         "printedName": "Swift.Duration?",
@@ -2196,14 +2595,167 @@
         "usr": "s:Sh"
        }
       ],
+      "declAttributes": [
+       "Available"
+      ],
       "declKind": "Constructor",
       "init_kind": "Designated",
+      "intro_iOS": "16",
       "kind": "Constructor",
       "mangledName": "$s9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR014hapticFeedback5theme19onRequestPermission13stringsBundle21acceptedDocumentTypesACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgAVSbAA0cD5ThemeVyyYbcSgSo8NSBundleCSgShySo0A16DocumentCategoryCGtcfc",
       "moduleName": "TesseraUI",
       "name": "init",
       "printedName": "init(enabledMethods:reviewMode:showTorchButton:torchOnByDefault:struggleTimeout:scanTimeout:hapticFeedback:theme:onRequestPermission:stringsBundle:acceptedDocumentTypes:)",
       "usr": "s:9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault15struggleTimeout04scanR014hapticFeedback5theme19onRequestPermission13stringsBundle21acceptedDocumentTypesACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgAVSbAA0cD5ThemeVyyYbcSgSo8NSBundleCSgShySo0A16DocumentCategoryCGtcfc"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "MrzScannerConfig",
+        "printedName": "TesseraUI.MrzScannerConfig",
+        "usr": "s:9TesseraUI16MrzScannerConfigV"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ScanMethod",
+          "printedName": "TesseraUI.ScanMethod",
+          "usr": "s:9TesseraUI10ScanMethodO"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Set",
+        "printedName": "Swift.Set<TesseraUI.ScanMethod>",
+        "usr": "s:Sh"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "ReviewMode",
+        "printedName": "TesseraUI.ReviewMode",
+        "usr": "s:9TesseraUI10ReviewModeO"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Duration",
+          "printedName": "Swift.Duration",
+          "usr": "s:s8DurationV"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Swift.Duration?",
+        "usr": "s:Sq"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "MrzScannerTheme",
+        "printedName": "TesseraUI.MrzScannerTheme",
+        "usr": "s:9TesseraUI15MrzScannerThemeV"
+       },
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "kind": "TypeNominal",
+              "name": "Void",
+              "printedName": "()"
+             }
+            ],
+            "kind": "TypeNameAlias",
+            "name": "Void",
+            "printedName": "Swift.Void"
+           },
+           {
+            "kind": "TypeNominal",
+            "name": "Void",
+            "printedName": "()"
+           }
+          ],
+          "kind": "TypeFunc",
+          "name": "Function",
+          "printedName": "() -> Swift.Void"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "(() -> Swift.Void)?",
+        "usr": "s:Sq"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Bundle",
+          "printedName": "Foundation.Bundle",
+          "usr": "c:objc(cs)NSBundle"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Foundation.Bundle?",
+        "usr": "s:Sq"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "DocumentCategory",
+          "printedName": "Tessera.DocumentCategory",
+          "usr": "c:objc(cs)TesseraDocumentCategory"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Set",
+        "printedName": "Swift.Set<Tessera.DocumentCategory>",
+        "usr": "s:Sh"
+       }
+      ],
+      "declAttributes": [
+       "Available"
+      ],
+      "declKind": "Constructor",
+      "init_kind": "Designated",
+      "intro_iOS": "16",
+      "kind": "Constructor",
+      "mangledName": "$s9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault11scanTimeout14hapticFeedback5theme19onRequestPermission13stringsBundle21acceptedDocumentTypesACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgSbAA0cD5ThemeVyyYbcSgSo8NSBundleCSgShySo0A16DocumentCategoryCGtcfc",
+      "moduleName": "TesseraUI",
+      "name": "init",
+      "printedName": "init(enabledMethods:reviewMode:showTorchButton:torchOnByDefault:scanTimeout:hapticFeedback:theme:onRequestPermission:stringsBundle:acceptedDocumentTypes:)",
+      "usr": "s:9TesseraUI16MrzScannerConfigV14enabledMethods10reviewMode15showTorchButton16torchOnByDefault11scanTimeout14hapticFeedback5theme19onRequestPermission13stringsBundle21acceptedDocumentTypesACShyAA10ScanMethodOG_AA06ReviewI0OS2bs8DurationVSgSbAA0cD5ThemeVyyYbcSgSo8NSBundleCSgShySo0A16DocumentCategoryCGtcfc"
      }
     ],
     "conformances": [
