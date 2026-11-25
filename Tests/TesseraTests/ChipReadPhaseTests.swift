@@ -148,4 +148,57 @@ struct ChipReadPhaseTests {
         }
         #expect(ChipReading.availability === reason)
     }
+
+    @Test func theReadinessStreamLetsOnlyChangesThrough() {
+        let changes = ReadinessChanges()
+        #expect(changes.isNew(.ready))
+        #expect(!changes.isNew(.ready))
+        #expect(changes.isNew(.readInProgress))
+        #expect(!changes.isNew(.readInProgress))
+        #expect(changes.isNew(.notYet(remaining: 1.5)))
+        #expect(!changes.isNew(.notYet(remaining: 1.5)))
+        #expect(changes.isNew(.notYet(remaining: 0.5)))
+        #expect(changes.isNew(.unavailable(.notSupported)))
+        #expect(!changes.isNew(.unavailable(.notSupported)))
+        #expect(changes.isNew(.unavailable(.disabled)))
+        #expect(changes.isNew(.ready))
+    }
+
+    @Test func theFinishCarriesTheSystemCodeOfItsKotlinEnding() async throws {
+        let real = try await RealReading.sample()
+        #expect(real.ending.systemCode == real.rawEnding.systemCode.map { Int($0.int32Value) })
+        #expect(ChipReadFinish(outcome: .notStarted(.notEligible)).systemCode == nil)
+        #expect(ChipReadFinish(outcome: .notStarted(.notEligible), systemCode: 7).systemCode == 7)
+    }
+
+    @Test func aScriptedReadKeepsTheSystemCodeOfItsEnding() async {
+        let reading = ChipReading.makeForTesting(
+            updates: [], ending: ChipReadFinish(outcome: .notStarted(.accessNotAnswered), systemCode: 8))
+        let finish = await reading.ending
+        #expect(finish.systemCode == 8)
+    }
+
+    @Test func aTimeoutSaysWhichLimitPassed() {
+        let outcome = ChipReadOutcome.endedBySystem(NfcTimeout(timeoutMillis: KotlinLong(value: 60_000), limit: .session))
+        let timeout = outcome.error as? NfcTimeout
+        #expect(timeout?.limit == NfcTimeout.Limit.session)
+        #expect(timeout?.code == "timeout.session")
+        #expect(!outcome.isNoAnswer)
+        #expect((NfcTimeout(timeoutMillis: nil, limit: .command) as ChipError).code == "timeout.command")
+        #expect(NfcTimeout(timeoutMillis: nil, limit: .waitForDocument).code == "timeout.wait-for-document")
+    }
+
+    @Test func theNewReasonsReachTheOutcomeUnchanged() async {
+        let reasons: [NfcUnavailable.Reason] = [
+            .tagReadingDisabled, .commandTooLong, .notEligible, .accessNotAnswered, .unexpectedFault,
+        ]
+        for reason in reasons {
+            let finish = await ChipReading.makeForTesting(phases: [.starting], outcome: .notStarted(reason)).ending
+            guard case .notStarted(let got) = finish.outcome else {
+                Issue.record("expected notStarted for \(reason)")
+                continue
+            }
+            #expect(got === reason)
+        }
+    }
 }

@@ -208,9 +208,13 @@ public enum ChipReadOutcome {
     case keyRejected(ChipError)
     /// The read was cancelled, by the person (`byPerson`) or by the app (`cancel()`).
     case cancelled(byPerson: Bool)
-    /// The system ended the session. The error says why.
+    /// The system ended the session. The error says why: an `NfcTimeout` says which time limit passed
+    /// in its `limit` (`.command`, `.waitForDocument` or `.session`).
     case endedBySystem(NfcError)
-    /// The read could not start. The reason says why, for example that NFC is not available.
+    /// The read could not start. The reason says why, for example that NFC is not available
+    /// (`.notSupported`), or one of the setup problems `.notPermitted`, `.notEligible` and
+    /// `.accessNotAnswered`, each with its own fix. ``ChipReadFinish/systemCode`` holds Core NFC's
+    /// code when the system gave one.
     case notStarted(NfcUnavailable.Reason)
     /// An ending this version of `Tessera` does not know. Read ``ChipReadFinish/raw``.
     case unknown
@@ -252,8 +256,9 @@ public enum ChipReadOutcome {
         }
     }
 
-    /// Whether the read ended because the chip never answered (``NfcNoAnswer``). Tell the person to
-    /// try another position of the document on the phone.
+    /// Whether the read ended because the chip never answered (``NfcNoAnswer``), also when the
+    /// connects to a found document failed three times in a row. Tell the person to try another
+    /// position of the document on the phone.
     public var isNoAnswer: Bool { error?.isNoAnswer ?? false }
 }
 
@@ -268,6 +273,11 @@ public struct ChipReadFinish: @unchecked Sendable {
     public let attempts: Int
     /// How far the read got when it ended.
     public let progress: ChipProgress
+    /// The platform's own code for the failure that ended the read, when it gave one: on iPhone,
+    /// Core NFC's `NFCReaderError` code (for example 2, 7 or 8 for `.notStarted` with `.notPermitted`,
+    /// `.notEligible` or `.accessNotAnswered`). `nil` when the ending came from no system code. A
+    /// fact for diagnosis, safe to log: the outcome is what the app acts on.
+    public let systemCode: Int?
     /// The Kotlin ending; `nil` for a scripted one.
     ///
     /// `@unchecked Sendable`: the outcome holds Kotlin objects that are read-only once built (see
@@ -278,10 +288,11 @@ public struct ChipReadFinish: @unchecked Sendable {
     public var read: ChipRead? { outcome.read }
 
     /// A scripted ending (a test, or a ``ChipReading/makeForTesting(phases:outcome:attempts:maxAttempts:finalProgress:delay:)`` read).
-    public init(outcome: ChipReadOutcome, attempts: Int = 1, progress: ChipProgress = .zero) {
+    public init(outcome: ChipReadOutcome, attempts: Int = 1, progress: ChipProgress = .zero, systemCode: Int? = nil) {
         self.outcome = outcome
         self.attempts = attempts
         self.progress = progress
+        self.systemCode = systemCode
         self.raw = nil
     }
 
@@ -289,6 +300,7 @@ public struct ChipReadFinish: @unchecked Sendable {
         outcome = ending.outcome
         attempts = Int(ending.attempts)
         progress = ChipProgress(ending.progress)
+        systemCode = ending.systemCode.map { Int($0.int32Value) }
         raw = ending
     }
 }

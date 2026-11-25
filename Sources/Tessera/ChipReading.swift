@@ -89,9 +89,13 @@ public final class ChipReading: Sendable {
     /// forward the values, and use ``ending`` for the end.
     public let updates: AsyncStream<ChipReadSnapshot>
 
-    /// Why a read cannot start on this device right now, or `nil` when it can. For example NFC is
-    /// not supported (`.notSupported`) or the app lacks the entitlement. Ask before showing a "read
-    /// the chip" button.
+    /// Whether this device can read chips at all: `nil` when it can, `.notSupported` when it cannot.
+    /// Ask before showing a "read the chip" button.
+    ///
+    /// It covers only what Core NFC can tell before a session (`NFCReaderSession.readingAvailable`).
+    /// A missing entitlement or Info.plist entry, NFC switched off, a device that is not eligible, or
+    /// a request to use the reader the person has not answered shows only when a read starts: the
+    /// ending is `.notStarted` with its reason, and ``ChipReadFinish/systemCode`` holds Core NFC's code.
     public static var availability: NfcUnavailable.Reason? {
         CoreNfcChipRead.companion.availability()
     }
@@ -107,18 +111,22 @@ public final class ChipReading: Sendable {
 
     /// The readiness now, then each change, as a stream: bind a button to it.
     ///
-    /// The first value is the current one; after that a value comes once per change of kind (for
+    /// The first value is the current one; after that a value comes only when it changes (for
     /// example from ``ChipReadReadiness/readInProgress`` to ``ChipReadReadiness/notYet(remaining:)``
-    /// to ``ChipReadReadiness/ready``), never twice in a row with the same kind. When the stream ends
-    /// (its task is cancelled or the loop is left) the listener is removed.
+    /// to ``ChipReadReadiness/ready``), never twice in a row the same value. When the stream ends (its
+    /// task is cancelled or the loop is left) the listener is removed.
     ///
     /// Each read of this property makes a new stream with its own listener.
     public static var readinessUpdates: AsyncStream<ChipReadReadiness> {
         AsyncStream(bufferingPolicy: .bufferingNewest(1)) { continuation in
-            let listener = ReadinessListener { continuation.yield($0) }
+            let changes = ReadinessChanges()
+            let listener = ReadinessListener { value in
+                if changes.isNew(value) { continuation.yield(value) }
+            }
             // Listen first, then ask for the value now, so no change falls between the two.
             let registration = CoreNfcChipRead.companion.addReadinessListener(listener: listener)
-            continuation.yield(readiness)
+            let now = readiness
+            if changes.isNew(now) { continuation.yield(now) }
             let box = RegistrationBox(registration)
             continuation.onTermination = { _ in box.remove() }
         }
@@ -236,6 +244,22 @@ private final class ReadinessListener: NSObject, TesseraCore.ChipReadReadinessLi
 
     func onReadinessChanged(readiness: TesseraCore.ChipReadReadiness) {
         handler(ChipReadReadiness(readiness))
+    }
+}
+
+/// Lets a readiness value through only when it differs from the last one let through. The listener
+/// (main queue) and the first value (the caller's thread) can race, so a lock guards the last value.
+final class ReadinessChanges: @unchecked Sendable {
+    private let lock = NSLock()
+    private var last: ChipReadReadiness?
+
+    /// Whether `value` is a change, and remembers it when it is.
+    func isNew(_ value: ChipReadReadiness) -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        if last == value { return false }
+        last = value
+        return true
     }
 }
 

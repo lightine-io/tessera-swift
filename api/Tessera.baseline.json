@@ -6191,6 +6191,68 @@
           "children": [
            {
             "kind": "TypeNominal",
+            "name": "Int",
+            "printedName": "Swift.Int",
+            "usr": "s:Si"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Swift.Int?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s7Tessera14ChipReadFinishV10systemCodeSiSgvg",
+        "moduleName": "Tessera",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:7Tessera14ChipReadFinishV10systemCodeSiSgvg"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Swift.Int?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "isLet": true,
+      "kind": "Var",
+      "mangledName": "$s7Tessera14ChipReadFinishV10systemCodeSiSgvp",
+      "moduleName": "Tessera",
+      "name": "systemCode",
+      "printedName": "systemCode",
+      "usr": "s:7Tessera14ChipReadFinishV10systemCodeSiSgvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
             "name": "ChipReadEnding",
             "printedName": "TesseraCore.ChipReadEnding",
             "usr": "c:objc(cs)TesseraChipReadEnding"
@@ -6324,16 +6386,31 @@
         "name": "ChipProgress",
         "printedName": "Tessera.ChipProgress",
         "usr": "s:7Tessera12ChipProgressV"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Swift.Int?",
+        "usr": "s:Sq"
        }
       ],
       "declKind": "Constructor",
       "init_kind": "Designated",
       "kind": "Constructor",
-      "mangledName": "$s7Tessera14ChipReadFinishV7outcome8attempts8progressAcA0bC7OutcomeO_SiAA0B8ProgressVtcfc",
+      "mangledName": "$s7Tessera14ChipReadFinishV7outcome8attempts8progress10systemCodeAcA0bC7OutcomeO_SiAA0B8ProgressVSiSgtcfc",
       "moduleName": "Tessera",
       "name": "init",
-      "printedName": "init(outcome:attempts:progress:)",
-      "usr": "s:7Tessera14ChipReadFinishV7outcome8attempts8progressAcA0bC7OutcomeO_SiAA0B8ProgressVtcfc"
+      "printedName": "init(outcome:attempts:progress:systemCode:)",
+      "usr": "s:7Tessera14ChipReadFinishV7outcome8attempts8progress10systemCodeAcA0bC7OutcomeO_SiAA0B8ProgressVSiSgtcfc"
      }
     ],
     "conformances": [
