@@ -1,10 +1,10 @@
 # tessera-swift
 
-This repository is the Swift package for Tessera, the open-source SDK that reads, validates, and generates MRZ data. An MRZ (machine-readable zone) is the block of text lines printed at the bottom of a passport or ID card page. The package vends three products: `Tessera`, the XCFramework with the Kotlin core and the headless readers, `TesseraKit`, the headless Swift layer for reading a chip, and `TesseraUI`, the SwiftUI scanner screen. The current release is 0.7.0. The Kotlin source and the releases live in the [main repository](https://github.com/lightine-io/tessera). The SDK reports what it read, and your app decides what to do with it.
+This repository is the Swift package for Tessera, the open-source SDK that reads, validates, and generates MRZ data. An MRZ (machine-readable zone) is the block of text lines printed at the bottom of a passport or ID card page. The package vends two products: `Tessera`, everything headless (the Kotlin core with the headless readers, and from the next release the Swift layer for reading a chip), and `TesseraUI`, the SwiftUI scanner screen. The current release is 0.7.0. The Kotlin source and the releases live in the [main repository](https://github.com/lightine-io/tessera). The SDK reports what it read, and your app decides what to do with it.
 
 ## Install
 
-In Xcode, choose **File > Add Package Dependencies**. Enter `https://github.com/lightine-io/tessera-swift` and set the dependency rule to **Exact Version** `0.7.0`. Add the products you use to your app target: `TesseraUI` for the scanner screen, `TesseraKit` for chip reading (next release, see below), and `Tessera` for the core types (`ParseResult`, `MrzDocument`). The table under [What is in the package](#what-is-in-the-package) says what each one gives you.
+In Xcode, choose **File > Add Package Dependencies**. Enter `https://github.com/lightine-io/tessera-swift` and set the dependency rule to **Exact Version** `0.7.0`. Add the products you use to your app target: `Tessera` for the core types (`ParseResult`, `MrzDocument`) and, from the next release, chip reading, and `TesseraUI` for the scanner screen. The table under [What is in the package](#what-is-in-the-package) says what each one gives you.
 
 In a `Package.swift`, the same setup looks like this:
 
@@ -13,8 +13,6 @@ In a `Package.swift`, the same setup looks like this:
 // In your target's dependencies:
 .product(name: "Tessera", package: "tessera-swift"),
 .product(name: "TesseraUI", package: "tessera-swift"),
-// For chip reading, from the next release (not in 0.7.0):
-// .product(name: "TesseraKit", package: "tessera-swift"),
 ```
 
 ## Show the scanner
@@ -53,11 +51,10 @@ For the full walkthrough, with the output you should see, read [Read your first 
 
 ## Read a chip (headless)
 
-`TesseraKit` reads the chip of a document with no screen of its own: the system NFC sheet is the only interface. It is not part of release 0.7.0; it arrives with the next release. Add the `TesseraKit` product to your target, next to `Tessera` (see [What is in the package](#what-is-in-the-package)), and import both:
+The `Tessera` product reads the chip of a document with no screen of its own: the system NFC sheet is the only interface. It is not part of release 0.7.0; it arrives with the next release. The one import gives you everything (see [What is in the package](#what-is-in-the-package)):
 
 ```swift
 import Tessera
-import TesseraKit
 ```
 
 Everything below is copied from code that is compiled in this repository (`Samples/HowToChipReading`).
@@ -236,15 +233,15 @@ func readWhileVisible(options: ChipReadOptions) async -> ChipReadFinish {
 
 | Product | What it gives you |
 |---|---|
-| `Tessera` | The Kotlin core as an XCFramework: MRZ parsing, validation, and generation, plus the headless camera, saved-image, and manual-entry readers. |
-| `TesseraKit` | Headless chip reading in Swift (next release): `ChipReading`, the `ChipAccessKey` builders, `ChipReadOptions.Builder` helpers, `TrustAnchors.shared.load(contentsOf:)`, and the `ChipReadOutcome` enum. It draws nothing and imports no UI framework. It depends on `Tessera`, but does not re-export it: import both. |
+| `Tessera` | Everything headless, with one `import Tessera`. The Kotlin core (the `TesseraCore` XCFramework, which `Tessera` re-exports): MRZ parsing, validation, and generation, plus the headless camera, saved-image, and manual-entry readers. From the next release also headless chip reading in Swift: `ChipReading`, the `ChipAccessKey` builders, `ChipReadOptions.Builder` helpers, `TrustAnchors.shared.load(contentsOf:)`, and the `ChipReadOutcome` enum. It draws nothing and imports no UI framework. |
 | `TesseraUI` | The SwiftUI scanner screen: `MrzScannerView`, `MrzScannerConfig`, and the result it returns. |
 
 Compatibility within 0.x:
 
 - `TesseraUI` is written in Swift, and its API is strict: no breaking change in 0.x. The API baseline check in this repository's CI guards it.
-- The Swift form of the `Tessera` framework is generated by Kotlin/Native from the Kotlin API. It may change before 1.0.0, so its rough edges can be fixed (crashing calls, values typed as `Any`, mangled names). Every such change gets its own line under a "Swift" heading in the [CHANGELOG](https://github.com/lightine-io/tessera/blob/main/CHANGELOG.md), with what to change in calling code.
+- The Swift form of the Kotlin core (the `TesseraCore` framework) is generated by Kotlin/Native from the Kotlin API. It may change before 1.0.0, so its rough edges can be fixed (crashing calls, values typed as `Any`, mangled names). Every such change gets its own line under a "Swift" heading in the [CHANGELOG](https://github.com/lightine-io/tessera/blob/main/CHANGELOG.md), with what to change in calling code.
 - The Kotlin API underneath is strict: no breaking change in 0.x.
+- From the next release the generated framework is named `TesseraCore`, and `Tessera` is the Swift target that re-exports it. App code written for 0.7.0 keeps compiling as it is: `import Tessera`, `import TesseraUI`, and names qualified with the module, such as `Tessera.MrzDocument`. Only the framework's own name changes, for example in a build script that looks for `Tessera.xcframework`.
 
 ## Documentation
 
