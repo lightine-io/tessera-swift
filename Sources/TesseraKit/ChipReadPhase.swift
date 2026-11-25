@@ -244,6 +244,10 @@ public enum ChipReadOutcome {
         default: return nil
         }
     }
+
+    /// Whether the read ended because the chip never answered (``NfcNoAnswer``). Tell the person to
+    /// try another position of the document on the phone.
+    public var isNoAnswer: Bool { error?.isNoAnswer ?? false }
 }
 
 /// The ending of a read with everything the app needs in one value: the outcome, the number of

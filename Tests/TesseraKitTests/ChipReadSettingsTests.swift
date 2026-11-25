@@ -101,6 +101,53 @@ struct ChipReadSettingsTests {
         #expect(event.outcome == .failed)
     }
 
+    @Test func readTimeoutAndSearchRestartFollowKotlin() {
+        let swift = ChipReadSettings()
+        #expect(swift.readTimeout == 2)
+        #expect(swift.searchRestart == 4)
+        let kotlin = swift.kotlinSettings()
+        #expect(kotlin.readTimeoutMillis == 2_000)
+        #expect(kotlin.searchRestartMillis == 4_000)
+        let back = ChipReadSettings(CoreNfcReadSettings())
+        #expect(back.readTimeout == 2)
+        #expect(back.searchRestart == 4)
+    }
+
+    @Test func searchRestartOffAndClamping() throws {
+        #expect(ChipReadSettings(searchRestart: nil).kotlinSettings().searchRestartMillis == 0)
+        #expect(ChipReadSettings(searchRestart: 0).kotlinSettings().searchRestartMillis == 0)
+        #expect(ChipReadSettings(searchRestart: 0).normalized.searchRestart == nil)
+        #expect(ChipReadSettings(searchRestart: 0.5).kotlinSettings().searchRestartMillis == 2_000)
+        #expect(ChipReadSettings(searchRestart: -3).normalized.searchRestart == 2)
+        #expect(ChipReadSettings(searchRestart: .nan).kotlinSettings().searchRestartMillis == 2_000)
+        #expect(ChipReadSettings(searchRestart: 1e12).normalized.searchRestart == 86_400)
+        #expect(ChipReadSettings(searchRestart: 7).kotlinSettings().searchRestartMillis == 7_000)
+        let off = ChipReadSettings(try CoreNfcReadSettings.Builder().searchRestartMillis(millis: 0).build())
+        #expect(off.searchRestart == nil)
+    }
+
+    @Test func readTimeoutIsClamped() {
+        #expect(ChipReadSettings(readTimeout: 0.75).kotlinSettings().readTimeoutMillis == 750)
+        #expect(ChipReadSettings(readTimeout: -1).normalized.readTimeout == 0.001)
+        #expect(ChipReadSettings(readTimeout: .nan).kotlinSettings().readTimeoutMillis == 1)
+        #expect(ChipReadSettings(readTimeout: 1e12).normalized.readTimeout == 86_400)
+    }
+
+    @Test func aStepEventCarriesTheSystemCode() {
+        let event = ChipReadStepEvent(step: "SESSION_END", outcome: .failed, systemCode: 201)
+        #expect(event.systemCode == 201)
+        #expect(ChipReadStepEvent(step: "PACE", outcome: .succeeded).systemCode == nil)
+    }
+
+    @Test func noAnswerIsRecognisedSimply() {
+        let failed = ChipReadOutcome.failed(NfcNoAnswer.shared, access: nil)
+        #expect(failed.isNoAnswer)
+        #expect(NfcNoAnswer.shared.isNoAnswer)
+        #expect(!ChipReadOutcome.endedBySystem(NfcTimeout(timeoutMillis: nil)).isNoAnswer)
+        #expect(!ChipReadOutcome.cancelled(byPerson: true).isNoAnswer)
+        #expect(!ChipReadOutcome.unknown.isNoAnswer)
+    }
+
     @Test func theSwiftLayerAsksTheReaderForItsOwnThread() {
         #expect(ChipReadSettings().kotlinSettings().observerOn === ObserverThread.caller)
         #expect(ChipReadSettings(linkLoss: .end).kotlinSettings().observerOn === ObserverThread.caller)

@@ -7,6 +7,10 @@ extension ChipError {
     ///
     /// The stable machine name of the error is the existing `code` (a `String`).
     public var statusWordInt: Int? { statusWord.map { Int($0.int32Value) } }
+
+    /// Whether this is ``NfcNoAnswer``: the document was found, but the chip never got past the first
+    /// commands. Tell the person to try another position of the document on the phone.
+    public var isNoAnswer: Bool { self is NfcNoAnswer }
 }
 
 /// How one check came out, as a Swift `enum`. The reason is the stable `code` of the reason (a

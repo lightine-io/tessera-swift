@@ -137,6 +137,8 @@ func readOnce(options: ChipReadOptions) async -> ChipRead? {
 }
 ```
 
+Settings are optional: `ChipReading.start(options:settings:)` takes a `ChipReadSettings`, and every value has a default. The time limits (in seconds): `commandTimeout` (5, only the heavy cryptographic steps), `readTimeout` (2, ordinary commands after access), `commandTimeoutBeforeAccess` (1.5); `settleDelay` (0.4) and `waitAfterSystemEnd` (1); `linkLoss` (resume, 2 restarts); `searchRestart` (4: while the system reports no document, the read asks it to search again on this period; `nil` or 0 turns it off, any other value is at least 2); and `telemetry`. Invalid values are clamped, never refused.
+
 **5. Show progress (optional).** `reading.updates` is an `AsyncStream<ChipReadSnapshot>`. Each snapshot has `.phase` (a `ChipReadPhase`), `.progress`, `.fraction` and `.percent`. The cases of `ChipReadPhase` are `waitingForDocument(waited:)`, `documentFound`, `connecting`, `openingAccess`, `readingFile(dataGroup:bytesRead:bytesTotal:)`, `authenticatingChip`, `checkingFiles`, `noAnswerYet(tries:)` (found, but the chip has not answered yet: show "Move the document slowly"), `linkLost(restartsLeft:)`, `starting`, `stopping` and `unknown`.
 
 ```swift
@@ -167,6 +169,8 @@ func describe(_ outcome: ChipReadOutcome) -> String {
     }
 }
 ```
+
+**No answer.** When the document was found but the chip never got past the first commands, the ending is `.failed` with `NfcNoAnswer` (code `no-answer`). Check it with `outcome.isNoAnswer` (or `error.isNoAnswer`). Tell the person to try another position of the document on the phone: usually the chip gets too little power where it lies.
 
 The payloads: `complete(ChipRead)`, `partial(ChipRead, stoppedBy: ChipError, stoppedIn: ChipReadPhase?)`, `failed(ChipError, access: AccessReport?)`, `keyNotAccepted(ChipAccessDenied)`, `keyRejected(ChipError)`, `cancelled(byPerson: Bool)`, `endedBySystem(NfcError)`, `notStarted(NfcUnavailable.Reason)` and `unknown`. If you do not want to match all of them, use the accessors: `outcome.read` is the `ChipRead?` of a complete or partial read, and `outcome.error` is the `ChipError?` of every ending that has one. `finish.read` is a shortcut for `finish.outcome.read`.
 

@@ -56,8 +56,10 @@ public enum LinkLoss: Sendable, Equatable {
 /// **Invalid values are clamped, never refused,** so building settings cannot fail:
 /// - the restarts of ``LinkLoss`` go to 1 to 3;
 /// - `settleDelay` and `waitAfterSystemEnd` below 0 (or not a number) become 0;
-/// - `commandTimeout` and `commandTimeoutBeforeAccess` below one millisecond (or not a number) become
-///   one millisecond, and one above a day becomes a day.
+/// - `commandTimeout`, `readTimeout` and `commandTimeoutBeforeAccess` below one millisecond (or not a
+///   number) become one millisecond, and one above a day becomes a day;
+/// - `searchRestart` of `nil` or 0 is off; any other value below 2 seconds (or not a number) becomes
+///   2 seconds, and one above a day becomes a day.
 ///
 /// Read ``normalized`` to see the values that will be used. Times are in seconds and are rounded to
 /// whole milliseconds for the reader.
@@ -69,9 +71,15 @@ public struct ChipReadSettings {
     /// How long the read waits after the system finds a document before the first command, so the
     /// hand can settle. Default 0.4 seconds.
     public var settleDelay: TimeInterval
-    /// The longest wait for the chip's answer to one command; a longer wait counts as a lost link.
-    /// Default 5 seconds.
+    /// The longest wait for the chip's answer to one command that makes the chip do heavy
+    /// cryptographic work (the key steps of BAC and PACE, chip and active authentication, and any
+    /// extended-length command); a longer wait counts as a lost link. Default 5 seconds. It is the
+    /// longest of the three limits: a longer ``readTimeout`` or ``commandTimeoutBeforeAccess`` is cut to it.
     public var commandTimeout: TimeInterval
+    /// The longest wait for the chip's answer to one ordinary command after access (selecting and
+    /// reading a file); a longer wait counts as a lost link. Default 2 seconds. A slow but legal chip
+    /// may need more: raise it then.
+    public var readTimeout: TimeInterval
     /// The longest wait for the chip's answer to one command before access: the plain commands before
     /// the key is used. They answer in milliseconds, so a chip that gets too little power is noticed
     /// sooner. An unanswered command is a try that costs no restart (``ChipReadPhase/noAnswerYet(tries:)``).
@@ -81,6 +89,11 @@ public struct ChipReadSettings {
     /// How long a new read waits before it begins a system session when the previous one was ended
     /// by the system or refused because the reader was busy. Default 1 second.
     public var waitAfterSystemEnd: TimeInterval
+    /// How often the read asks the system to search for the document again while it waits for one and
+    /// the system has reported none. A new search gives a weak first contact another try with the
+    /// sheet still up. Default 4 seconds. `nil` (or 0) turns it off; any other value is at least
+    /// 2 seconds.
+    public var searchRestart: TimeInterval?
     /// Where the read's step events go (see ``ChipReadStepSink``); `nil` uses the sink registered in
     /// `TelemetrySinkRegistry`, which drops everything when none is registered.
     public var telemetry: (any TelemetrySink)?
@@ -91,7 +104,9 @@ public struct ChipReadSettings {
         commandTimeout: TimeInterval = 5,
         commandTimeoutBeforeAccess: TimeInterval = 1.5,
         waitAfterSystemEnd: TimeInterval = 1,
-        telemetry: (any TelemetrySink)? = nil
+        telemetry: (any TelemetrySink)? = nil,
+        readTimeout: TimeInterval = 2,
+        searchRestart: TimeInterval? = 4
     ) {
         self.linkLoss = linkLoss
         self.settleDelay = settleDelay
@@ -99,6 +114,14 @@ public struct ChipReadSettings {
         self.commandTimeoutBeforeAccess = commandTimeoutBeforeAccess
         self.waitAfterSystemEnd = waitAfterSystemEnd
         self.telemetry = telemetry
+        self.readTimeout = readTimeout
+        self.searchRestart = searchRestart
+    }
+
+    /// The Kotlin `searchRestartMillis`: 0 for off, otherwise 2000 or more.
+    private static func searchRestartMillis(_ seconds: TimeInterval?) -> Int64 {
+        guard let seconds, seconds != 0 else { return 0 }
+        return millis(seconds, minimum: 2_000)
     }
 
     private static let maxMillis: Int64 = 86_400_000
@@ -119,7 +142,9 @@ public struct ChipReadSettings {
             commandTimeout: TimeInterval(Self.millis(commandTimeout, minimum: 1)) / 1000,
             commandTimeoutBeforeAccess: TimeInterval(Self.millis(commandTimeoutBeforeAccess, minimum: 1)) / 1000,
             waitAfterSystemEnd: TimeInterval(Self.millis(waitAfterSystemEnd, minimum: 0)) / 1000,
-            telemetry: telemetry
+            telemetry: telemetry,
+            readTimeout: TimeInterval(Self.millis(readTimeout, minimum: 1)) / 1000,
+            searchRestart: searchRestart.flatMap { $0 == 0 ? nil : TimeInterval(Self.searchRestartMillis($0)) / 1000 }
         )
     }
 
@@ -132,6 +157,8 @@ public struct ChipReadSettings {
             .settleDelayMillis(millis: Self.millis(settleDelay, minimum: 0))
             .commandTimeoutMillis(millis: Self.millis(commandTimeout, minimum: 1))
             .commandTimeoutBeforeAccessMillis(millis: Self.millis(commandTimeoutBeforeAccess, minimum: 1))
+            .readTimeoutMillis(millis: Self.millis(readTimeout, minimum: 1))
+            .searchRestartMillis(millis: Self.searchRestartMillis(searchRestart))
             .waitAfterSystemEndMillis(millis: Self.millis(waitAfterSystemEnd, minimum: 0))
             .telemetry(sink: telemetry)
             // The Swift layer orders and buffers updates itself (see `ChipReadingCore`), so the
@@ -149,7 +176,9 @@ public struct ChipReadSettings {
             commandTimeout: TimeInterval(settings.commandTimeoutMillis) / 1000,
             commandTimeoutBeforeAccess: TimeInterval(settings.commandTimeoutBeforeAccessMillis) / 1000,
             waitAfterSystemEnd: TimeInterval(settings.waitAfterSystemEndMillis) / 1000,
-            telemetry: settings.telemetry
+            telemetry: settings.telemetry,
+            readTimeout: TimeInterval(settings.readTimeoutMillis) / 1000,
+            searchRestart: settings.searchRestartMillis == 0 ? nil : TimeInterval(settings.searchRestartMillis) / 1000
         )
     }
 }
@@ -178,10 +207,13 @@ public struct ChipReadStepEvent: Sendable, Equatable {
     /// The chip's status word, when it answered with one.
     public let statusWord: Int?
     public let durationMillis: Int64
+    /// The platform's own code, for a step that ended on one: today only the `SESSION_END` step, with
+    /// Core NFC's `NFCReaderError` code. `nil` for every other step.
+    public let systemCode: Int?
 
     public init(
         step: String, outcome: ChipReadStepResult, protocol: String? = nil, fileId: Int? = nil,
-        byteCount: Int? = nil, statusWord: Int? = nil, durationMillis: Int64 = 0
+        byteCount: Int? = nil, statusWord: Int? = nil, durationMillis: Int64 = 0, systemCode: Int? = nil
     ) {
         self.step = step
         self.outcome = outcome
@@ -190,6 +222,7 @@ public struct ChipReadStepEvent: Sendable, Equatable {
         self.byteCount = byteCount
         self.statusWord = statusWord
         self.durationMillis = durationMillis
+        self.systemCode = systemCode
     }
 
     init(_ event: ChipReadEvent) {
@@ -205,6 +238,7 @@ public struct ChipReadStepEvent: Sendable, Equatable {
         byteCount = event.byteCount.map { Int($0.int32Value) }
         statusWord = event.statusWord.map { Int($0.int32Value) }
         durationMillis = event.durationMillis
+        systemCode = event.systemCode.map { Int($0.int32Value) }
     }
 }
 
