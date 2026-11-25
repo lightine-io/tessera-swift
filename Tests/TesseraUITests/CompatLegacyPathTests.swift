@@ -91,6 +91,30 @@ struct CompatLegacyPathTests {
         #expect(taken.contains(.navigationStack), "\(taken)")
     }
 
+    /// TES-344: the explainer, with its magnified zone, on the old navigation at the narrowest width and the
+    /// largest text size, in light and dark.
+    @Test(arguments: [ColorScheme.light, .dark])
+    func theExplainerPictureRendersOnTheOldPathAtTheLargestTextSize(_ scheme: ColorScheme) {
+        var dialog = CGSize.zero
+        var picture = CGSize.zero
+        let taken = withLegacyPaths {
+            let controller = host(
+                MrzExplainerDialog(onDismiss: {})
+                    .environment(\.dynamicTypeSize, .accessibility5)
+                    .environment(\.colorScheme, scheme),
+                width: 320, height: 568
+            )
+            dialog = controller.view.bounds.size
+            let pictureHost = UIHostingController(rootView: MrzExplainerPicture()
+                .environment(\.dynamicTypeSize, .accessibility5)
+                .environment(\.colorScheme, scheme))
+            picture = pictureHost.sizeThatFits(in: CGSize(width: 320, height: CGFloat.greatestFiniteMagnitude))
+        }
+        #expect(taken.contains(.navigationStack), "\(taken)")
+        #expect(dialog.width == 320 && dialog.height > 0, "\(dialog)")
+        #expect(picture.width <= 320.5 && picture.height.isFinite && picture.height > 0, "\(picture)")
+    }
+
     @Test func manualEntryRendersWithTheOldKeyboardDismissal() {
         let taken = withLegacyPaths {
             host(ManualEntryScreen(text: Self.specimen, parseFailed: true, onTextChange: { _ in }, onRead: {}))
