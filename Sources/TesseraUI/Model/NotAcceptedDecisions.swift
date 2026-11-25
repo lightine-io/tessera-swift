@@ -4,8 +4,9 @@ import Tessera
 // TES-103: the app's intake rule (`MrzScannerConfig.acceptedDocumentTypes`). A reading whose category is not in
 // the accepted set does not go to review and is not returned. The screen states two facts - what kind was read
 // and what kinds the app accepts - and lets the person go on. The SDK does not judge the document: the copy
-// never says invalid, wrong or rejected, and a reading whose category the SDK cannot place
-// (`broadCategory` is `nil`) is never filtered. The iOS mirror of the Android `NotAcceptedNotice.kt`.
+// never says invalid, wrong or rejected. A reading whose kind the SDK cannot tell (`broadCategory` is `nil`) is
+// refused the same way when the app limits the kinds it accepts (TES-341); with the default (every category)
+// it is not filtered and goes on as before. The iOS mirror of the Android `NotAcceptedNotice.kt`.
 
 /// Every ``DocumentCategory``, worked out from the enum so a later category is in the default.
 var allDocumentCategories: Set<DocumentCategory> { Set(DocumentCategory.entries) }
@@ -33,15 +34,33 @@ func documentCategory(of decoded: MrzScanResultDecoded) -> DocumentCategory? {
     return DocumentTypeCodeTable.shared.broadCategory(code: rawCode)
 }
 
-/// The category of `decoded` when the app does not accept it, otherwise `nil`. `nil` also when the reading did
-/// not parse, or when its type code has no category: the SDK filters only on a category it has. Mirrors the
-/// Android `notAcceptedCategory`.
-func notAcceptedCategory(
+/// A reading refused under the app's intake rule (``MrzScannerConfig/acceptedDocumentTypes``): either the rule
+/// names the kind the app does not take, or the reading's kind could not be told at all. Carries no document
+/// value. `nil` (wherever this type is optional) always means "no refusal". Mirrors the Android
+/// `NotAcceptedKind`.
+enum NotAcceptedKind: Equatable {
+    /// The reading is of `category`, a kind the accepted set does not include.
+    case ofCategory(DocumentCategory)
+
+    /// The SDK could not tell what kind of document this is (`broadCategory` is `nil`) and the app limits the
+    /// kinds it accepts, so the reading is refused like a kind outside the set. Never produced when every
+    /// category is accepted (the default).
+    case unknown
+}
+
+/// The refusal of `decoded` under `acceptedDocumentTypes`, otherwise `nil`. `nil` also when the reading did not
+/// parse. A category outside the set refuses the reading. A reading whose kind cannot be told is refused only
+/// when the app limits the kinds it takes; with every category accepted it is not filtered. Mirrors the Android
+/// `notAcceptedKind`.
+func notAcceptedKind(
     _ decoded: MrzScanResultDecoded,
     acceptedDocumentTypes: Set<DocumentCategory>
-) -> DocumentCategory? {
-    guard let category = documentCategory(of: decoded) else { return nil }
-    return acceptedDocumentTypes.contains(category) ? nil : category
+) -> NotAcceptedKind? {
+    guard decoded.parse is ParseResult.Success || decoded.parse is ParseResult.PartialSuccess else { return nil }
+    if let category = documentCategory(of: decoded) {
+        return acceptedDocumentTypes.contains(category) ? nil : .ofCategory(category)
+    }
+    return acceptedDocumentTypes == allDocumentCategories ? nil : .unknown
 }
 
 // MARK: - Live camera
@@ -59,11 +78,11 @@ enum LiveDecodeStep: Equatable {
     case gathering
 
     /// A not-accepted frame, agreement not reached yet: keep any notice alive, show no cue.
-    case notAcceptedGathering(read: DocumentCategory)
+    case notAcceptedGathering(read: NotAcceptedKind)
 
     /// The frames agreed on a reading the app does not accept. The consensus has been reset so a later
     /// document can still be agreed on; the session is NOT latched.
-    case notAccepted(read: DocumentCategory)
+    case notAccepted(read: NotAcceptedKind)
 }
 
 /// Offers one live frame to `consensus` and decides what it means under `acceptedDocumentTypes`. A frame that
@@ -81,13 +100,13 @@ func stepLiveDecode(
     if alreadyRouted || decoded.parse is ParseResult.Failure { return .ignore }
     switch consensus.offer(decoded: decoded) {
     case is ConsensusVerdictConfirmed:
-        guard let read = notAcceptedCategory(decoded, acceptedDocumentTypes: acceptedDocumentTypes) else {
+        guard let read = notAcceptedKind(decoded, acceptedDocumentTypes: acceptedDocumentTypes) else {
             return .route(decoded: decoded)
         }
         consensus.reset()
         return .notAccepted(read: read)
     case is ConsensusVerdictGathering:
-        guard let read = notAcceptedCategory(decoded, acceptedDocumentTypes: acceptedDocumentTypes) else {
+        guard let read = notAcceptedKind(decoded, acceptedDocumentTypes: acceptedDocumentTypes) else {
             return .gathering
         }
         return .notAcceptedGathering(read: read)
@@ -99,7 +118,7 @@ func stepLiveDecode(
 /// The live state after the frames agreed on a not-accepted reading: a scanning state shows the notice for
 /// `read` (and drops the gathering cue, which described that reading); any other state is unchanged. Mirrors
 /// the Android `showNotAcceptedNotice`.
-func showNotAcceptedNotice(_ current: ScannerState, read: DocumentCategory) -> ScannerState {
+func showNotAcceptedNotice(_ current: ScannerState, read: NotAcceptedKind) -> ScannerState {
     guard case let .scanning(struggling, _, _) = current else { return current }
     return .scanning(struggling: struggling, gathering: false, notAccepted: read)
 }
@@ -110,7 +129,7 @@ func showNotAcceptedNotice(_ current: ScannerState, read: DocumentCategory) -> S
 /// `manualDraft` kept and an inline note. Mirrors the Android `notAcceptedStateFor`.
 func notAcceptedState(
     for source: ScanMethod,
-    read: DocumentCategory,
+    read: NotAcceptedKind,
     current: ScannerState,
     manualDraft: String
 ) -> ScannerState {
@@ -147,8 +166,17 @@ func categoryNameKey(_ category: DocumentCategory) -> String {
     return "tessera_scanner_category_other"
 }
 
+/// The notice title key for a refusal: the category title, or "We could not tell what kind of document this is"
+/// when the kind could not be told.
+func notAcceptedTitleKey(_ read: NotAcceptedKind) -> String {
+    switch read {
+    case let .ofCategory(category): return notAcceptedTitleKey(category)
+    case .unknown: return "tessera_scanner_not_accepted_title_unknown"
+    }
+}
+
 /// The notice title for a reading of `read`.
-func notAcceptedTitle(_ read: DocumentCategory, bundle: Bundle?) -> String {
+func notAcceptedTitle(_ read: NotAcceptedKind, bundle: Bundle?) -> String {
     TesseraStrings.string(notAcceptedTitleKey(read), bundle: bundle)
 }
 
@@ -168,7 +196,7 @@ func notAcceptedBody(_ acceptedDocumentTypes: Set<DocumentCategory>, bundle: Bun
 /// What VoiceOver announces when the camera notice or the manual-entry note appears: both lines, as the
 /// Android polite live region (merged descendants) reads them.
 func notAcceptedAnnouncement(
-    _ read: DocumentCategory,
+    _ read: NotAcceptedKind,
     acceptedDocumentTypes: Set<DocumentCategory>,
     bundle: Bundle?
 ) -> String {

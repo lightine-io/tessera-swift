@@ -36,6 +36,15 @@ struct AcceptedDocumentTypesTests {
         dateOfExpiry: Kotlinx_datetimeLocalDate(year: 2034, month: 3, day: 14),
         personalNumber: "", transliteration: nil))
 
+    // TES-341: a document type code whose first character is a digit, as when the camera misreads the first
+    // letter: broadCategory is nil.
+    static let digitCodeLines: [String] = generated(MrzGenerator.shared.generateTD3(
+        documentType: "1", issuingState: "UTO", documentNumber: "T22000129",
+        primaryIdentifier: "SPECIMEN", secondaryIdentifier: "ALEX MORGAN", nationality: "UTO",
+        dateOfBirth: Kotlinx_datetimeLocalDate(year: 1990, month: 3, day: 15), sex: .female,
+        dateOfExpiry: Kotlinx_datetimeLocalDate(year: 2034, month: 3, day: 14),
+        personalNumber: "", transliteration: nil))
+
     private static func generated(_ result: GenerationResult) -> [String] {
         (result as? GenerationResult.Success)?.mrz ?? []
     }
@@ -46,18 +55,21 @@ struct AcceptedDocumentTypesTests {
     private var idCard: MrzScanResultDecoded { assembleManualDecoded(text: Self.text(Self.idCardLines)) }
     private var uncategorized: MrzScanResultDecoded { assembleManualDecoded(text: Self.text(Self.uncategorizedLines)) }
 
+    private var digitCode: MrzScanResultDecoded { assembleManualDecoded(text: Self.text(Self.digitCodeLines)) }
+
     private let passportOnly: Set<DocumentCategory> = [DocumentCategory.passport]
     private let idCardOnly: Set<DocumentCategory> = [DocumentCategory.identityCard]
 
     // MARK: - Fixtures and config
 
     @Test func fixturesParseToTheCategoriesTheTestsRelyOn() {
-        for decoded in [passport, idCard, uncategorized] {
+        for decoded in [passport, idCard, uncategorized, digitCode] {
             #expect(!(decoded.parse is ParseResult.Failure), "fixture must parse: \(decoded.parse)")
         }
         #expect(documentCategory(of: passport) === DocumentCategory.passport)
         #expect(documentCategory(of: idCard) === DocumentCategory.identityCard)
         #expect(documentCategory(of: uncategorized) == nil)
+        #expect(documentCategory(of: digitCode) == nil)
     }
 
     @Test func defaultAcceptsEveryCategoryAndASetIsStoredAsGiven() {
@@ -92,7 +104,7 @@ struct AcceptedDocumentTypesTests {
     @Test func aReadingTheAppDoesNotAcceptIsNeitherReviewedNorReturned() {
         for mode in [ReviewMode.review, .instantReturn] {
             if case let .notAccepted(read) = routeDecode(passport, reviewMode: mode, acceptedDocumentTypes: idCardOnly) {
-                #expect(read === DocumentCategory.passport)
+                #expect(read == .ofCategory(.passport))
             } else {
                 Issue.record("a passport under an ID-card-only rule must not route on in \(mode)")
             }
@@ -105,12 +117,24 @@ struct AcceptedDocumentTypesTests {
         }
     }
 
-    @Test func aReadingWithNoCategoryIsNotFiltered() {
-        if case .showReview = routeDecode(uncategorized, reviewMode: .review, acceptedDocumentTypes: passportOnly) {} else {
-            Issue.record("unknown category reviews")
+    @Test func aReadingWithNoCategoryIsRefusedWhenTheSetIsLimited() {
+        for mode in [ReviewMode.review, .instantReturn] {
+            for decoded in [digitCode, uncategorized] {
+                if case let .notAccepted(read) = routeDecode(decoded, reviewMode: mode, acceptedDocumentTypes: passportOnly) {
+                    #expect(read == .unknown)
+                } else { Issue.record("no category with a limited set is refused in \(mode)") }
+            }
         }
-        if case .returnConfirmed = routeDecode(uncategorized, reviewMode: .instantReturn, acceptedDocumentTypes: passportOnly) {} else {
-            Issue.record("unknown category returns")
+        #expect(notAcceptedKind(digitCode, acceptedDocumentTypes: idCardOnly) == .unknown)
+        #expect(notAcceptedKind(passport, acceptedDocumentTypes: passportOnly) == nil)
+    }
+
+    @Test func aReadingWithNoCategoryGoesOnWithTheDefaultSet() {
+        if case .showReview = routeDecode(digitCode, reviewMode: .review, acceptedDocumentTypes: allDocumentCategories) {} else {
+            Issue.record("no category with the default set reviews")
+        }
+        if case .returnConfirmed = routeDecode(digitCode, reviewMode: .instantReturn, acceptedDocumentTypes: allDocumentCategories) {} else {
+            Issue.record("no category with the default set returns")
         }
     }
 
@@ -123,21 +147,21 @@ struct AcceptedDocumentTypesTests {
     }
 
     @Test func eachMethodLandsOnItsOwnNotAcceptedState() {
-        let camera = notAcceptedState(for: .camera, read: .passport,
+        let camera = notAcceptedState(for: .camera, read: .ofCategory(.passport),
                                       current: .scanning(struggling: true, gathering: true), manualDraft: "")
         if case let .scanning(struggling, gathering, read) = camera {
-            #expect(struggling && !gathering && read === DocumentCategory.passport)
+            #expect(struggling && !gathering && read == .ofCategory(.passport))
         } else { Issue.record("camera stays on the live preview") }
 
-        if case let .savedImageNotAccepted(read) = notAcceptedState(for: .savedImage, read: .passport,
+        if case let .savedImageNotAccepted(read) = notAcceptedState(for: .savedImage, read: .ofCategory(.passport),
                                                                     current: .savedImageAnalyzing, manualDraft: "") {
-            #expect(read === DocumentCategory.passport)
+            #expect(read == .ofCategory(.passport))
         } else { Issue.record("photo gets its own screen") }
 
-        if case let .manualRaw(text, parseFailed, read) = notAcceptedState(for: .manualEntry, read: .passport,
+        if case let .manualRaw(text, parseFailed, read) = notAcceptedState(for: .manualEntry, read: .ofCategory(.passport),
                                                                            current: .manualRaw(text: "typed", parseFailed: false),
                                                                            manualDraft: "typed") {
-            #expect(text == "typed" && !parseFailed && read === DocumentCategory.passport)
+            #expect(text == "typed" && !parseFailed && read == .ofCategory(.passport))
         } else { Issue.record("manual entry stays on the entry screen") }
     }
 
@@ -162,11 +186,11 @@ struct AcceptedDocumentTypesTests {
             return result
         }
         // The ID card gathers (no "hold steady" cue), then the frames agree: a notice, not a route.
-        #expect(step(idCard) == .notAcceptedGathering(read: .identityCard))
-        #expect(step(idCard) == .notAccepted(read: .identityCard))
+        #expect(step(idCard) == .notAcceptedGathering(read: .ofCategory(.identityCard)))
+        #expect(step(idCard) == .notAccepted(read: .ofCategory(.identityCard)))
         #expect(!routed, "a not-accepted reading must not latch the session")
         // The consensus was reset: one more ID card frame gathers again rather than confirming at once.
-        #expect(step(idCard) == .notAcceptedGathering(read: .identityCard))
+        #expect(step(idCard) == .notAcceptedGathering(read: .ofCategory(.identityCard)))
         // A passport now: gathers, then routes.
         #expect(step(passport) == .gathering)
         if case .route = step(passport) {} else { Issue.record("the passport routes") }
@@ -176,20 +200,22 @@ struct AcceptedDocumentTypesTests {
     @Test func liveSingleFrameConsensusAndUnknownCategory() throws {
         let consensus = try MrzDecodeConsensus(threshold: 1)
         #expect(stepLiveDecode(idCard, alreadyRouted: false, consensus: consensus, acceptedDocumentTypes: passportOnly)
-            == .notAccepted(read: .identityCard))
+            == .notAccepted(read: .ofCategory(.identityCard)))
         #expect(stepLiveDecode(idCard, alreadyRouted: false, consensus: consensus, acceptedDocumentTypes: passportOnly)
-            == .notAccepted(read: .identityCard))
-        if case .route = stepLiveDecode(uncategorized, alreadyRouted: false, consensus: consensus, acceptedDocumentTypes: passportOnly) {} else {
-            Issue.record("an unknown category routes")
+            == .notAccepted(read: .ofCategory(.identityCard)))
+        #expect(stepLiveDecode(digitCode, alreadyRouted: false, consensus: consensus, acceptedDocumentTypes: passportOnly)
+            == .notAccepted(read: .unknown))
+        if case .route = stepLiveDecode(digitCode, alreadyRouted: false, consensus: consensus, acceptedDocumentTypes: allDocumentCategories) {} else {
+            Issue.record("an unknown category routes with the default set")
         }
     }
 
     @Test func liveNoticeKeepsStrugglingAndDropsTheGatheringCue() {
-        if case let .scanning(struggling, gathering, read) = showNotAcceptedNotice(.scanning(struggling: true, gathering: true), read: .visa) {
-            #expect(struggling && !gathering && read === DocumentCategory.visa)
+        if case let .scanning(struggling, gathering, read) = showNotAcceptedNotice(.scanning(struggling: true, gathering: true), read: .ofCategory(.visa)) {
+            #expect(struggling && !gathering && read == .ofCategory(.visa))
         } else { Issue.record("stays scanning") }
         // Off the live preview it changes nothing.
-        if case .cameraInUse = showNotAcceptedNotice(.cameraInUse, read: .visa) {} else { Issue.record("unchanged") }
+        if case .cameraInUse = showNotAcceptedNotice(.cameraInUse, read: .ofCategory(.visa)) {} else { Issue.record("unchanged") }
     }
 
     @Test func theNoticeRanksBelowGatheringAndAboveStruggling() {
@@ -214,7 +240,7 @@ struct AcceptedDocumentTypesTests {
             quality: ScanQuality(mrzRegionFound: false, ocrConfidence: nil, recognizedLineCount: 0))
     }
 
-    private func liveNotice(_ model: ScannerModel) -> DocumentCategory? {
+    private func liveNotice(_ model: ScannerModel) -> NotAcceptedKind? {
         if case let .scanning(_, _, read) = model.state { return read }
         return nil
     }
@@ -229,14 +255,14 @@ struct AcceptedDocumentTypesTests {
         model.onCameraResult(idCard)
         #expect(liveNotice(model) == nil, "no notice before the frames agree")
         model.onCameraResult(idCard)
-        #expect(liveNotice(model) === DocumentCategory.identityCard)
+        #expect(liveNotice(model) == .ofCategory(.identityCard))
         #expect(model.confirmedReadHaptic == 0, "no haptic for a not-accepted reading")
         #expect(results.values.isEmpty)
 
         // The document is still near: a miss within the linger keeps the notice.
         now += 1
         model.onCameraResult(noMrz())
-        #expect(liveNotice(model) === DocumentCategory.identityCard)
+        #expect(liveNotice(model) == .ofCategory(.identityCard))
         // 3 seconds after the last filtered frame it clears.
         now += 2.5
         model.onCameraResult(noMrz())
@@ -250,7 +276,7 @@ struct AcceptedDocumentTypesTests {
                                  onResult: { results.values.append($0) })
         model.onCameraResult(idCard)
         model.onCameraResult(idCard)
-        #expect(liveNotice(model) === DocumentCategory.identityCard)
+        #expect(liveNotice(model) == .ofCategory(.identityCard))
 
         // An accepted reading starting to gather replaces the notice with the "hold steady" cue.
         model.onCameraResult(passport)
@@ -276,6 +302,29 @@ struct AcceptedDocumentTypesTests {
         model.onCameraResult(passport)
         #expect(results.confirmed.count == 1)
         #expect(results.confirmed.first?.recognizedText.lines.map(\.text) == Self.passportLines)
+    }
+
+    @Test func cameraRefusesANoCategoryReadingWithALimitedSetAndClearsTheNotice() {
+        let results = Results()
+        let model = ScannerModel(config: MrzScannerConfig(acceptedDocumentTypes: passportOnly),
+                                 onResult: { results.values.append($0) })
+        var now = Date(timeIntervalSince1970: 0)
+        model.notAcceptedClock = { now }
+        model.onCameraResult(digitCode)
+        model.onCameraResult(digitCode)
+        #expect(liveNotice(model) == .unknown)
+        #expect(results.values.isEmpty)
+        if case .scanning = model.state {} else { Issue.record("still scanning, got \(model.state)") }
+        now += 3.5
+        model.onCameraResult(noMrz())
+        #expect(liveNotice(model) == nil)
+    }
+
+    @Test func cameraWithTheDefaultRoutesANoCategoryReading() {
+        let model = ScannerModel(config: MrzScannerConfig(), onResult: { _ in })
+        model.onCameraResult(digitCode)
+        model.onCameraResult(digitCode)
+        if case .review = model.state {} else { Issue.record("default config reviews, got \(model.state)") }
     }
 
     @Test func cameraWithTheDefaultRoutesAnyCategory() {
@@ -304,7 +353,7 @@ struct AcceptedDocumentTypesTests {
         if case let .manualRaw(text, parseFailed, read) = model.state {
             #expect(text == Self.text(Self.passportLines), "the typed text stays")
             #expect(!parseFailed)
-            #expect(read === DocumentCategory.passport)
+            #expect(read == .ofCategory(.passport))
         } else { Issue.record("stays on the entry screen, got \(model.state)") }
         #expect(results.values.isEmpty)
 
@@ -330,22 +379,45 @@ struct AcceptedDocumentTypesTests {
         #expect(results.confirmed.first?.recognizedText.lines.map(\.text) == Self.idCardLines)
     }
 
-    @Test func manualEntryWithAnUnknownCategoryGoesToReview() {
-        let model = manualModel(passportOnly, results: Results())
-        type(Self.uncategorizedLines, into: model)
-        if case .review = model.state {} else { Issue.record("unknown category reviews, got \(model.state)") }
+    @Test func manualEntryRefusesANoCategoryReadingWithALimitedSetAndAnEditClearsIt() {
+        let results = Results()
+        let model = manualModel(passportOnly, results: results)
+        type(Self.digitCodeLines, into: model)
+        if case let .manualRaw(text, parseFailed, read) = model.state {
+            #expect(text == Self.text(Self.digitCodeLines) && !parseFailed)
+            #expect(read == .unknown)
+        } else { Issue.record("stays on the entry screen, got \(model.state)") }
+        #expect(results.values.isEmpty)
+        model.updateManualText(Self.text(Self.digitCodeLines) + "<")
+        if case let .manualRaw(_, _, read) = model.state { #expect(read == nil) } else { Issue.record("manual") }
     }
 
-    @Test func manualEntryDefaultConfigReviewsAnyCategory() {
-        let model = ScannerModel(config: MrzScannerConfig(enabledMethods: [.manualEntry]), onResult: { _ in })
-        type(Self.idCardLines, into: model)
-        if case .review = model.state {} else { Issue.record("default reviews an ID card, got \(model.state)") }
+    @Test func manualEntryWithANoCategoryReadingAndTheDefaultSetGoesToReview() {
+        let model = manualModel(allDocumentCategories, results: Results())
+        type(Self.digitCodeLines, into: model)
+        if case .review = model.state {} else { Issue.record("default set reviews, got \(model.state)") }
+    }
+
+    @Test func manualEntryWithAnAcceptedCategoryGoesToReview() {
+        let model = manualModel(passportOnly, results: Results())
+        type(Self.passportLines, into: model)
+        if case .review = model.state {} else { Issue.record("accepted category reviews, got \(model.state)") }
+    }
+
+    @Test func photoRefusesANoCategoryReadingWithALimitedSet() {
+        // The photo path routes through the same decision, then lands on its own screen.
+        guard case let .notAccepted(read) = routeDecode(digitCode, reviewMode: .review, acceptedDocumentTypes: passportOnly) else {
+            Issue.record("refused"); return
+        }
+        if case let .savedImageNotAccepted(kind) = notAcceptedState(for: .savedImage, read: read, current: .savedImageAnalyzing, manualDraft: "") {
+            #expect(kind == .unknown)
+        } else { Issue.record("photo gets the not-accepted screen") }
     }
 
     // MARK: - Photo screen state
 
     @Test func thePhotoNotAcceptedScreenBehavesLikeTheOtherPhotoPrompts() {
-        let state = ScannerState.savedImageNotAccepted(read: .passport)
+        let state = ScannerState.savedImageNotAccepted(read: .ofCategory(.passport))
         #expect(showsMethodSwitcher(state))
         #expect(activeMethod(state) == .savedImage)
         #expect(announcementKey(for: state) == "tessera_scanner_not_accepted_title_passport")
@@ -360,6 +432,7 @@ struct AcceptedDocumentTypesTests {
         "tessera_scanner_not_accepted_title_residence_permit",
         "tessera_scanner_not_accepted_title_visa",
         "tessera_scanner_not_accepted_title_other",
+        "tessera_scanner_not_accepted_title_unknown",
         "tessera_scanner_not_accepted_body",
         "tessera_scanner_not_accepted_separator",
     ]
@@ -373,6 +446,13 @@ struct AcceptedDocumentTypesTests {
         }
     }
 
+    @Test func theUnknownKindHasItsTitleAndAnnouncement() {
+        #expect(notAcceptedTitle(.unknown, bundle: nil) == "We could not tell what kind of document this is")
+        #expect(notAcceptedAnnouncement(.unknown, acceptedDocumentTypes: passportOnly, bundle: nil)
+            == "We could not tell what kind of document this is\nThis app accepts: passport.")
+        #expect(announcementKey(for: .savedImageNotAccepted(read: .unknown)) == "tessera_scanner_not_accepted_title_unknown")
+    }
+
     @Test func eachCategoryHasItsTitle() {
         let expected: [(DocumentCategory, String)] = [
             (.passport, "This looks like a passport"),
@@ -382,14 +462,14 @@ struct AcceptedDocumentTypesTests {
             (.other, "This looks like another kind of document"),
         ]
         for (category, title) in expected {
-            #expect(notAcceptedTitle(category, bundle: nil) == title)
+            #expect(notAcceptedTitle(.ofCategory(category), bundle: nil) == title)
         }
     }
 
     @Test func theBodyListsTheAcceptedKindsInCategoryOrder() {
         #expect(notAcceptedBody([DocumentCategory.visa, DocumentCategory.passport], bundle: nil) == "This app accepts: passport, visa.")
         #expect(notAcceptedBody(idCardOnly, bundle: nil) == "This app accepts: ID card.")
-        #expect(notAcceptedAnnouncement(.identityCard, acceptedDocumentTypes: passportOnly, bundle: nil)
+        #expect(notAcceptedAnnouncement(.ofCategory(.identityCard), acceptedDocumentTypes: passportOnly, bundle: nil)
             == "This looks like an ID card\nThis app accepts: passport.")
     }
 }

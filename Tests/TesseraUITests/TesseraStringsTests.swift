@@ -34,6 +34,24 @@ struct TesseraStringsTests {
         #expect(!resolved.isEmpty)
     }
 
+    /// The built bundle's compiled strings table must resolve on every iOS the package supports: a miss
+    /// would show the raw key on the screen. The old-iOS simulator CI runs this on iOS 15, 16 and 17.
+    @Test func screenKeysResolveToText() {
+        let keys = [
+            "tessera_scanner_title",
+            "tessera_scanner_done",
+            "tessera_scanner_camera_guide",
+            "tessera_scanner_camera_manual",
+            "tessera_scanner_camera_in_use_title",
+            "tessera_scanner_camera_unavailable_body",
+        ]
+        for key in keys {
+            let resolved = TesseraStrings.string(key, bundle: nil)
+            #expect(!resolved.isEmpty, "\(key) resolved to empty text")
+            #expect(resolved != key, "\(key) did not resolve")
+        }
+    }
+
     @Test func hostOverrideWinsForAnOverriddenKey() {
         let host = FakeHostBundle(overrides: [Self.realModuleKey: "Custom Title"])
         #expect(TesseraStrings.string(Self.realModuleKey, bundle: host) == "Custom Title")

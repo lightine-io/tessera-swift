@@ -607,6 +607,17 @@
         }
       }
     },
+    "tessera_scanner_not_accepted_title_unknown": {
+      "comment": "Shown when a reading's kind of document could not be told and the app accepts only some kinds (MrzScannerConfig acceptedDocumentTypes): over the live camera preview, on its own screen after a photo, and as a note on the manual-entry screen. Followed by the line of kinds the app accepts. Never \"invalid\", \"wrong\" or \"rejected\".",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We could not tell what kind of document this is"
+          }
+        }
+      }
+    },
     "tessera_scanner_not_accepted_title_visa": {
       "comment": "Shown when a reading is of a kind of document the app does not accept (MrzScannerConfig acceptedDocumentTypes): over the live camera preview, on its own screen after a photo, and as a note on the manual-entry screen. Two facts only: what kind was read, and what kinds the app accepts. Never \"invalid\", \"wrong\" or \"rejected\". One title per category, so a translation can get the article and grammar right.",
       "localizations": {
@@ -644,6 +655,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Expiry %1$@ is a real date"
+          }
+        }
+      }
+    },
+    "tessera_scanner_obs_name_line_padded": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The end of the name line wasn't read, so it was left blank. Please compare the name with your document."
           }
         }
       }
@@ -694,6 +715,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Attention:"
+          }
+        }
+      }
+    },
+    "tessera_scanner_obs_warning_expiry_after_non_harmonized_passport_limit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passport code %1$@ has no second letter from the ICAO list, and ICAO says passports without one expire before 2038"
+          }
+        }
+      }
+    },
+    "tessera_scanner_obs_warning_expiry_century_unknown": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expiry year %1$@ can't be placed in a century"
           }
         }
       }

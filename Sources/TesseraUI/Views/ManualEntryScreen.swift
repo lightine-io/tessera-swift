@@ -32,7 +32,7 @@ internal struct ManualEntryScreen: View {
     let parseFailed: Bool
     /// TES-103: the category the typed lines read as when the app does not accept it; shows an inline note.
     /// Any edit clears it, like `parseFailed`.
-    var notAccepted: DocumentCategory? = nil
+    var notAccepted: NotAcceptedKind? = nil
     /// The kinds the app accepts, named in that note.
     var acceptedDocumentTypes: Set<DocumentCategory> = allDocumentCategories
     let onTextChange: (String) -> Void
@@ -137,7 +137,7 @@ internal struct ManualEntryScreen: View {
         // Keyboard dismissal (TES-154). Scrolling dismisses it interactively; a tap anywhere outside the field
         // dismisses it (a simultaneous gesture, so buttons and the field itself keep working); and the keyboard
         // carries a Done button. None of these touch the typed text or start a read.
-        .scrollDismissesKeyboard(.interactively)
+        .compatScrollDismissesKeyboard()
         .simultaneousGesture(TapGesture().onEnded { dismissKeyboard() })
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {

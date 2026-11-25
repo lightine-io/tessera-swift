@@ -99,7 +99,8 @@ func demo() {
         recognizedLineCount: 0,
         mrzRegionFound: false,
         ocrConfidence: nil,
-        detectedFormat: nil
+        detectedFormat: nil,
+        fillerPaddingAdded: 0
     ))
     let quality = ScanQuality(mrzRegionFound: false, ocrConfidence: nil, recognizedLineCount: 0)
     let capture = MrzScanResultCaptureError(error: CameraErrorOcrFailed(message: "engine failed"), quality: quality)

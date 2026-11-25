@@ -16,3 +16,4 @@ DerivedData/
 
 # Claude Code work copies of this repo (git worktrees), never committed
 .claude/worktrees/
+.build-apiguard-*/

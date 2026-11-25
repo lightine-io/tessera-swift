@@ -1,6 +1,7 @@
 # CLAUDE.md: tessera-swift
 
-The Swift package for Tessera: the `Tessera` binary target (the XCFramework the main
+The Swift package for Tessera: the `Tessera` product (the hand-written Swift layer in
+`Sources/Tessera`, which re-exports the `TesseraCore` binary target, the XCFramework the main
 repository builds and pins at each release) and `TesseraUI`, the SwiftUI scanner screen.
 Principles, process, and documentation rules live in the main repository's `CLAUDE.md`
 (lightine-io/tessera). This file adds only what differs here.
@@ -24,7 +25,9 @@ Principles, process, and documentation rules live in the main repository's `CLAU
   simulator destination is a sanctioned raw use; so is `xcodebuild` with environment
   variables (`TESSERA_LOCAL_XCFRAMEWORK=1`).
 - The `TesseraUI` public API is frozen (`scripts/check-public-api.sh`). A deliberate change
-  regenerates `api/TesseraUI.baseline.json` with the Xcode version pinned in CI.
+  regenerates `api/TesseraUI.baseline.json` with the Xcode version pinned in CI. The Swift
+  layer's own API has `api/Tessera.baseline.json` (`scripts/check-public-api.sh Tessera`, with
+  the local framework until a release carries the Kotlin API it needs).
 - Merge rules differ from the main repository: merge commits, squash, and rebase are
   all allowed (the release workflow merges its pin PR with a merge commit); `main`
   needs a PR and signed commits but no status check; branches are not deleted on merge

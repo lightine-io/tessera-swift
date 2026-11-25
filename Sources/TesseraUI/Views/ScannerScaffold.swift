@@ -17,8 +17,8 @@ struct ScannerScaffold<Content: View>: View {
     /// The scan-timeout time left, shown as a countdown chip in the top bar on every screen; `nil` when the
     /// host left `scanTimeout` at `nil` (no deadline → no chip). Defaults to `nil` so screen-focused call
     /// sites don't need to thread a deadline. Mirrors the Android `ScannerScaffold`'s `timeRemaining`
-    /// parameter / ``ScanCountdownChip``.
-    var timeRemaining: Duration? = nil
+    /// parameter / ``ScanCountdownChip``. In seconds.
+    var timeRemaining: TimeInterval? = nil
     @ViewBuilder let content: () -> Content
 
     /// Whether a docked keyboard (or its hardware-keyboard shortcut bar) covers the bottom of the screen.
@@ -27,79 +27,81 @@ struct ScannerScaffold<Content: View>: View {
     @State private var keyboardCoversFooter = false
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                VStack(spacing: 0) {
-                    if showsMethodSwitcher(currentState) {
-                        MethodSwitcher(
-                            enabledMethods: enabledMethods,
-                            currentState: currentState,
-                            onSelectMethod: onSelectMethod
-                        )
-                    }
-                    content()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
-                // "Powered by Tessera" attribution, shown once on every screen — a quiet, theme-coloured
-                // footer that respects the safe area. The content reserves the footer's exact height with a
-                // hidden copy in `.safeAreaInset` (the SwiftUI idiom for a persistent bottom bar that never
-                // overlaps scrollable content, mirroring the Android Scaffold's `bottomBar`); the visible
-                // footer is drawn in the layer below. Overridable like every `tessera_*` key: a blank
-                // resolved string renders nothing at all (`PoweredByFooter`), so the opt-out actually
-                // reclaims the space.
-                //
-                // While the keyboard is up the reservation is dropped, so the content still avoids the
-                // keyboard exactly (TES-153) without a blank band above it — the keyboard is part of the
-                // safe area, and an inset would otherwise stack on top of it.
-                .safeAreaInset(edge: .bottom, spacing: 0) {
-                    if !keyboardCoversFooter {
-                        PoweredByFooter().hidden()
-                    }
-                }
-
-                // The visible footer ignores ONLY the keyboard safe area, so it stays at the physical
-                // bottom of the screen (behind the keyboard) instead of riding on the keyboard's top edge —
-                // matching the Android footer, which stays below the IME (TES-156). The container safe area
-                // (home indicator) is still respected, so with the keyboard down it sits exactly where the
-                // hidden copy reserves space.
-                PoweredByFooter()
-                    .frame(maxHeight: .infinity, alignment: .bottom)
-                    .ignoresSafeArea(.keyboard, edges: .bottom)
-            }
-            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) {
-                keyboardCoversFooter = keyboardReachesScreenBottom($0)
-            }
-            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
-                keyboardCoversFooter = false
-            }
-            .navigationTitle(TesseraStrings.string("tessera_scanner_title", bundle: stringsBundle))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(action: onClose) {
-                        // SF Symbol close glyph; the accessibility label carries the spoken name.
-                        Image(systemName: "xmark")
-                    }
-                    .scannerControl(.close, bundle: stringsBundle)
-                    .accessibilityIdentifier("tessera-mrz-close")
-                }
-                // The scan-timeout countdown (TES-125), shown on EVERY screen while a finite `scanTimeout`
-                // runs (the host set a session deadline) — so the user always knows there is a limit and how
-                // long is left. Nothing shows when `scanTimeout` is `nil` (`timeRemaining == nil`).
-                if let timeRemaining {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        ScanCountdownChip(remaining: timeRemaining)
-                    }
-                }
-                // The privacy / transparency notice, reachable on every screen from the shared chrome rather
-                // than repeated as ad-hoc copy per screen — one coherent, opt-in explanation of what the
-                // scanner does with the document. Placed AFTER the countdown chip, mirroring the Android top
-                // bar's `actions { ScanCountdownChip(...); PrivacyNoticeAction() }` order.
-                ToolbarItem(placement: .topBarTrailing) {
-                    PrivacyNoticeAction()
-                }
-            }
+        CompatNavigationStack {
+            screenContent
+                .compatTopBar(
+                    leading: { closeButton },
+                    // The scan-timeout countdown (TES-125), shown on EVERY screen while a finite `scanTimeout`
+                    // runs (the host set a session deadline) — so the user always knows there is a limit and
+                    // how long is left. Nothing shows when `scanTimeout` is `nil` (`timeRemaining == nil`).
+                    countdown: timeRemaining.map { ScanCountdownChip(remaining: $0) },
+                    // The privacy / transparency notice, reachable on every screen from the shared chrome
+                    // rather than repeated as ad-hoc copy per screen — one coherent, opt-in explanation of what
+                    // the scanner does with the document. Placed AFTER the countdown chip, mirroring the
+                    // Android top bar's `actions { ScanCountdownChip(...); PrivacyNoticeAction() }` order.
+                    trailing: { PrivacyNoticeAction() }
+                )
         }
+    }
+
+    /// The screen inside the navigation container, without its toolbar.
+    private var screenContent: some View {
+        ZStack {
+            VStack(spacing: 0) {
+                if showsMethodSwitcher(currentState) {
+                    MethodSwitcher(
+                        enabledMethods: enabledMethods,
+                        currentState: currentState,
+                        onSelectMethod: onSelectMethod
+                    )
+                }
+                content()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            // "Powered by Tessera" attribution, shown once on every screen — a quiet, theme-coloured
+            // footer that respects the safe area. The content reserves the footer's exact height with a
+            // hidden copy in `.safeAreaInset` (the SwiftUI idiom for a persistent bottom bar that never
+            // overlaps scrollable content, mirroring the Android Scaffold's `bottomBar`); the visible
+            // footer is drawn in the layer below. Overridable like every `tessera_*` key: a blank
+            // resolved string renders nothing at all (`PoweredByFooter`), so the opt-out actually
+            // reclaims the space.
+            //
+            // While the keyboard is up the reservation is dropped, so the content still avoids the
+            // keyboard exactly (TES-153) without a blank band above it — the keyboard is part of the
+            // safe area, and an inset would otherwise stack on top of it.
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if !keyboardCoversFooter {
+                    PoweredByFooter().hidden()
+                }
+            }
+
+            // The visible footer ignores ONLY the keyboard safe area, so it stays at the physical
+            // bottom of the screen (behind the keyboard) instead of riding on the keyboard's top edge —
+            // matching the Android footer, which stays below the IME (TES-156). The container safe area
+            // (home indicator) is still respected, so with the keyboard down it sits exactly where the
+            // hidden copy reserves space.
+            PoweredByFooter()
+                .frame(maxHeight: .infinity, alignment: .bottom)
+                .ignoresSafeArea(.keyboard, edges: .bottom)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) {
+            keyboardCoversFooter = keyboardReachesScreenBottom($0)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            keyboardCoversFooter = false
+        }
+        .navigationTitle(TesseraStrings.string("tessera_scanner_title", bundle: stringsBundle))
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    /// The top bar's ✕: the global cancel.
+    private var closeButton: some View {
+        Button(action: onClose) {
+            // SF Symbol close glyph; the accessibility label carries the spoken name.
+            Image(systemName: "xmark")
+        }
+        .scannerControl(.close, bundle: stringsBundle)
+        .accessibilityIdentifier("tessera-mrz-close")
     }
 }
 
@@ -147,7 +149,8 @@ private struct PoweredByFooter: View {
 /// chip's non-live-region semantics (`liveRegion` is intentionally absent there too).
 private struct ScanCountdownChip: View {
     @Environment(\.tesseraStringsBundle) private var stringsBundle
-    let remaining: Duration
+    /// The time left, in seconds.
+    let remaining: TimeInterval
 
     var body: some View {
         let text = formatCountdown(remaining)

@@ -8,6 +8,8 @@ import Tessera
 import TesseraUI
 // endregion
 
+// Outside the page's blocks: the `Duration` timeouts need iOS 16, and the package supports iOS 15.
+@available(iOS 16, *)
 struct TunedScreen: View {
     // region TES-A-125 block 3
     let config = MrzScannerConfig(
@@ -25,6 +27,7 @@ struct TunedScreen: View {
     }
 }
 
+@available(iOS 16, *)
 struct NoStruggleHintConfig {
     // region TES-A-125 block 5
     let config = MrzScannerConfig(

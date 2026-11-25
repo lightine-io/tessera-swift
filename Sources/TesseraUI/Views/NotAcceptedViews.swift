@@ -12,7 +12,7 @@ import Tessera
 /// polite live region). Mirrors the Android `NotAcceptedHint`.
 internal struct NotAcceptedHint: View {
     @Environment(\.tesseraStringsBundle) private var stringsBundle
-    let read: DocumentCategory
+    let read: NotAcceptedKind
     let acceptedDocumentTypes: Set<DocumentCategory>
 
     var body: some View {
@@ -34,7 +34,7 @@ internal struct NotAcceptedHint: View {
 /// announced on arrival (``announcementKey(for:)``). Mirrors the Android `SavedImageNotAcceptedContent`.
 internal struct SavedImageNotAcceptedScreen: View {
     @Environment(\.tesseraStringsBundle) private var stringsBundle
-    let read: DocumentCategory
+    let read: NotAcceptedKind
     let acceptedDocumentTypes: Set<DocumentCategory>
     let onChooseDifferent: () -> Void
     let onManualEntry: () -> Void
@@ -81,7 +81,7 @@ internal struct SavedImageNotAcceptedScreen: View {
 /// posts both lines, the Android polite live region). Mirrors the Android `ManualNotAcceptedNote`.
 internal struct ManualNotAcceptedNote: View {
     @Environment(\.tesseraStringsBundle) private var stringsBundle
-    let read: DocumentCategory
+    let read: NotAcceptedKind
     let acceptedDocumentTypes: Set<DocumentCategory>
 
     var body: some View {

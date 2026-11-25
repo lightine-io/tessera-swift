@@ -19,12 +19,12 @@ enum ScannerState {
     /// getting a decode at all means progress is being made. Mirrors the Android `Scanning(struggling,
     /// gathering)`.
     ///
-    /// `notAccepted` (TES-103) is the category of the last reading the frames agreed on that is not in
-    /// ``MrzScannerConfig/acceptedDocumentTypes``. While set, the preview shows a notice saying what kind was
+    /// `notAccepted` (TES-103) is the refusal (a category, or a kind that could not be told) of the last reading
+    /// the frames agreed on that the app does not accept (``MrzScannerConfig/acceptedDocumentTypes``). While set, the preview shows a notice saying what kind was
     /// read and what kinds the app accepts; the camera keeps scanning. It renders below gathering and above
     /// struggling, and clears when an accepted reading starts gathering or 3 seconds after the last frame of
     /// that document. Mirrors the Android `Scanning.notAccepted`.
-    case scanning(struggling: Bool, gathering: Bool, notAccepted: DocumentCategory? = nil)
+    case scanning(struggling: Bool, gathering: Bool, notAccepted: NotAcceptedKind? = nil)
 
     /// The camera permission is not held and can still be requested (mockup 04).
     case permissionNeeded
@@ -69,11 +69,11 @@ enum ScannerState {
     ///   counterpart).
     case savedImageEmpty
 
-    /// A picked photo read as a document of category `read`, which is not in the app's
-    /// ``MrzScannerConfig/acceptedDocumentTypes`` (TES-103). The screen states what kind was read and what
+    /// A picked photo read as a document the app does not accept (`read`: a category outside
+    /// ``MrzScannerConfig/acceptedDocumentTypes``, or a kind that could not be told, TES-341). The screen states what kind was read and what
     /// kinds the app accepts, and offers another photo. The reading itself is not kept. Mirrors the Android
     /// `SavedImageNotAccepted`.
-    case savedImageNotAccepted(read: DocumentCategory)
+    case savedImageNotAccepted(read: NotAcceptedKind)
 
     /// Manual entry of the MRZ lines as raw text (mockup 06). `text` is the in-progress input. `parseFailed`
     /// is set when the last submitted read did not parse - an inline note shown on this same screen, never a
@@ -81,8 +81,34 @@ enum ScannerState {
     /// edit clears it (see ``ScannerModel/updateManualText(_:)``). Mirrors the Android `ManualRaw(text,
     /// parseFailed)`.
     ///
-    /// `notAccepted` (TES-103) is set when the typed lines read as a document whose category is not in the
-    /// app's ``MrzScannerConfig/acceptedDocumentTypes``: the text stays and an inline note shows instead of
+    /// `notAccepted` (TES-103) is set when the typed lines read as a document the app does not accept
+    /// (``MrzScannerConfig/acceptedDocumentTypes``; a kind that could not be told counts when the set is limited): the text stays and an inline note shows instead of
     /// review. Any edit clears it, like `parseFailed`.
-    case manualRaw(text: String, parseFailed: Bool, notAccepted: DocumentCategory? = nil)
+    case manualRaw(text: String, parseFailed: Bool, notAccepted: NotAcceptedKind? = nil)
+}
+
+extension ScannerState {
+    /// Whether `other` shows exactly the same screen as this state, so assigning it would change nothing the
+    /// user sees. Compared case by case without making ``ScannerState`` `Equatable`: a state that carries
+    /// document data (``review(decoded:expanded:source:)``, ``readFailed(capturedText:)``,
+    /// ``manualRaw(text:parseFailed:notAccepted:)``) never counts as the same, so its assignment always goes
+    /// through. Pure, so it is host-tested.
+    func showsSameScreen(as other: ScannerState) -> Bool {
+        switch (self, other) {
+        case let (.scanning(s1, g1, n1), .scanning(s2, g2, n2)):
+            return s1 == s2 && g1 == g2 && n1 == n2
+        case (.permissionNeeded, .permissionNeeded),
+             (.permissionPermanentlyDenied, .permissionPermanentlyDenied),
+             (.cameraInUse, .cameraInUse),
+             (.cameraUnavailable, .cameraUnavailable),
+             (.awaitingSavedImagePick, .awaitingSavedImagePick),
+             (.savedImageAnalyzing, .savedImageAnalyzing),
+             (.savedImageEmpty, .savedImageEmpty):
+            return true
+        case let (.savedImageNotAccepted(r1), .savedImageNotAccepted(r2)):
+            return r1 == r2
+        default:
+            return false
+        }
+    }
 }

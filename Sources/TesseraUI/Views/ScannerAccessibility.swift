@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // What VoiceOver says for each control of the scanner screens (TES-58), kept in one place so a test can check it.
 //
@@ -145,6 +146,7 @@ extension View {
 @MainActor
 func postScreenChanged(title: String?) {
     DispatchQueue.main.async {
-        AccessibilityNotification.ScreenChanged(title).post()
+        // The UIKit call, not `AccessibilityNotification` (iOS 17): the package runs on iOS 15.
+        UIAccessibility.post(notification: .screenChanged, argument: title)
     }
 }

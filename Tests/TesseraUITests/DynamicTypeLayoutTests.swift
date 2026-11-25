@@ -6,18 +6,19 @@ import UIKit
 
 /// TES-58: the scanner screens at large Dynamic Type sizes.
 ///
-/// Each screen is laid out by SwiftUI in a hosting controller, on the narrowest iPhone width iOS 18 runs on, at
+/// Each screen is laid out by SwiftUI in a hosting controller, on the narrowest iPhone width iOS 15 runs on, at
 /// the largest text sizes. Two things must hold: the screen's text grows with the text size, and nothing makes
 /// the screen wider than the phone (text that cannot wrap would be cut off at the edge). A raw MRZ line is
 /// exempt by design: `MonoLine` scrolls it sideways rather than wrapping it, inside the screen's width.
 ///
 /// Not covered: the shared top bar and the "What's the MRZ?" sheet (both sit in a system navigation stack, which
-/// reports a fixed size here), the camera preview (it needs a camera), and how the result looks; that stays a
-/// manual check on a device.
+/// reports a fixed size here; the sheet's picture is covered in `MrzExplainerPictureTests`), the camera preview
+/// (it needs a camera), and how the result looks; that stays a manual check on a device.
 @MainActor
 struct DynamicTypeLayoutTests {
-    /// The narrowest iPhone screen width iOS 18 supports, in points.
-    private static let narrowestWidth: CGFloat = 375
+    /// The narrowest iPhone screen width the package's minimum, iOS 15, supports (iPhone SE, 1st generation),
+    /// in points.
+    private static let narrowestWidth: CGFloat = 320
 
     // The project's own TD3 specimen (synthetic).
     private static let specimen = """
@@ -74,12 +75,12 @@ struct DynamicTypeLayoutTests {
         case .gatheringHint:
             AnyView(GatheringHint())
         case .notAcceptedHint:
-            AnyView(NotAcceptedHint(read: .residencePermit, acceptedDocumentTypes: allDocumentCategories))
+            AnyView(NotAcceptedHint(read: .ofCategory(.residencePermit), acceptedDocumentTypes: allDocumentCategories))
         case .notAcceptedPhoto:
-            AnyView(SavedImageNotAcceptedScreen(read: .other, acceptedDocumentTypes: allDocumentCategories,
+            AnyView(SavedImageNotAcceptedScreen(read: .ofCategory(.other), acceptedDocumentTypes: allDocumentCategories,
                                                 onChooseDifferent: {}, onManualEntry: {}, showManualEntry: true))
         case .manualEntryNotAccepted:
-            AnyView(ManualEntryScreen(text: Self.specimen, parseFailed: false, notAccepted: .passport,
+            AnyView(ManualEntryScreen(text: Self.specimen, parseFailed: false, notAccepted: .ofCategory(.passport),
                                       acceptedDocumentTypes: [.identityCard, .residencePermit],
                                       onTextChange: { _ in }, onRead: {}))
         }

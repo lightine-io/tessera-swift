@@ -1,4 +1,4 @@
-import Observation
+import Foundation
 import SwiftUI
 import Testing
 import UIKit
@@ -11,6 +11,8 @@ import UIKit
 /// view identity, as each `fullScreenCover` presentation does. No modal presentation is involved: UIKit
 /// presentation and dismissal in a package test host are slow and timing-dependent. Each render of the scanner
 /// is reported through ``EnvironmentValues/scannerRenderProbe``.
+// The package supports iOS 15, so these tests run there: the host is an `ObservableObject` (not `@Observable`,
+// iOS 17) and waits use `Task.sleep(nanoseconds:)` (not `Duration`, iOS 16).
 @MainActor
 @Suite(.serialized)
 struct ScannerConfigPresentationTests {
@@ -18,19 +20,18 @@ struct ScannerConfigPresentationTests {
     private static let noCamera: Set<ScanMethod> = [.savedImage, .manualEntry]
 
     @MainActor
-    @Observable
-    final class Host {
-        var config: MrzScannerConfig
-        var open = false
-        @ObservationIgnored var lastRender: ScannerRender?
+    final class Host: ObservableObject {
+        @Published var config: MrzScannerConfig
+        @Published var open = false
+        var lastRender: ScannerRender?
         /// The config the host's own body last rendered with.
-        @ObservationIgnored var hostRenderedMethods: Set<ScanMethod>?
-        @ObservationIgnored private(set) lazy var probe = ScannerRenderProbe { [unowned self] in self.lastRender = $0 }
+        var hostRenderedMethods: Set<ScanMethod>?
+        private(set) lazy var probe = ScannerRenderProbe { [unowned self] in self.lastRender = $0 }
         init(config: MrzScannerConfig) { self.config = config }
     }
 
     struct HostView: View {
-        let host: Host
+        @ObservedObject var host: Host
         var body: some View {
             let config = host.config
             let _ = { host.hostRenderedMethods = config.enabledMethods }()
@@ -107,14 +108,14 @@ struct ScannerConfigPresentationTests {
 
     /// Lets SwiftUI apply pending updates until `condition` holds; fails the test after 10 seconds.
     private func update(_ window: UIWindow, until condition: () -> Bool) async throws {
-        let deadline = ContinuousClock.now + .seconds(10)
+        let deadline = Date().addingTimeInterval(10)
         while !condition() {
-            guard ContinuousClock.now < deadline else {
+            guard Date() < deadline else {
                 Issue.record("SwiftUI did not apply the update in time")
                 throw CancellationError()
             }
             window.layoutIfNeeded()
-            try await Task.sleep(for: .milliseconds(10))
+            try await Task.sleep(nanoseconds: 10_000_000)
         }
     }
 
@@ -122,7 +123,7 @@ struct ScannerConfigPresentationTests {
     private func flush(_ window: UIWindow) async throws {
         for _ in 0..<20 {
             window.layoutIfNeeded()
-            try await Task.sleep(for: .milliseconds(10))
+            try await Task.sleep(nanoseconds: 10_000_000)
         }
     }
 }
