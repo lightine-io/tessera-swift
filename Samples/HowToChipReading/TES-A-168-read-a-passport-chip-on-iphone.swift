@@ -1,12 +1,13 @@
 // Sample for TES-A-168 "Read a passport chip on iPhone".
 // Each region is one code block of the page, as published. scripts/check-samples.py compares them.
-// skip TES-A-168 block 1: Info.plist and entitlements (property list text, not Swift)
+// skip TES-A-168 block 1: Package.swift dependency lines
+// Blocks 2 and 3 are the entitlement and Info.plist entries (XML, not checked).
 
-// region TES-A-168 block 2
+// region TES-A-168 block 4
 import Tessera
 // endregion
 
-// region TES-A-168 block 3
+// region TES-A-168 block 5
 func makeKey(scanned: ParseResult) -> ChipAccessKey? {
     do {
         // A key is used up by one read: build a new one for every read.
@@ -21,7 +22,7 @@ func makeKey(scanned: ParseResult) -> ChipAccessKey? {
 }
 // endregion
 
-// region TES-A-168 block 4
+// region TES-A-168 block 6
 func loadRoots(from file: URL) -> TrustAnchorLoad {
     // A file URL from the document picker works as it is.
     let roots = TrustAnchors.shared.load(contentsOf: file)
@@ -30,7 +31,7 @@ func loadRoots(from file: URL) -> TrustAnchorLoad {
 }
 // endregion
 
-// region TES-A-168 block 5
+// region TES-A-168 block 7
 func makeOptions(key: ChipAccessKey, roots: TrustAnchorLoad, scanned: ParseResult) throws -> ChipReadOptions {
     try ChipReadOptions.Builder(accessKey: key)
         .dataGroups([1, 2])
@@ -41,7 +42,7 @@ func makeOptions(key: ChipAccessKey, roots: TrustAnchorLoad, scanned: ParseResul
 }
 // endregion
 
-// region TES-A-168 block 6
+// region TES-A-168 block 8
 func readOnce(options: ChipReadOptions) async -> ChipRead? {
     let reading = ChipReading.start(options: options)
     let finish = await reading.ending
@@ -49,7 +50,7 @@ func readOnce(options: ChipReadOptions) async -> ChipRead? {
 }
 // endregion
 
-// region TES-A-168 block 7
+// region TES-A-168 block 9
 func showProgress(of reading: ChipReading) async {
     for await update in reading.updates {
         print(ChipReadTexts.progressBar(for: update.progress))
@@ -60,7 +61,7 @@ func showProgress(of reading: ChipReading) async {
 }
 // endregion
 
-// region TES-A-168 block 8
+// region TES-A-168 block 10
 func describe(_ outcome: ChipReadOutcome) -> String {
     switch outcome {
     case .complete: return "Done"
@@ -76,7 +77,7 @@ func describe(_ outcome: ChipReadOutcome) -> String {
 }
 // endregion
 
-// region TES-A-168 block 9
+// region TES-A-168 block 11
 func readUntilLeft(options: ChipReadOptions) async -> ChipReadFinish {
     let reading = ChipReading.start(options: options)
     // Cancelling the task cancels the read.
@@ -88,7 +89,7 @@ func readUntilLeft(options: ChipReadOptions) async -> ChipReadFinish {
 }
 // endregion
 
-// region TES-A-168 block 10
+// region TES-A-168 block 13
 func startWithSettings(options: ChipReadOptions) -> ChipReading {
     let texts = ChipReadTexts(
         text: { snapshot in
@@ -102,7 +103,7 @@ func startWithSettings(options: ChipReadOptions) -> ChipReading {
 }
 // endregion
 
-// region TES-A-168 block 11
+// region TES-A-168 block 14
 func makeKeyFromTypedValues(documentNumber: String, dateOfBirth: String, dateOfExpiry: String) -> ChipAccessKey? {
     // Dates are six digits, YYMMDD. The check digits are worked out for you.
     // Normalising trims spaces and upper-cases letters; nothing else changes.
@@ -122,7 +123,7 @@ func makeKeyFromTypedValues(documentNumber: String, dateOfBirth: String, dateOfE
 }
 // endregion
 
-// region TES-A-168 block 12
+// region TES-A-168 block 15
 func summary(of finish: ChipReadFinish) -> String {
     // `read` is set for a complete or a partial read, `error` for every ending that has one.
     if let read = finish.read { return "Read \(read.files.count) files" }
@@ -131,11 +132,37 @@ func summary(of finish: ChipReadFinish) -> String {
 }
 // endregion
 
-// region TES-A-168 block 13
+// region TES-A-168 block 16
 func readWhileVisible(options: ChipReadOptions) async -> ChipReadFinish {
     let reading = ChipReading.start(options: options)
     // result() cancels the read when this task is cancelled, for example when a SwiftUI
     // .task ends because the screen went away.
     return await reading.result()
+}
+// endregion
+
+// region TES-A-168 block 12
+func readinessText(_ readiness: ChipReadReadiness) -> String {
+    switch readiness {
+    case .ready: return "Ready"
+    case .notYet(let remaining): return "Ready in at most \(Int(remaining.rounded(.up))) s" // a start now waits
+    case .readInProgress: return "A read is running"
+    case .unavailable(let reason): return "NFC cannot be used: \(reason)"
+    case .unknown: return "Not known"
+    }
+}
+
+func showReadButton() -> Bool {
+    // nil: the device can read tags. Setup problems show only when a read starts.
+    ChipReading.availability == nil
+}
+
+// Run it in a SwiftUI .task: the loop ends, and its listener goes, when the screen goes away.
+@MainActor
+func bindReadButton(setEnabled: (Bool) -> Void) async {
+    print("Now: \(readinessText(ChipReading.readiness))")
+    for await readiness in ChipReading.readinessUpdates { // the value now, then each change
+        setEnabled(readiness == .ready)
+    }
 }
 // endregion
