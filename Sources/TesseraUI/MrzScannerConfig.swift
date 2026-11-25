@@ -210,7 +210,7 @@ public struct MrzScannerConfig: Sendable {
     /// filtered.
     /// An empty set is a configuration error: setting one stops the program with a precondition failure.
     ///
-    /// - Since: 0.8.0
+    /// - Since: 1.0.0
     public var acceptedDocumentTypes: Set<DocumentCategory> {
         didSet { requireAcceptableDocumentTypeSet(acceptedDocumentTypes) }
     }
@@ -234,7 +234,7 @@ public struct MrzScannerConfig: Sendable {
     ///   - onRequestPermission: Called to request the camera permission. Default: `nil`.
     ///   - stringsBundle: Bundle with string overrides. Default: `nil`. Since 0.5.1.
     ///   - acceptedDocumentTypes: The kinds of document your app takes. Default: every category. Must not be
-    ///     empty: an empty set stops the program with a precondition failure. Since 0.8.0.
+    ///     empty: an empty set stops the program with a precondition failure. Since 1.0.0.
     public init(
         enabledMethods: Set<ScanMethod> = [.camera, .manualEntry],
         reviewMode: ReviewMode = .review,
@@ -285,7 +285,7 @@ public struct MrzScannerConfig: Sendable {
     ///   - onRequestPermission: Called to request the camera permission. Default: `nil`.
     ///   - stringsBundle: Bundle with string overrides. Default: `nil`. Since 0.5.1.
     ///   - acceptedDocumentTypes: The kinds of document your app takes. Default: every category. Must not be
-    ///     empty: an empty set stops the program with a precondition failure. Since 0.8.0.
+    ///     empty: an empty set stops the program with a precondition failure. Since 1.0.0.
     @available(iOS 16, *)
     public init(
         enabledMethods: Set<ScanMethod> = [.camera, .manualEntry],
@@ -329,7 +329,7 @@ public struct MrzScannerConfig: Sendable {
     ///   - onRequestPermission: Called to request the camera permission. Default: `nil`.
     ///   - stringsBundle: Bundle with string overrides. Default: `nil`. Since 0.5.1.
     ///   - acceptedDocumentTypes: The kinds of document your app takes. Default: every category. Must not be
-    ///     empty: an empty set stops the program with a precondition failure. Since 0.8.0.
+    ///     empty: an empty set stops the program with a precondition failure. Since 1.0.0.
     @available(iOS 16, *)
     public init(
         enabledMethods: Set<ScanMethod> = [.camera, .manualEntry],
