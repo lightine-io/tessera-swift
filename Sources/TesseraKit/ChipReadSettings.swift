@@ -50,6 +50,41 @@ public enum LinkLoss: Sendable, Equatable {
     }
 }
 
+/// What the system session polls for. Mirrors `CoreNfcPolling`.
+///
+/// From iOS 26.4 Core NFC can poll for ISO 14443 tags and PACE tags (chips that answer only after
+/// PACE polling) together; before iOS 26.4 it cannot combine them, so ISO 14443 is polled alone.
+///
+/// - Since: 1.0.0
+public enum ChipReadPolling: Sendable, Equatable, CaseIterable {
+    /// The SDK's choice, the default: today the same as ``iso14443AndPace``.
+    case automatic
+    /// ISO 14443 polling only, on every iOS version, with the session opened as before iOS 26.4 (the
+    /// select identifiers come from the app's Info.plist). Misses chips that answer only after PACE
+    /// polling.
+    case iso14443
+    /// ISO 14443 and PACE polling together from iOS 26.4; ISO 14443 alone before, where the system
+    /// cannot combine them.
+    case iso14443AndPace
+
+    /// The Kotlin choice.
+    func kotlinPolling() -> CoreNfcPolling {
+        switch self {
+        case .automatic: return .automatic
+        case .iso14443: return .iso14443
+        case .iso14443AndPace: return .iso14443AndPace
+        }
+    }
+
+    init(kotlin polling: CoreNfcPolling) {
+        switch polling {
+        case .iso14443: self = .iso14443
+        case .iso14443AndPace: self = .iso14443AndPace
+        default: self = .automatic
+        }
+    }
+}
+
 /// How a read behaves around the radio, with a default for every value: `ChipReadSettings()` suits
 /// an ordinary app, and `ChipReadSettings(linkLoss: .end)` changes one value only.
 ///
@@ -97,6 +132,8 @@ public struct ChipReadSettings {
     /// Where the read's step events go (see ``ChipReadStepSink``); `nil` uses the sink registered in
     /// `TelemetrySinkRegistry`, which drops everything when none is registered.
     public var telemetry: (any TelemetrySink)?
+    /// What the system session polls for. Default ``ChipReadPolling/automatic``.
+    public var polling: ChipReadPolling
 
     public init(
         linkLoss: LinkLoss = .resume(2),
@@ -106,7 +143,8 @@ public struct ChipReadSettings {
         waitAfterSystemEnd: TimeInterval = 1,
         telemetry: (any TelemetrySink)? = nil,
         readTimeout: TimeInterval = 2,
-        searchRestart: TimeInterval? = 4
+        searchRestart: TimeInterval? = 4,
+        polling: ChipReadPolling = .automatic
     ) {
         self.linkLoss = linkLoss
         self.settleDelay = settleDelay
@@ -116,6 +154,7 @@ public struct ChipReadSettings {
         self.telemetry = telemetry
         self.readTimeout = readTimeout
         self.searchRestart = searchRestart
+        self.polling = polling
     }
 
     /// The Kotlin `searchRestartMillis`: 0 for off, otherwise 2000 or more.
@@ -144,7 +183,8 @@ public struct ChipReadSettings {
             waitAfterSystemEnd: TimeInterval(Self.millis(waitAfterSystemEnd, minimum: 0)) / 1000,
             telemetry: telemetry,
             readTimeout: TimeInterval(Self.millis(readTimeout, minimum: 1)) / 1000,
-            searchRestart: searchRestart.flatMap { $0 == 0 ? nil : TimeInterval(Self.searchRestartMillis($0)) / 1000 }
+            searchRestart: searchRestart.flatMap { $0 == 0 ? nil : TimeInterval(Self.searchRestartMillis($0)) / 1000 },
+            polling: polling
         )
     }
 
@@ -161,6 +201,7 @@ public struct ChipReadSettings {
             .searchRestartMillis(millis: Self.searchRestartMillis(searchRestart))
             .waitAfterSystemEndMillis(millis: Self.millis(waitAfterSystemEnd, minimum: 0))
             .telemetry(sink: telemetry)
+            .polling(choice: polling.kotlinPolling())
             // The Swift layer orders and buffers updates itself (see `ChipReadingCore`), so the
             // reader's own thread is enough: asking for the main queue would add one more hop.
             .observerOn(thread: .caller)
@@ -178,7 +219,8 @@ public struct ChipReadSettings {
             waitAfterSystemEnd: TimeInterval(settings.waitAfterSystemEndMillis) / 1000,
             telemetry: settings.telemetry,
             readTimeout: TimeInterval(settings.readTimeoutMillis) / 1000,
-            searchRestart: settings.searchRestartMillis == 0 ? nil : TimeInterval(settings.searchRestartMillis) / 1000
+            searchRestart: settings.searchRestartMillis == 0 ? nil : TimeInterval(settings.searchRestartMillis) / 1000,
+            polling: ChipReadPolling(kotlin: settings.polling)
         )
     }
 }

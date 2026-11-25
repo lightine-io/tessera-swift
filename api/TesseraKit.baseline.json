@@ -6612,6 +6612,374 @@
    {
     "children": [
      {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipReadPolling",
+          "printedName": "TesseraKit.ChipReadPolling",
+          "usr": "s:10TesseraKit15ChipReadPollingO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipReadPolling",
+            "printedName": "TesseraKit.ChipReadPolling",
+            "usr": "s:10TesseraKit15ChipReadPollingO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.ChipReadPolling.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.ChipReadPolling.Type) -> TesseraKit.ChipReadPolling"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit15ChipReadPollingO9automaticyA2CmF",
+      "moduleName": "TesseraKit",
+      "name": "automatic",
+      "printedName": "automatic",
+      "usr": "s:10TesseraKit15ChipReadPollingO9automaticyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipReadPolling",
+          "printedName": "TesseraKit.ChipReadPolling",
+          "usr": "s:10TesseraKit15ChipReadPollingO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipReadPolling",
+            "printedName": "TesseraKit.ChipReadPolling",
+            "usr": "s:10TesseraKit15ChipReadPollingO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.ChipReadPolling.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.ChipReadPolling.Type) -> TesseraKit.ChipReadPolling"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit15ChipReadPollingO8iso14443yA2CmF",
+      "moduleName": "TesseraKit",
+      "name": "iso14443",
+      "printedName": "iso14443",
+      "usr": "s:10TesseraKit15ChipReadPollingO8iso14443yA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipReadPolling",
+          "printedName": "TesseraKit.ChipReadPolling",
+          "usr": "s:10TesseraKit15ChipReadPollingO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipReadPolling",
+            "printedName": "TesseraKit.ChipReadPolling",
+            "usr": "s:10TesseraKit15ChipReadPollingO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.ChipReadPolling.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.ChipReadPolling.Type) -> TesseraKit.ChipReadPolling"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit15ChipReadPollingO15iso14443AndPaceyA2CmF",
+      "moduleName": "TesseraKit",
+      "name": "iso14443AndPace",
+      "printedName": "iso14443AndPace",
+      "usr": "s:10TesseraKit15ChipReadPollingO15iso14443AndPaceyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipReadPolling",
+          "printedName": "TesseraKit.ChipReadPolling",
+          "usr": "s:10TesseraKit15ChipReadPollingO"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Array",
+        "printedName": "[TesseraKit.ChipReadPolling]",
+        "usr": "s:Sa"
+       }
+      ],
+      "declKind": "TypeAlias",
+      "implicit": true,
+      "kind": "TypeAlias",
+      "mangledName": "$s10TesseraKit15ChipReadPollingO8AllCasesa",
+      "moduleName": "TesseraKit",
+      "name": "AllCases",
+      "printedName": "AllCases",
+      "usr": "s:10TesseraKit15ChipReadPollingO8AllCasesa"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "ChipReadPolling",
+        "printedName": "TesseraKit.ChipReadPolling",
+        "usr": "s:10TesseraKit15ChipReadPollingO"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "ChipReadPolling",
+        "printedName": "TesseraKit.ChipReadPolling",
+        "usr": "s:10TesseraKit15ChipReadPollingO"
+       }
+      ],
+      "declAttributes": [
+       "Implements"
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "implicit": true,
+      "kind": "Function",
+      "mangledName": "$s10TesseraKit15ChipReadPollingO21__derived_enum_equalsySbAC_ACtFZ",
+      "moduleName": "TesseraKit",
+      "name": "__derived_enum_equals",
+      "printedName": "__derived_enum_equals(_:_:)",
+      "static": true,
+      "usr": "s:10TesseraKit15ChipReadPollingO21__derived_enum_equalsySbAC_ACtFZ"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipReadPolling",
+            "printedName": "TesseraKit.ChipReadPolling",
+            "usr": "s:10TesseraKit15ChipReadPollingO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Array",
+          "printedName": "[TesseraKit.ChipReadPolling]",
+          "usr": "s:Sa"
+         }
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit15ChipReadPollingO8allCasesSayACGvgZ",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "static": true,
+        "usr": "s:10TesseraKit15ChipReadPollingO8allCasesSayACGvgZ"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipReadPolling",
+          "printedName": "TesseraKit.ChipReadPolling",
+          "usr": "s:10TesseraKit15ChipReadPollingO"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Array",
+        "printedName": "[TesseraKit.ChipReadPolling]",
+        "usr": "s:Sa"
+       }
+      ],
+      "declAttributes": [
+       "Nonisolated"
+      ],
+      "declKind": "Var",
+      "implicit": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit15ChipReadPollingO8allCasesSayACGvpZ",
+      "moduleName": "TesseraKit",
+      "name": "allCases",
+      "printedName": "allCases",
+      "static": true,
+      "usr": "s:10TesseraKit15ChipReadPollingO8allCasesSayACGvpZ"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Void",
+        "printedName": "()"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "Hasher",
+        "paramValueOwnership": "InOut",
+        "printedName": "Swift.Hasher",
+        "usr": "s:s6HasherV"
+       }
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "implicit": true,
+      "kind": "Function",
+      "mangledName": "$s10TesseraKit15ChipReadPollingO4hash4intoys6HasherVz_tF",
+      "moduleName": "TesseraKit",
+      "name": "hash",
+      "printedName": "hash(into:)",
+      "usr": "s:10TesseraKit15ChipReadPollingO4hash4intoys6HasherVz_tF"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit15ChipReadPollingO9hashValueSivg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit15ChipReadPollingO9hashValueSivg"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Int",
+        "printedName": "Swift.Int",
+        "usr": "s:Si"
+       }
+      ],
+      "declKind": "Var",
+      "implicit": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit15ChipReadPollingO9hashValueSivp",
+      "moduleName": "TesseraKit",
+      "name": "hashValue",
+      "printedName": "hashValue",
+      "usr": "s:10TesseraKit15ChipReadPollingO9hashValueSivp"
+     }
+    ],
+    "conformances": [
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipReadPolling",
+            "printedName": "TesseraKit.ChipReadPolling",
+            "usr": "s:10TesseraKit15ChipReadPollingO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Array",
+          "printedName": "[TesseraKit.ChipReadPolling]",
+          "usr": "s:Sa"
+         }
+        ],
+        "kind": "TypeWitness",
+        "name": "AllCases",
+        "printedName": "AllCases"
+       }
+      ],
+      "kind": "Conformance",
+      "mangledName": "$ss12CaseIterableP",
+      "name": "CaseIterable",
+      "printedName": "CaseIterable",
+      "usr": "s:s12CaseIterableP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSH",
+      "name": "Hashable",
+      "printedName": "Hashable",
+      "usr": "s:SH"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss16SendableMetatypeP",
+      "name": "SendableMetatype",
+      "printedName": "SendableMetatype",
+      "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
+     }
+    ],
+    "declKind": "Enum",
+    "isEnumExhaustive": true,
+    "kind": "TypeDecl",
+    "mangledName": "$s10TesseraKit15ChipReadPollingO",
+    "moduleName": "TesseraKit",
+    "name": "ChipReadPolling",
+    "printedName": "ChipReadPolling",
+    "usr": "s:10TesseraKit15ChipReadPollingO"
+   },
+   {
+    "children": [
+     {
       "accessors": [
        {
         "accessorKind": "get",
@@ -7364,6 +7732,78 @@
       "usr": "s:10TesseraKit16ChipReadSettingsV9telemetrySo0A13TelemetrySink_pSgvp"
      },
      {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipReadPolling",
+          "printedName": "TesseraKit.ChipReadPolling",
+          "usr": "s:10TesseraKit15ChipReadPollingO"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit16ChipReadSettingsV7pollingAA0cD7PollingOvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit16ChipReadSettingsV7pollingAA0cD7PollingOvg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "kind": "TypeNominal",
+          "name": "ChipReadPolling",
+          "printedName": "TesseraKit.ChipReadPolling",
+          "usr": "s:10TesseraKit15ChipReadPollingO"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit16ChipReadSettingsV7pollingAA0cD7PollingOvs",
+        "moduleName": "TesseraKit",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:10TesseraKit16ChipReadSettingsV7pollingAA0cD7PollingOvs"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "ChipReadPolling",
+        "printedName": "TesseraKit.ChipReadPolling",
+        "usr": "s:10TesseraKit15ChipReadPollingO"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit16ChipReadSettingsV7pollingAA0cD7PollingOvp",
+      "moduleName": "TesseraKit",
+      "name": "polling",
+      "printedName": "polling",
+      "usr": "s:10TesseraKit16ChipReadSettingsV7pollingAA0cD7PollingOvp"
+     },
+     {
       "children": [
        {
         "kind": "TypeNominal",
@@ -7484,16 +7924,23 @@
         "name": "Optional",
         "printedName": "Foundation.TimeInterval?",
         "usr": "s:Sq"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "ChipReadPolling",
+        "printedName": "TesseraKit.ChipReadPolling",
+        "usr": "s:10TesseraKit15ChipReadPollingO"
        }
       ],
       "declKind": "Constructor",
       "init_kind": "Designated",
       "kind": "Constructor",
-      "mangledName": "$s10TesseraKit16ChipReadSettingsV8linkLoss11settleDelay14commandTimeout0jK12BeforeAccess18waitAfterSystemEnd9telemetry04readK013searchRestartAcA04LinkG0O_S4dSo0A13TelemetrySink_pSgS2dSgtcfc",
+      "mangledName": "$s10TesseraKit16ChipReadSettingsV8linkLoss11settleDelay14commandTimeout0jK12BeforeAccess18waitAfterSystemEnd9telemetry04readK013searchRestart7pollingAcA04LinkG0O_S4dSo0A13TelemetrySink_pSgS2dSgAA0cD7PollingOtcfc",
       "moduleName": "TesseraKit",
       "name": "init",
-      "printedName": "init(linkLoss:settleDelay:commandTimeout:commandTimeoutBeforeAccess:waitAfterSystemEnd:telemetry:readTimeout:searchRestart:)",
-      "usr": "s:10TesseraKit16ChipReadSettingsV8linkLoss11settleDelay14commandTimeout0jK12BeforeAccess18waitAfterSystemEnd9telemetry04readK013searchRestartAcA04LinkG0O_S4dSo0A13TelemetrySink_pSgS2dSgtcfc"
+      "printedName": "init(linkLoss:settleDelay:commandTimeout:commandTimeoutBeforeAccess:waitAfterSystemEnd:telemetry:readTimeout:searchRestart:polling:)",
+      "usr": "s:10TesseraKit16ChipReadSettingsV8linkLoss11settleDelay14commandTimeout0jK12BeforeAccess18waitAfterSystemEnd9telemetry04readK013searchRestart7pollingAcA04LinkG0O_S4dSo0A13TelemetrySink_pSgS2dSgAA0cD7PollingOtcfc"
      },
      {
       "accessors": [

@@ -148,6 +148,24 @@ struct ChipReadSettingsTests {
         #expect(!ChipReadOutcome.unknown.isNoAnswer)
     }
 
+    @Test func pollingDefaultsToAutomaticAsInKotlin() {
+        #expect(ChipReadSettings().polling == .automatic)
+        #expect(ChipReadSettings().kotlinSettings().polling === CoreNfcPolling.automatic)
+        #expect(ChipReadSettings(CoreNfcReadSettings()).polling == .automatic)
+    }
+
+    @Test func eachPollingChoiceReachesKotlinAndComesBack() {
+        let expected: [ChipReadPolling: CoreNfcPolling] = [
+            .automatic: .automatic, .iso14443: .iso14443, .iso14443AndPace: .iso14443AndPace,
+        ]
+        for choice in ChipReadPolling.allCases {
+            let kotlin = ChipReadSettings(polling: choice).kotlinSettings()
+            #expect(kotlin.polling === expected[choice])
+            #expect(ChipReadSettings(kotlin).polling == choice)
+            #expect(ChipReadSettings(polling: choice).normalized.polling == choice)
+        }
+    }
+
     @Test func theSwiftLayerAsksTheReaderForItsOwnThread() {
         #expect(ChipReadSettings().kotlinSettings().observerOn === ObserverThread.caller)
         #expect(ChipReadSettings(linkLoss: .end).kotlinSettings().observerOn === ObserverThread.caller)
