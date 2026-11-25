@@ -4336,6 +4336,63 @@
        {
         "children": [
          {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipReadPhase",
+            "printedName": "TesseraKit.ChipReadPhase",
+            "usr": "s:10TesseraKit13ChipReadPhaseO"
+           },
+           {
+            "children": [
+             {
+              "kind": "TypeNominal",
+              "name": "Int",
+              "printedName": "Swift.Int",
+              "usr": "s:Si"
+             }
+            ],
+            "kind": "TypeNominal",
+            "name": "Tuple",
+            "printedName": "(tries: Swift.Int)"
+           }
+          ],
+          "kind": "TypeFunc",
+          "name": "Function",
+          "printedName": "(Swift.Int) -> TesseraKit.ChipReadPhase"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipReadPhase",
+            "printedName": "TesseraKit.ChipReadPhase",
+            "usr": "s:10TesseraKit13ChipReadPhaseO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.ChipReadPhase.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.ChipReadPhase.Type) -> (Swift.Int) -> TesseraKit.ChipReadPhase"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit13ChipReadPhaseO11noAnswerYetyACSi_tcACmF",
+      "moduleName": "TesseraKit",
+      "name": "noAnswerYet",
+      "printedName": "noAnswerYet",
+      "usr": "s:10TesseraKit13ChipReadPhaseO11noAnswerYetyACSi_tcACmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
           "kind": "TypeNominal",
           "name": "ChipReadPhase",
           "printedName": "TesseraKit.ChipReadPhase",
@@ -6800,6 +6857,99 @@
         "declKind": "Accessor",
         "implicit": true,
         "kind": "Accessor",
+        "mangledName": "$s10TesseraKit16ChipReadSettingsV26commandTimeoutBeforeAccessSdvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit16ChipReadSettingsV26commandTimeoutBeforeAccessSdvg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Double",
+            "printedName": "Swift.Double",
+            "usr": "s:Sd"
+           }
+          ],
+          "kind": "TypeNameAlias",
+          "name": "TimeInterval",
+          "printedName": "Foundation.TimeInterval"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit16ChipReadSettingsV26commandTimeoutBeforeAccessSdvs",
+        "moduleName": "TesseraKit",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:10TesseraKit16ChipReadSettingsV26commandTimeoutBeforeAccessSdvs"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Double",
+          "printedName": "Swift.Double",
+          "usr": "s:Sd"
+         }
+        ],
+        "kind": "TypeNameAlias",
+        "name": "TimeInterval",
+        "printedName": "Foundation.TimeInterval"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit16ChipReadSettingsV26commandTimeoutBeforeAccessSdvp",
+      "moduleName": "TesseraKit",
+      "name": "commandTimeoutBeforeAccess",
+      "printedName": "commandTimeoutBeforeAccess",
+      "usr": "s:10TesseraKit16ChipReadSettingsV26commandTimeoutBeforeAccessSdvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Double",
+            "printedName": "Swift.Double",
+            "usr": "s:Sd"
+           }
+          ],
+          "kind": "TypeNameAlias",
+          "name": "TimeInterval",
+          "printedName": "Foundation.TimeInterval"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
         "mangledName": "$s10TesseraKit16ChipReadSettingsV18waitAfterSystemEndSdvg",
         "moduleName": "TesseraKit",
         "name": "Get",
@@ -7026,6 +7176,20 @@
         "children": [
          {
           "kind": "TypeNominal",
+          "name": "Double",
+          "printedName": "Swift.Double",
+          "usr": "s:Sd"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNameAlias",
+        "name": "TimeInterval",
+        "printedName": "Foundation.TimeInterval"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
           "name": "TelemetrySink",
           "printedName": "any Tessera.TelemetrySink",
           "usr": "c:objc(pl)TesseraTelemetrySink"
@@ -7041,11 +7205,11 @@
       "declKind": "Constructor",
       "init_kind": "Designated",
       "kind": "Constructor",
-      "mangledName": "$s10TesseraKit16ChipReadSettingsV8linkLoss11settleDelay14commandTimeout18waitAfterSystemEnd9telemetryAcA04LinkG0O_S3dSo0A13TelemetrySink_pSgtcfc",
+      "mangledName": "$s10TesseraKit16ChipReadSettingsV8linkLoss11settleDelay14commandTimeout0jK12BeforeAccess18waitAfterSystemEnd9telemetryAcA04LinkG0O_S4dSo0A13TelemetrySink_pSgtcfc",
       "moduleName": "TesseraKit",
       "name": "init",
-      "printedName": "init(linkLoss:settleDelay:commandTimeout:waitAfterSystemEnd:telemetry:)",
-      "usr": "s:10TesseraKit16ChipReadSettingsV8linkLoss11settleDelay14commandTimeout18waitAfterSystemEnd9telemetryAcA04LinkG0O_S3dSo0A13TelemetrySink_pSgtcfc"
+      "printedName": "init(linkLoss:settleDelay:commandTimeout:commandTimeoutBeforeAccess:waitAfterSystemEnd:telemetry:)",
+      "usr": "s:10TesseraKit16ChipReadSettingsV8linkLoss11settleDelay14commandTimeout0jK12BeforeAccess18waitAfterSystemEnd9telemetryAcA04LinkG0O_S4dSo0A13TelemetrySink_pSgtcfc"
      },
      {
       "accessors": [

@@ -12,6 +12,7 @@ struct ChipReadingScriptTests {
         .starting,
         .waitingForDocument(waited: 1.5),
         .documentFound,
+        .noAnswerYet(tries: 2),
         .readingFile(dataGroup: 1, bytesRead: 10, bytesTotal: 100),
         .linkLost(restartsLeft: 1),
         .readingFile(dataGroup: nil, bytesRead: 0, bytesTotal: nil),
@@ -48,17 +49,20 @@ struct ChipReadingScriptTests {
         var waited: TimeInterval?
         var file: (Int?, Int, Int?)?
         var restarts: Int?
+        var tries: Int?
         for await snapshot in reading.updates {
             switch snapshot.phase {
             case .waitingForDocument(let time): waited = time
             case .readingFile(let group, let read, let total): file = file ?? (group, read, total)
             case .linkLost(let left): restarts = left
+            case .noAnswerYet(let count): tries = count
             default: break
             }
         }
         #expect(waited == 1.5)
         #expect(file?.0 == 1 && file?.1 == 10 && file?.2 == 100)
         #expect(restarts == 1)
+        #expect(tries == 2)
     }
 
     @Test func theEndingsSwiftCanBuildMapToTheirOutcomes() async throws {

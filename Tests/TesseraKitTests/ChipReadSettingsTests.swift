@@ -13,6 +13,8 @@ struct ChipReadSettingsTests {
         #expect(swift.settleDelay == kotlin.settleDelay)
         #expect(swift.commandTimeout == kotlin.commandTimeout)
         #expect(swift.waitAfterSystemEnd == kotlin.waitAfterSystemEnd)
+        #expect(swift.commandTimeoutBeforeAccess == kotlin.commandTimeoutBeforeAccess)
+        #expect(swift.commandTimeoutBeforeAccess == 1.5)
         #expect(swift.linkLoss == .resume(Int(CoreNfcReadSettings.companion.DEFAULT_RESTARTS)))
     }
 
@@ -34,6 +36,14 @@ struct ChipReadSettingsTests {
         #expect(kotlin.settleDelayMillis == 250)
         #expect(kotlin.commandTimeoutMillis == 7_500)
         #expect(kotlin.waitAfterSystemEndMillis == 2_000)
+    }
+
+    @Test func theTimeLimitBeforeAccessReachesKotlinAndIsClamped() {
+        #expect(ChipReadSettings(commandTimeoutBeforeAccess: 0.8).kotlinSettings().commandTimeoutBeforeAccessMillis == 800)
+        #expect(ChipReadSettings().kotlinSettings().commandTimeoutBeforeAccessMillis == 1_500)
+        #expect(ChipReadSettings(commandTimeoutBeforeAccess: -2).normalized.commandTimeoutBeforeAccess == 0.001)
+        #expect(ChipReadSettings(commandTimeoutBeforeAccess: .nan).kotlinSettings().commandTimeoutBeforeAccessMillis == 1)
+        #expect(ChipReadSettings(commandTimeoutBeforeAccess: 1e12).normalized.commandTimeoutBeforeAccess == 86_400)
     }
 
     @Test func resumeBuildsAResumePolicy() {

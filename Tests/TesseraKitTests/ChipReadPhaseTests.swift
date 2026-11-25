@@ -44,6 +44,11 @@ struct ChipReadPhaseTests {
         #expect(ChipReadPhase.lost(restartsLeft: 0) == .linkLost(restartsLeft: 0))
     }
 
+    @Test func noAnswerYetCarriesTheTries() {
+        #expect(ChipReadPhase.noAnswer(tries: 3) == .noAnswerYet(tries: 3))
+        #expect(ChipReadPhase.noAnswer(tries: 1) != .noAnswerYet(tries: 2))
+    }
+
     @Test func theRealStatesOfARealReadMapToACaseTheEnumKnows() async throws {
         let real = try await RealReading.sample()
         for snapshot in real.updates {

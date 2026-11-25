@@ -56,8 +56,8 @@ public enum LinkLoss: Sendable, Equatable {
 /// **Invalid values are clamped, never refused,** so building settings cannot fail:
 /// - the restarts of ``LinkLoss`` go to 1 to 3;
 /// - `settleDelay` and `waitAfterSystemEnd` below 0 (or not a number) become 0;
-/// - `commandTimeout` below one millisecond (or not a number) becomes one millisecond, and one above
-///   a day becomes a day.
+/// - `commandTimeout` and `commandTimeoutBeforeAccess` below one millisecond (or not a number) become
+///   one millisecond, and one above a day becomes a day.
 ///
 /// Read ``normalized`` to see the values that will be used. Times are in seconds and are rounded to
 /// whole milliseconds for the reader.
@@ -72,6 +72,12 @@ public struct ChipReadSettings {
     /// The longest wait for the chip's answer to one command; a longer wait counts as a lost link.
     /// Default 5 seconds.
     public var commandTimeout: TimeInterval
+    /// The longest wait for the chip's answer to one command before access: the plain commands before
+    /// the key is used. They answer in milliseconds, so a chip that gets too little power is noticed
+    /// sooner. An unanswered command is a try that costs no restart (``ChipReadPhase/noAnswerYet(tries:)``).
+    /// Default 1.5 seconds. From the first command that uses the key, ``commandTimeout`` applies; when
+    /// this value is longer, ``commandTimeout`` applies before access too.
+    public var commandTimeoutBeforeAccess: TimeInterval
     /// How long a new read waits before it begins a system session when the previous one was ended
     /// by the system or refused because the reader was busy. Default 1 second.
     public var waitAfterSystemEnd: TimeInterval
@@ -83,12 +89,14 @@ public struct ChipReadSettings {
         linkLoss: LinkLoss = .resume(2),
         settleDelay: TimeInterval = 0.4,
         commandTimeout: TimeInterval = 5,
+        commandTimeoutBeforeAccess: TimeInterval = 1.5,
         waitAfterSystemEnd: TimeInterval = 1,
         telemetry: (any TelemetrySink)? = nil
     ) {
         self.linkLoss = linkLoss
         self.settleDelay = settleDelay
         self.commandTimeout = commandTimeout
+        self.commandTimeoutBeforeAccess = commandTimeoutBeforeAccess
         self.waitAfterSystemEnd = waitAfterSystemEnd
         self.telemetry = telemetry
     }
@@ -109,6 +117,7 @@ public struct ChipReadSettings {
             linkLoss: linkLoss.clamped,
             settleDelay: TimeInterval(Self.millis(settleDelay, minimum: 0)) / 1000,
             commandTimeout: TimeInterval(Self.millis(commandTimeout, minimum: 1)) / 1000,
+            commandTimeoutBeforeAccess: TimeInterval(Self.millis(commandTimeoutBeforeAccess, minimum: 1)) / 1000,
             waitAfterSystemEnd: TimeInterval(Self.millis(waitAfterSystemEnd, minimum: 0)) / 1000,
             telemetry: telemetry
         )
@@ -122,6 +131,7 @@ public struct ChipReadSettings {
             .linkLoss(policy: linkLoss.kotlinPolicy())
             .settleDelayMillis(millis: Self.millis(settleDelay, minimum: 0))
             .commandTimeoutMillis(millis: Self.millis(commandTimeout, minimum: 1))
+            .commandTimeoutBeforeAccessMillis(millis: Self.millis(commandTimeoutBeforeAccess, minimum: 1))
             .waitAfterSystemEndMillis(millis: Self.millis(waitAfterSystemEnd, minimum: 0))
             .telemetry(sink: telemetry)
             // The Swift layer orders and buffers updates itself (see `ChipReadingCore`), so the
@@ -137,6 +147,7 @@ public struct ChipReadSettings {
             linkLoss: LinkLoss(kotlin: settings.linkLoss),
             settleDelay: TimeInterval(settings.settleDelayMillis) / 1000,
             commandTimeout: TimeInterval(settings.commandTimeoutMillis) / 1000,
+            commandTimeoutBeforeAccess: TimeInterval(settings.commandTimeoutBeforeAccessMillis) / 1000,
             waitAfterSystemEnd: TimeInterval(settings.waitAfterSystemEndMillis) / 1000,
             telemetry: settings.telemetry
         )

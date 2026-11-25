@@ -34,6 +34,11 @@ public enum ChipReadPhase: Sendable, Equatable {
     case checkingFiles
     /// The link to the chip was lost. The read tries again `restartsLeft` more times.
     case linkLost(restartsLeft: Int)
+    /// The document was found, but the chip has not answered a command yet in this read, usually
+    /// because the document is not in a good place. The read keeps trying, at no cost to the
+    /// restarts. `tries` is how many commands went unanswered so far. A good line for a person:
+    /// "Move the document slowly", then "Stay there" once the read goes on.
+    case noAnswerYet(tries: Int)
     /// The read is starting.
     case starting
     /// The read is stopping.
@@ -57,6 +62,8 @@ public enum ChipReadPhase: Sendable, Equatable {
 
     static func lost(restartsLeft: Int32) -> ChipReadPhase { .linkLost(restartsLeft: Int(restartsLeft)) }
 
+    static func noAnswer(tries: Int32) -> ChipReadPhase { .noAnswerYet(tries: Int(tries)) }
+
     /// Maps a raw object. It takes `Any` so a test can pass something that is not a state.
     static func from(_ object: Any) -> ChipReadPhase {
         switch object {
@@ -68,6 +75,7 @@ public enum ChipReadPhase: Sendable, Equatable {
             return reading(dataGroup: state.file.dataGroup, bytesRead: state.bytesRead, bytesTotal: state.bytesTotal)
         case is ChipReadState.AuthenticatingChip: return .authenticatingChip
         case is ChipReadState.CheckingFiles: return .checkingFiles
+        case let state as ChipReadState.NoAnswerYet: return noAnswer(tries: state.tries)
         case let state as ChipReadState.LinkLost: return lost(restartsLeft: state.restartsLeft)
         case is ChipReadState.Starting: return .starting
         case is ChipReadState.Stopping: return .stopping

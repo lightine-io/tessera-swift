@@ -105,7 +105,7 @@ public final class ChipReading: Sendable {
     ///   - texts: The words on the system sheet. `nil` uses the built-in English texts.
     ///     Use ``ChipReadTexts`` for your own.
     ///   - settings: How the read behaves around the radio. The default is
-    ///     ``ChipReadSettings/init(linkLoss:settleDelay:commandTimeout:waitAfterSystemEnd:telemetry:)``
+    ///     ``ChipReadSettings/init(linkLoss:settleDelay:commandTimeout:commandTimeoutBeforeAccess:waitAfterSystemEnd:telemetry:)``
     ///     with no arguments.
     /// - Returns: The running read. A read that cannot start still returns: its ending says why.
     public static func start(

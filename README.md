@@ -137,7 +137,7 @@ func readOnce(options: ChipReadOptions) async -> ChipRead? {
 }
 ```
 
-**5. Show progress (optional).** `reading.updates` is an `AsyncStream<ChipReadSnapshot>`. Each snapshot has `.phase` (a `ChipReadPhase`), `.progress`, `.fraction` and `.percent`. The cases of `ChipReadPhase` are `waitingForDocument(waited:)`, `documentFound`, `connecting`, `openingAccess`, `readingFile(dataGroup:bytesRead:bytesTotal:)`, `authenticatingChip`, `checkingFiles`, `linkLost(restartsLeft:)`, `starting`, `stopping` and `unknown`.
+**5. Show progress (optional).** `reading.updates` is an `AsyncStream<ChipReadSnapshot>`. Each snapshot has `.phase` (a `ChipReadPhase`), `.progress`, `.fraction` and `.percent`. The cases of `ChipReadPhase` are `waitingForDocument(waited:)`, `documentFound`, `connecting`, `openingAccess`, `readingFile(dataGroup:bytesRead:bytesTotal:)`, `authenticatingChip`, `checkingFiles`, `noAnswerYet(tries:)` (found, but the chip has not answered yet: show "Move the document slowly"), `linkLost(restartsLeft:)`, `starting`, `stopping` and `unknown`.
 
 ```swift
 func showProgress(of reading: ChipReading) async {
