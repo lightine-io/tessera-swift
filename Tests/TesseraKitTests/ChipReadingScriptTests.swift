@@ -80,7 +80,7 @@ struct ChipReadingScriptTests {
                 #expect(error === denied)
                 #expect(finish.outcome.error?.statusWordInt == 0x6300)
                 #expect(finish.outcome.error?.code == denied.code)
-            case (.keyRejected(let error), "keyRejected"): #expect(error.fields == [.documentNumber])
+            case (.keyRejected(let error), "keyRejected"): #expect((error as? ChipKeyCheckDigitMismatch)?.fields == [.documentNumber])
             case (.failed(let error, let access), "failed"):
                 #expect(error is NfcTagLost)
                 #expect(access == nil)

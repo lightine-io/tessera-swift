@@ -71,14 +71,14 @@ public final class ChipReadTexts: NSObject, CoreNfcSheetTexts, @unchecked Sendab
             guard let chosen else { return defaults.progressBar(progress: raw) }
             return (try? defaults.progressBar(progress: raw, width: Int32(chosen))) ?? defaults.progressBar(progress: raw)
         }
-        let size = chosen ?? Int(defaults.BAR_WIDTH)
+        let size = chosen ?? progressBarWidth
         let filled = min(size, Int(progress.fraction * Double(size)))
         return String(repeating: "\u{2593}", count: filled) + String(repeating: "\u{2591}", count: size - filled)
             + " \(progress.percent)%"
     }
 
     /// The width of the built-in progress bar.
-    public static var progressBarWidth: Int { Int(CoreNfcDefaultSheetTexts.shared.BAR_WIDTH) }
+    public static let progressBarWidth: Int = 10
 
     // MARK: CoreNfcSheetTexts
 

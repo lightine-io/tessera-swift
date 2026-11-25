@@ -187,8 +187,10 @@ public enum ChipReadOutcome {
     case failed(ChipError, access: AccessReport?)
     /// The chip did not accept the key.
     case keyNotAccepted(ChipAccessDenied)
-    /// The key was refused before the read: a check digit does not match.
-    case keyRejected(ChipKeyCheckDigitMismatch)
+    /// The key was refused before the read, with nothing sent to a chip: a check digit does not
+    /// match (`ChipKeyCheckDigitMismatch`), or the key was already used by an earlier read
+    /// (`ChipAccessDenied` with reason `KEY_CLEARED`; a new read needs a new key).
+    case keyRejected(ChipError)
     /// The read was cancelled, by the person (`byPerson`) or by the app (`cancel()`).
     case cancelled(byPerson: Bool)
     /// The system ended the session. The error says why.

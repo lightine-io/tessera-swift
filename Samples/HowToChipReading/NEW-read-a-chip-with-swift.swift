@@ -104,7 +104,7 @@ final class ChipReadModel: ObservableObject {
         case .partial: return "Some files could not be read"
         case .failed(let error, _): return "The read failed (\(error.code))"
         case .keyNotAccepted: return "The chip did not accept the key"
-        case .keyRejected: return "The key has a wrong check digit"
+        case .keyRejected(let error): return "The key was refused before the read (\(error.code))"
         case .cancelled(let byPerson): return byPerson ? "Cancelled" : "Stopped by the app"
         case .endedBySystem: return "The system ended the session"
         case .notStarted: return "NFC is not available"

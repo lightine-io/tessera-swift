@@ -5541,14 +5541,14 @@
            },
            {
             "kind": "TypeNominal",
-            "name": "ChipKeyCheckDigitMismatch",
-            "printedName": "Tessera.ChipKeyCheckDigitMismatch",
-            "usr": "c:objc(cs)TesseraChipKeyCheckDigitMismatch"
+            "name": "ChipError",
+            "printedName": "Tessera.ChipError",
+            "usr": "c:objc(cs)TesseraChipError"
            }
           ],
           "kind": "TypeFunc",
           "name": "Function",
-          "printedName": "(Tessera.ChipKeyCheckDigitMismatch) -> TesseraKit.ChipReadOutcome"
+          "printedName": "(Tessera.ChipError) -> TesseraKit.ChipReadOutcome"
          },
          {
           "children": [
@@ -5566,16 +5566,16 @@
         ],
         "kind": "TypeFunc",
         "name": "Function",
-        "printedName": "(TesseraKit.ChipReadOutcome.Type) -> (Tessera.ChipKeyCheckDigitMismatch) -> TesseraKit.ChipReadOutcome"
+        "printedName": "(TesseraKit.ChipReadOutcome.Type) -> (Tessera.ChipError) -> TesseraKit.ChipReadOutcome"
        }
       ],
       "declKind": "EnumElement",
       "kind": "Var",
-      "mangledName": "$s10TesseraKit15ChipReadOutcomeO11keyRejectedyACSo0aC21KeyCheckDigitMismatchCcACmF",
+      "mangledName": "$s10TesseraKit15ChipReadOutcomeO11keyRejectedyACSo0aC5ErrorCcACmF",
       "moduleName": "TesseraKit",
       "name": "keyRejected",
       "printedName": "keyRejected",
-      "usr": "s:10TesseraKit15ChipReadOutcomeO11keyRejectedyACSo0aC21KeyCheckDigitMismatchCcACmF"
+      "usr": "s:10TesseraKit15ChipReadOutcomeO11keyRejectedyACSo0aC5ErrorCcACmF"
      },
      {
       "children": [
@@ -8413,6 +8413,7 @@
          "Final"
         ],
         "declKind": "Accessor",
+        "implicit": true,
         "kind": "Accessor",
         "mangledName": "$s10TesseraKit13ChipReadTextsC16progressBarWidthSivgZ",
         "moduleName": "TesseraKit",
@@ -8431,9 +8432,13 @@
        }
       ],
       "declAttributes": [
-       "Final"
+       "Final",
+       "HasInitialValue",
+       "HasStorage"
       ],
       "declKind": "Var",
+      "hasStorage": true,
+      "isLet": true,
       "kind": "Var",
       "mangledName": "$s10TesseraKit13ChipReadTextsC16progressBarWidthSivpZ",
       "moduleName": "TesseraKit",

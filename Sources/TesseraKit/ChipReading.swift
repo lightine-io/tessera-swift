@@ -125,9 +125,9 @@ public final class ChipReading: Sendable {
         ChipReading { observer in
             CoreNfcChipRead.companion.start(
                 options: options,
+                observer: observer,
                 texts: texts ?? CoreNfcDefaultSheetTexts.shared,
-                settings: coreSettings,
-                observer: observer
+                settings: coreSettings
             )
         }
     }
