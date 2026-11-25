@@ -63,4 +63,68 @@ struct ChipAccessKeyBuildersTests {
             )
         }
     }
+
+    // MARK: from a document, a scanned result and typed fields (the published ICAO specimen and the
+    // project's own synthetic TD3 specimen; no real document data)
+
+    private static let specimenLines = [
+        "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<",
+        "L898902C36UTO7408122F1204159ZE184226B<<<<<10",
+    ]
+
+    private func parsed() -> ParseResult {
+        MrzParser.shared.parse(lines: Self.specimenLines, referenceTime: KotlinInstant.companion.fromEpochMilliseconds(epochMilliseconds: 1_700_000_000_000))
+    }
+
+    @Test func aKeyIsMadeFromAParseResult() throws {
+        let key = try ChipAccessKey.from(parse: parsed())
+        #expect(!key.isCleared)
+        #expect(key.checkDigitFindings.isEmpty)
+    }
+
+    @Test func aKeyIsMadeFromADocument() throws {
+        let result = parsed()
+        let document = try #require((result as? ParseResult.Success)?.document ?? (result as? ParseResult.PartialSuccess)?.document)
+        let key = try ChipAccessKey.from(document: document)
+        #expect(key.checkDigitFindings.isEmpty)
+    }
+
+    @Test func aFailedParseGivesNoDocumentAsASwiftError() {
+        let failed = MrzParser.shared.parse(
+            lines: ["not", "an mrz"], referenceTime: KotlinInstant.companion.fromEpochMilliseconds(epochMilliseconds: 1_700_000_000_000))
+        #expect(failed is ParseResult.Failure)
+        #expect(throws: ChipAccessKeyError.notBuilt(field: nil, problem: .noDocument)) {
+            _ = try ChipAccessKey.from(parse: failed)
+        }
+    }
+
+    @Test func typedFieldsGiveAKeyWithoutCheckDigits() throws {
+        let key = try ChipAccessKey.fromTypedFields(documentNumber: "L898902C3", dateOfBirth: "740812", dateOfExpiry: "120415")
+        #expect(key.checkDigitFindings.isEmpty)
+    }
+
+    @Test func aBadTypedFieldNamesTheFieldAndTheProblemButNotTheValue() {
+        do {
+            _ = try ChipAccessKey.fromTypedFields(documentNumber: "L898902C3", dateOfBirth: "7408", dateOfExpiry: "120415")
+            Issue.record("expected an error")
+        } catch let error as ChipAccessKeyError {
+            guard case .notBuilt(let field, let problem) = error else { Issue.record("wrong case: \(error)"); return }
+            #expect(field == .dateOfBirth)
+            #expect(problem == .wrongLength)
+            #expect(!error.description.contains("7408"))
+        } catch {
+            Issue.record("not a ChipAccessKeyError: \(error)")
+        }
+    }
+
+    @Test func anEmptyTypedNumberIsProblemEmpty() {
+        #expect(throws: ChipAccessKeyError.notBuilt(field: .documentNumber, problem: .empty)) {
+            _ = try ChipAccessKey.fromTypedFields(documentNumber: "", dateOfBirth: "740812", dateOfExpiry: "120415")
+        }
+    }
+
+    @Test func everyKotlinProblemAndFieldHasASwiftCase() {
+        for problem in MrzKeyProblem.entries { #expect(ChipKeyProblem(problem) != .unknown) }
+        for field in MrzField.entries { #expect(ChipKeyField(field) != .unknown) }
+    }
 }

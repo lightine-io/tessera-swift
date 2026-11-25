@@ -42,16 +42,24 @@ enum RealReading {
     /// test would make the others end with `READ_IN_PROGRESS`.
     private static let shared = Task { try await capture() }
 
-    static func sample() async throws -> (updates: [ChipReadUpdate], ending: ChipReadEnding) {
+    static func sample() async throws -> Sample {
         try await shared.value
     }
 
-    private static func capture() async throws -> (updates: [ChipReadUpdate], ending: ChipReadEnding) {
+    /// The Swift snapshots and finish of the real read; `raw` holds the Kotlin objects.
+    struct Sample: @unchecked Sendable {
+        let updates: [ChipReadSnapshot]
+        let ending: ChipReadFinish
+        var rawUpdates: [ChipReadUpdate] { updates.compactMap(\.raw) }
+        var rawEnding: ChipReadEnding { ending.raw! }
+    }
+
+    private static func capture() async throws -> Sample {
         let key = try ChipAccessKey.fromCan("123456")
         let options = try ChipReadOptions.Builder(accessKey: key).build()
         let reading = ChipReading.start(options: options)
-        var updates: [ChipReadUpdate] = []
+        var updates: [ChipReadSnapshot] = []
         for await update in reading.updates { updates.append(update) }
-        return (updates, await reading.ending)
+        return Sample(updates: updates, ending: await reading.ending)
     }
 }

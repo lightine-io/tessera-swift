@@ -25,26 +25,27 @@ struct ChipReadingTests {
         let fake = Fake()
         let reading = ChipReading(starter: fake.starter)
         let observer = fake.observer
-        for update in real.updates { observer.onUpdate(update: update) }
-        observer.onEnding(ending: real.ending)
+        for update in real.rawUpdates { observer.onUpdate(update: update) }
+        observer.onEnding(ending: real.rawEnding)
 
         var count = 0
         for await _ in reading.updates { count += 1 }
         #expect(count == real.updates.count)
         let ending = await reading.ending
-        #expect(ending === real.ending)
+        #expect(ending.raw === real.rawEnding)
+        #expect(ending.attempts == Int(real.rawEnding.attempts))
     }
 
     @Test func nothingHoldsTheObserverAfterTheEnding() async throws {
         let real = try await RealReading.sample()
         let fake = Fake()
         let reading = ChipReading(starter: fake.starter)
-        fake.observer.onUpdate(update: try #require(real.updates.first))
+        fake.observer.onUpdate(update: try #require(real.rawUpdates.first))
         fake.forgetObserver() // the fake stands for Kotlin letting go: only ChipReading holds it now
         #expect(fake.weakObserver != nil)
         do { // a scope, so this strong reference is gone before the check
             let observer = fake.weakObserver as? any ChipReadObserver
-            observer?.onEnding(ending: real.ending)
+            observer?.onEnding(ending: real.rawEnding)
         }
         _ = await reading.ending
         #expect(fake.weakObserver == nil)
@@ -67,8 +68,8 @@ struct ChipReadingTests {
         #expect(try await waitUntil { fake.handle.cancelCount == 1 })
         // The read ends the way Kotlin ends a cancelled read; here the real ending stands in for it.
         let real = try await RealReading.sample()
-        fake.observer.onEnding(ending: real.ending)
-        #expect(await task.value === real.ending)
+        fake.observer.onEnding(ending: real.rawEnding)
+        #expect(await task.value.raw === real.rawEnding)
     }
 
     @Test func cancellingTheTaskOfAnUpdatesLoopDoesNotCancelTheRead() async throws {
@@ -88,20 +89,20 @@ struct ChipReadingTests {
         let a = Task { await reading.ending }
         let b = Task { await reading.ending }
         try await Task.sleep(nanoseconds: 30_000_000)
-        fake.observer.onEnding(ending: real.ending)
-        #expect(await a.value === real.ending)
-        #expect(await b.value === real.ending)
-        #expect(await reading.ending === real.ending)
+        fake.observer.onEnding(ending: real.rawEnding)
+        #expect(await a.value.raw === real.rawEnding)
+        #expect(await b.value.raw === real.rawEnding)
+        #expect(await reading.ending.raw === real.rawEnding)
     }
 
     @Test func aReadThatEndsInsideStartStillDeliversItsEnding() async throws {
         let real = try await RealReading.sample()
         let handle = FakeHandle()
         let reading = ChipReading { observer in
-            observer.onEnding(ending: real.ending) // the way a read that cannot start behaves
+            observer.onEnding(ending: real.rawEnding) // the way a read that cannot start behaves
             return handle
         }
-        #expect(await reading.ending === real.ending)
+        #expect(await reading.ending.raw === real.rawEnding)
         reading.cancel()
         #expect(handle.cancelCount == 0)
     }

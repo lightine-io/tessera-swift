@@ -1,17 +1,141 @@
 import Foundation
 import Tessera
 
+/// Which MRZ field a key could not be made from. Mirrors `MrzField`; a field this version does not
+/// know is `.unknown`.
+///
+/// - Since: 1.0.0
+public enum ChipKeyField: String, Sendable, Equatable, CaseIterable {
+    case documentType, issuingState, nameField, documentNumber, nationality
+    case dateOfBirth, dateOfExpiry, optionalData, composite, sex
+    case unknown
+
+    init(_ field: MrzField) {
+        switch field {
+        case .documentType: self = .documentType
+        case .issuingState: self = .issuingState
+        case .nameField: self = .nameField
+        case .documentNumber: self = .documentNumber
+        case .nationality: self = .nationality
+        case .dateOfBirth: self = .dateOfBirth
+        case .dateOfExpiry: self = .dateOfExpiry
+        case .optionalData: self = .optionalData
+        case .composite: self = .composite
+        case .sex: self = .sex
+        default: self = .unknown
+        }
+    }
+}
+
+/// Why no chip access key could be made from the MRZ. Mirrors `MrzKeyProblem`.
+///
+/// - Since: 1.0.0
+public enum ChipKeyProblem: String, Sendable, Equatable, CaseIterable {
+    /// The parse failed, so there is no document to take the values from.
+    case noDocument
+    /// The document has no chip (it is a visa, for example).
+    case documentHasNoChip
+    /// A field is empty.
+    case empty
+    /// A field has the wrong length.
+    case wrongLength
+    /// A field has a character the key cannot hold.
+    case characterNotAllowed
+    /// A long document number lacks its continuation in the optional data.
+    case numberContinuationMissing
+    /// A problem this version does not know.
+    case unknown
+
+    init(_ problem: MrzKeyProblem) {
+        switch problem {
+        case .noDocument: self = .noDocument
+        case .documentHasNoChip: self = .documentHasNoChip
+        case .empty: self = .empty
+        case .wrongLength: self = .wrongLength
+        case .characterNotAllowed: self = .characterNotAllowed
+        case .numberContinuationMissing: self = .numberContinuationMissing
+        default: self = .unknown
+        }
+    }
+}
+
 /// Why a chip access key could not be made. The text never holds the values you gave.
 ///
 /// - Since: 1.0.0
-public enum ChipAccessKeyError: Error, Sendable, Equatable {
-    /// A check digit was not exactly one character that fits in 16 bits.
+public enum ChipAccessKeyError: Error, Sendable, Equatable, CustomStringConvertible {
+    /// A check digit given to ``Tessera/ChipAccessKey/fromMrz(documentNumber:documentNumberCheckDigit:dateOfBirth:dateOfBirthCheckDigit:dateOfExpiry:dateOfExpiryCheckDigit:)``
+    /// was not exactly one character that fits in 16 bits (an emoji, for example).
     case checkDigitNotOneCharacter(parameter: String)
     /// The reader refused a value. `message` names the field, never its value.
     case invalid(message: String)
+    /// No key could be built from the MRZ. `field` is the field at fault, when one is; `problem`
+    /// says what was wrong with it. Neither holds a value.
+    case notBuilt(field: ChipKeyField?, problem: ChipKeyProblem)
+
+    public var description: String {
+        switch self {
+        case .checkDigitNotOneCharacter(let parameter): return "\(parameter) must be one character"
+        case .invalid(let message): return message
+        case .notBuilt(let field, let problem):
+            return "no key: \(problem.rawValue)" + (field.map { " (\($0.rawValue))" } ?? "")
+        }
+    }
+}
+
+extension ChipAccessKeyError {
+    /// Maps the Kotlin answer: the key, or the field and problem.
+    static func unwrap(_ result: MrzKeyResult) throws -> ChipAccessKey.Mrz {
+        switch result {
+        case let built as MrzKeyResult.Built:
+            return built.key
+        case let notBuilt as MrzKeyResult.NotBuilt:
+            throw ChipAccessKeyError.notBuilt(
+                field: notBuilt.field.map(ChipKeyField.init),
+                problem: ChipKeyProblem(notBuilt.problem)
+            )
+        default:
+            throw ChipAccessKeyError.notBuilt(field: nil, problem: .unknown)
+        }
+    }
 }
 
 extension ChipAccessKey {
+    /// A key from a parsed document: the three MRZ values and their check digits are taken from it.
+    /// The check digits are the ones printed; a wrong one is a finding on the key, never corrected.
+    ///
+    /// ```swift
+    /// let key = try ChipAccessKey.from(document: document)
+    /// ```
+    ///
+    /// - Throws: ``ChipAccessKeyError/notBuilt(field:problem:)`` when the document has no chip or a
+    ///   field cannot make a key.
+    public static func from(document: MrzDocument) throws -> ChipAccessKey.Mrz {
+        try ChipAccessKeyError.unwrap(ChipAccessKey.Mrz.companion.from(document: document))
+    }
+
+    /// A key from the parse result the scanner gives (`ParseResult`): a success or a partial
+    /// success holds a document, a failure does not.
+    ///
+    /// - Throws: ``ChipAccessKeyError/notBuilt(field:problem:)``, with `.noDocument` for a failed parse.
+    public static func from(parse result: ParseResult) throws -> ChipAccessKey.Mrz {
+        try ChipAccessKeyError.unwrap(ChipAccessKey.Mrz.companion.from(result: result))
+    }
+
+    /// A key from values a person typed in: no check digits, the SDK works them out. Use this when
+    /// the person reads the three values off the document.
+    ///
+    /// - Throws: ``ChipAccessKeyError/notBuilt(field:problem:)`` with the field at fault.
+    public static func fromTypedFields(
+        documentNumber: String,
+        dateOfBirth: String,
+        dateOfExpiry: String
+    ) throws -> ChipAccessKey.Mrz {
+        try ChipAccessKeyError.unwrap(
+            ChipAccessKey.Mrz.companion.fromTypedFields(
+                documentNumber: documentNumber, dateOfBirth: dateOfBirth, dateOfExpiry: dateOfExpiry)
+        )
+    }
+
     /// A key from the MRZ: the three values, each with its check digit, as printed.
     ///
     /// Give the values exactly as printed, fillers (`<`) included, and the check digits as printed,

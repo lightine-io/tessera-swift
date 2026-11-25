@@ -13,9 +13,13 @@ func readChipShortest(key: ChipAccessKey) async throws -> ChipRead? {
     return nil
 }
 
-// Making the key from the printed values, with Swift errors.
-func makeKeys() throws -> [ChipAccessKey] {
+// Making the key. From a scanned document (the result of the scanner), from the three values a person
+// typed, from the printed values with their check digits, or from the card access number. Every
+// one throws a Swift error that names the field and the problem, never the value.
+func makeKeys(scanned: ParseResult) throws -> [ChipAccessKey] {
     [
+        try ChipAccessKey.from(parse: scanned),
+        try ChipAccessKey.fromTypedFields(documentNumber: "L898902C3", dateOfBirth: "740812", dateOfExpiry: "120415"),
         try ChipAccessKey.fromMrz(
             documentNumber: "L898902C3", documentNumberCheckDigit: "6",
             dateOfBirth: "740812", dateOfBirthCheckDigit: "2",
@@ -25,22 +29,45 @@ func makeKeys() throws -> [ChipAccessKey] {
     ]
 }
 
-// A progress bar and every ending handled.
+// The full use: a scanned document as the key, root certificates from a file, a check time, custom
+// texts on the system sheet, settings, a progress bar, and every outcome handled.
 @MainActor
 final class ChipReadModel: ObservableObject {
-    @Published var fraction = 0.0
+    @Published var bar = ""
     @Published var message = "Hold the phone on the document"
     private var reading: ChipReading?
 
-    func read(key: ChipAccessKey) async {
+    /// Ask first: `nil` means a read can start on this device.
+    var unavailable: NfcUnavailable.Reason? { ChipReading.availability }
+
+    func read(scanned: ParseResult, rootsFile: URL) async {
         do {
-            let options = try ChipReadOptions.Builder(accessKey: key).build()
-            let reading = ChipReading.start(options: options)
+            // A key is used up by one read: build a new one for every read.
+            let key = try ChipAccessKey.from(parse: scanned)
+            // A file URL from the document picker works as it is: access is started and stopped for you.
+            let roots = TrustAnchors.shared.load(contentsOf: rootsFile)
+            let options = try ChipReadOptions.Builder(accessKey: key)
+                .dataGroups([1, 2])
+                .trustAnchors(roots)
+                .checkTime(Date()) // without it the validity checks are reported as not run
+                .build()
+            let texts = ChipReadTexts(
+                text: { snapshot in
+                    if case .waitingForDocument = snapshot.phase { return "Hold the top of the phone on the document" }
+                    return nil // the built-in line for every other update
+                },
+                ending: { _ in nil }
+            )
+            let reading = ChipReading.start(
+                options: options,
+                texts: texts,
+                settings: ChipReadSettings(linkLoss: .resume(2), commandTimeout: 6)
+            )
             self.reading = reading
             // Leaving the screen cancels this task, and the handler cancels the read.
             await withTaskCancellationHandler {
                 for await update in reading.updates {
-                    fraction = update.progress.fraction
+                    bar = ChipReadTexts.progressBar(for: update.progress)
                     if case .linkLost(let restartsLeft) = update.phase {
                         message = "Connection lost, \(restartsLeft) tries left"
                     }
@@ -48,7 +75,8 @@ final class ChipReadModel: ObservableObject {
             } onCancel: {
                 reading.cancel()
             }
-            message = Self.describe(await reading.ending.outcome)
+            let finish = await reading.ending
+            message = Self.describe(finish.outcome) + " (attempts: \(finish.attempts), \(finish.progress.percent)%)"
         } catch {
             message = "The read could not be set up"
         }
@@ -60,7 +88,7 @@ final class ChipReadModel: ObservableObject {
         switch outcome {
         case .complete: return "Done"
         case .partial: return "Some files could not be read"
-        case .failed: return "The read failed"
+        case .failed(let error, _): return "The read failed (\(error.code))"
         case .keyNotAccepted: return "The chip did not accept the key"
         case .keyRejected: return "The key has a wrong check digit"
         case .cancelled(let byPerson): return byPerson ? "Cancelled" : "Stopped by the app"

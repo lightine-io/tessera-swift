@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
-# Public-API guard for the TesseraUI SwiftUI product.
+# Public-API guard for the Swift products: TesseraUI (default) and TesseraKit.
 #
+# TesseraKit (TES-346) has its own baseline, api/TesseraKit.baseline.json. It builds against the
+# Kotlin API that the published release does not have yet, so until a release carries it, run both
+# modes with the local framework: TESSERA_LOCAL_XCFRAMEWORK=1 ./scripts/check-public-api.sh TesseraKit
+#
+
 # TesseraUI's public surface FREEZES at the 0.5.0 tag under ADR-007. This guard makes any change to that
 # surface — additions, removals, or signature changes — a deliberate, reviewed act: it dumps the module's
 # current API with swift-api-digester and diffs it against the committed baseline. A full-dump diff (rather
@@ -8,18 +13,30 @@
 # BREAKING changes and silently ignores additions, but a frozen surface must catch an accidental new public
 # symbol too. Any difference fails CI.
 #
-#   ./scripts/check-public-api.sh            # verify current API == baseline (CI mode)
-#   ./scripts/check-public-api.sh --update   # regenerate the baseline after an intentional surface change
+#   ./scripts/check-public-api.sh                       # TesseraUI: verify current API == baseline (CI mode)
+#   ./scripts/check-public-api.sh --update              # TesseraUI: regenerate the baseline after an intentional change
+#   ./scripts/check-public-api.sh TesseraKit            # TesseraKit: verify
+#   ./scripts/check-public-api.sh TesseraKit --update   # TesseraKit: regenerate
 #
 # Regenerating the baseline is how you ACCEPT a surface change; the diff in review shows exactly what moved.
 set -euo pipefail
 
 MODULE="TesseraUI"
-SCHEME="TesseraUI"
+if [[ $# -gt 0 && "$1" != --* ]]; then
+  MODULE="$1"
+  shift
+fi
+case "$MODULE" in
+  TesseraUI|TesseraKit) ;;
+  *) echo "ERROR: unknown module '$MODULE' (TesseraUI or TesseraKit)" >&2; exit 2 ;;
+esac
+SCHEME="$MODULE"
 TARGET_TRIPLE="arm64-apple-ios15.0-simulator"       # matches Package.swift .iOS(.v15)
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BASELINE="$REPO_ROOT/api/$MODULE.baseline.json"
-DDP="${API_GUARD_DERIVED_DATA:-$REPO_ROOT/.build-apiguard}"
+DERIVED_SUFFIX=""
+[[ "$MODULE" == "TesseraUI" ]] || DERIVED_SUFFIX="-$MODULE"
+DDP="${API_GUARD_DERIVED_DATA:-$REPO_ROOT/.build-apiguard$DERIVED_SUFFIX}"
 PRODUCTS="$DDP/Build/Products/Debug-iphonesimulator"
 CURRENT="$(mktemp -t "$MODULE.current.XXXXXX.json")"
 
@@ -106,12 +123,13 @@ if [[ ! -f "$BASELINE" ]]; then
   exit 1
 fi
 
-if diff -u <(normalize "$BASELINE") <(normalize "$CURRENT") > /tmp/tesseraui-api.diff; then
-  echo "==> OK: TesseraUI public API matches the frozen baseline."
+DIFF_FILE="${TMPDIR:-/tmp}/$MODULE-api.diff"
+if diff -u <(normalize "$BASELINE") <(normalize "$CURRENT") > "$DIFF_FILE"; then
+  echo "==> OK: $MODULE public API matches the baseline."
 else
-  echo "ERROR: TesseraUI public API differs from the frozen baseline (ADR-007)." >&2
+  echo "ERROR: $MODULE public API differs from the baseline (TesseraUI: frozen under ADR-007)." >&2
   echo "       If the change is intentional, review the diff and run: $0 --update" >&2
   echo "----------------------------------------------------------------------" >&2
-  cat /tmp/tesseraui-api.diff >&2
+  cat "$DIFF_FILE" >&2
   exit 1
 fi
