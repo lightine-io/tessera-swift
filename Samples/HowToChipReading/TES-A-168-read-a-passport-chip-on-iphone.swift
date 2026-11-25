@@ -102,3 +102,41 @@ func startWithSettings(options: ChipReadOptions) -> ChipReading {
     return ChipReading.start(options: options, texts: texts, settings: settings)
 }
 // endregion
+
+// region TES-A-168 block 11
+func makeKeyFromTypedValues(documentNumber: String, dateOfBirth: String, dateOfExpiry: String) -> ChipAccessKey? {
+    // Dates are six digits, YYMMDD. The check digits are worked out for you.
+    // Normalising trims spaces and upper-cases letters; nothing else changes.
+    let typed = ChipAccessKey.normalizeTypedFields(
+        documentNumber: documentNumber, dateOfBirth: dateOfBirth, dateOfExpiry: dateOfExpiry)
+    do {
+        return try ChipAccessKey.fromTypedFields(
+            documentNumber: typed.documentNumber,
+            dateOfBirth: typed.dateOfBirth,
+            dateOfExpiry: typed.dateOfExpiry)
+    } catch let error as ChipAccessKeyError {
+        print("No key: \(error)")
+        return nil
+    } catch {
+        return nil
+    }
+}
+// endregion
+
+// region TES-A-168 block 12
+func summary(of finish: ChipReadFinish) -> String {
+    // `read` is set for a complete or a partial read, `error` for every ending that has one.
+    if let read = finish.read { return "Read \(read.files.count) files" }
+    if let error = finish.outcome.error { return "No data (\(error.code))" }
+    return "No data"
+}
+// endregion
+
+// region TES-A-168 block 13
+func readWhileVisible(options: ChipReadOptions) async -> ChipReadFinish {
+    let reading = ChipReading.start(options: options)
+    // result() cancels the read when this task is cancelled, for example when a SwiftUI
+    // .task ends because the screen went away.
+    return await reading.result()
+}
+// endregion
