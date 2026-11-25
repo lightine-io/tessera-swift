@@ -174,5 +174,6 @@ struct ChipReadConveniencesTests {
         #expect(ChipCheckResult.from(CheckOutcomeFailed(reason: ChipCheckReason.hashDiffers)) == .failed(reason: "HASH_DIFFERS"))
         #expect(ChipCheckResult.from(CheckOutcomeNotRun(reason: ChipCheckReason.noTimeGiven)) == .notRun(reason: "NO_TIME_GIVEN"))
         #expect(ChipCheckResult.from(CheckOutcomeNotApplicable(reason: nil)) == .notApplicable(reason: nil))
+        #expect(ChipCheckResult(CheckOutcomePassed.shared) == .passed)
     }
 }

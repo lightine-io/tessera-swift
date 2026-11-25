@@ -21,6 +21,10 @@ public enum ChipCheckResult: Sendable, Equatable {
     /// An outcome this version does not know.
     case unknown
 
+    /// The Swift view of any Kotlin check outcome: a chip check's, a master list check's or an MRZ
+    /// comparison's.
+    public init(_ outcome: any CheckOutcome) { self = Self.from(outcome) }
+
     static func from(_ outcome: any CheckOutcome) -> ChipCheckResult {
         switch outcome {
         case is CheckOutcomePassed: return .passed

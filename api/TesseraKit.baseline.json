@@ -1844,6 +1844,30 @@
       "children": [
        {
         "kind": "TypeNominal",
+        "name": "ChipCheckResult",
+        "printedName": "TesseraKit.ChipCheckResult",
+        "usr": "s:10TesseraKit15ChipCheckResultO"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "CheckOutcome",
+        "printedName": "any Tessera.CheckOutcome",
+        "usr": "c:objc(pl)TesseraCheckOutcome"
+       }
+      ],
+      "declKind": "Constructor",
+      "init_kind": "Designated",
+      "kind": "Constructor",
+      "mangledName": "$s10TesseraKit15ChipCheckResultOyACSo0aD7Outcome_pcfc",
+      "moduleName": "TesseraKit",
+      "name": "init",
+      "printedName": "init(_:)",
+      "usr": "s:10TesseraKit15ChipCheckResultOyACSo0aD7Outcome_pcfc"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
         "name": "Bool",
         "printedName": "Swift.Bool",
         "usr": "s:Sb"
