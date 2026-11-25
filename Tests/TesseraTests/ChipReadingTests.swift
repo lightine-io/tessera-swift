@@ -1,7 +1,6 @@
 import Foundation
 import Testing
-import Tessera
-@testable import TesseraKit
+@testable import Tessera
 
 /// `ChipReading` itself, with a fake starter that hands out the observer. The updates and the ending
 /// are real Kotlin objects, captured once from the real reader on the simulator (see `RealReading`).

@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# Public-API guard for the Swift products: TesseraUI (default) and TesseraKit.
+# Public-API guard for the Swift products: TesseraUI (default) and Tessera (the hand-written Swift layer).
 #
-# TesseraKit (TES-346) has its own baseline, api/TesseraKit.baseline.json. It builds against the
+# Tessera (TES-346) has its own baseline, api/Tessera.baseline.json: the Swift layer's own declarations
+# (what it re-exports from the TesseraCore binary is not in the dump). It builds against the
 # Kotlin API that the published release does not have yet, so until a release carries it, run both
-# modes with the local framework: TESSERA_LOCAL_XCFRAMEWORK=1 ./scripts/check-public-api.sh TesseraKit
+# modes with the local framework: TESSERA_LOCAL_XCFRAMEWORK=1 ./scripts/check-public-api.sh Tessera
 #
 
 # TesseraUI's public surface FREEZES at the 0.5.0 tag under ADR-007. This guard makes any change to that
@@ -15,8 +16,8 @@
 #
 #   ./scripts/check-public-api.sh                       # TesseraUI: verify current API == baseline (CI mode)
 #   ./scripts/check-public-api.sh --update              # TesseraUI: regenerate the baseline after an intentional change
-#   ./scripts/check-public-api.sh TesseraKit            # TesseraKit: verify
-#   ./scripts/check-public-api.sh TesseraKit --update   # TesseraKit: regenerate
+#   ./scripts/check-public-api.sh Tessera               # Tessera: verify
+#   ./scripts/check-public-api.sh Tessera --update      # Tessera: regenerate
 #
 # Regenerating the baseline is how you ACCEPT a surface change; the diff in review shows exactly what moved.
 set -euo pipefail
@@ -27,8 +28,8 @@ if [[ $# -gt 0 && "$1" != --* ]]; then
   shift
 fi
 case "$MODULE" in
-  TesseraUI|TesseraKit) ;;
-  *) echo "ERROR: unknown module '$MODULE' (TesseraUI or TesseraKit)" >&2; exit 2 ;;
+  TesseraUI|Tessera) ;;
+  *) echo "ERROR: unknown module '$MODULE' (TesseraUI or Tessera)" >&2; exit 2 ;;
 esac
 SCHEME="$MODULE"
 TARGET_TRIPLE="arm64-apple-ios15.0-simulator"       # matches Package.swift .iOS(.v15)

@@ -4,9 +4,10 @@ name: old-ios
 # to iOS 15). No old simulator runs on the maintainer's Mac (Xcode 27), so this is the only place the
 # old-iOS code paths run. Not part of ci.yml: it downloads multi-GB runtimes and builds the framework.
 #
-# The package consumes a binary Tessera.xcframework. The release URL in Package.swift is built for
+# The package consumes a binary TesseraCore.xcframework. The release URL in Package.swift is built for
 # iOS 18, so the `framework` job builds the one that matches the ref from lightine-io/tessera and the
-# `test` job takes it through TESSERA_LOCAL_XCFRAMEWORK=1 (.local-xcframework/).
+# `test` job takes it through TESSERA_LOCAL_XCFRAMEWORK=1 (.local-xcframework/). The ref must have the
+# TesseraCore name (TES-346); an older ref builds Tessera.xcframework and the framework job stops.
 #
 # Not a required check. Every action is pinned to a full commit SHA with a version comment.
 
@@ -97,22 +98,22 @@ jobs:
           cache-read-only: true
 
       - name: Build the XCFramework
-        run: ./gradlew :mrz-camera-ios:packTesseraXCFramework
+        run: ./gradlew :mrz-camera-ios:packTesseraCoreXCFramework
 
       - name: Zip the XCFramework (keeps symlinks)
         run: |
-          BUILT="mrz-camera-ios/build/XCFrameworks/release/Tessera.xcframework"
+          BUILT="mrz-camera-ios/build/XCFrameworks/release/TesseraCore.xcframework"
           [ -d "$BUILT" ] || { echo "::error::$BUILT not found after the build."; exit 1; }
           mkdir -p "$RUNNER_TEMP/fw"
           # ditto keeps symlinks and extended attributes; upload-artifact would otherwise flatten them.
-          ditto -c -k --sequesterRsrc --keepParent "$BUILT" "$RUNNER_TEMP/fw/Tessera.xcframework.zip"
+          ditto -c -k --sequesterRsrc --keepParent "$BUILT" "$RUNNER_TEMP/fw/TesseraCore.xcframework.zip"
           ls -l "$RUNNER_TEMP/fw"
 
       - name: Upload the XCFramework
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: tessera-xcframework
-          path: ${{ runner.temp }}/fw/Tessera.xcframework.zip
+          path: ${{ runner.temp }}/fw/TesseraCore.xcframework.zip
           if-no-files-found: error
           retention-days: 7
 
@@ -154,9 +155,9 @@ jobs:
       - name: Put the XCFramework in .local-xcframework
         run: |
           mkdir -p .local-xcframework
-          ditto -x -k "$RUNNER_TEMP/fw/Tessera.xcframework.zip" .local-xcframework
-          [ -d .local-xcframework/Tessera.xcframework ] || { echo "::error::The artifact did not hold Tessera.xcframework."; ls -la .local-xcframework; exit 1; }
-          ls .local-xcframework/Tessera.xcframework
+          ditto -x -k "$RUNNER_TEMP/fw/TesseraCore.xcframework.zip" .local-xcframework
+          [ -d .local-xcframework/TesseraCore.xcframework ] || { echo "::error::The artifact did not hold TesseraCore.xcframework."; ls -la .local-xcframework; exit 1; }
+          ls .local-xcframework/TesseraCore.xcframework
 
       - name: Simulator runtimes before
         run: xcrun simctl list runtimes

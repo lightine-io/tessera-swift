@@ -1,5 +1,5 @@
 import Foundation
-import Tessera
+import TesseraCore
 
 /// An MRZ field, by name: the one a key could not be made from, one the typed-field normaliser
 /// changed, or one the printed-MRZ comparison speaks about. Mirrors `MrzField`; a field this version

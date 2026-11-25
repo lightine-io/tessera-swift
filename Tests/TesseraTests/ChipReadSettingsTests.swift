@@ -1,7 +1,6 @@
 import Foundation
 import Testing
-import Tessera
-@testable import TesseraKit
+@testable import Tessera
 
 /// `ChipReadSettings`, `LinkLoss` and the step sink. The values are checked against what the Kotlin
 /// side reports, so a change of a Kotlin default shows up here.
@@ -143,7 +142,7 @@ struct ChipReadSettingsTests {
         let failed = ChipReadOutcome.failed(NfcNoAnswer.shared, access: nil)
         #expect(failed.isNoAnswer)
         #expect(NfcNoAnswer.shared.isNoAnswer)
-        #expect(!ChipReadOutcome.endedBySystem(NfcTimeout(timeoutMillis: nil)).isNoAnswer)
+        #expect(!ChipReadOutcome.endedBySystem(NfcTimeout(timeoutMillis: nil, limit: .session)).isNoAnswer)
         #expect(!ChipReadOutcome.cancelled(byPerson: true).isNoAnswer)
         #expect(!ChipReadOutcome.unknown.isNoAnswer)
     }

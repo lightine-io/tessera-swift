@@ -1,5 +1,5 @@
 import Foundation
-import Tessera
+import TesseraCore
 
 extension TrustAnchors {
     /// Loads root certificates from bytes: a master list, one certificate (DER) or PEM certificates.

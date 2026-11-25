@@ -1,5 +1,5 @@
 import Foundation
-import Tessera
+import TesseraCore
 
 /// Why the options builder refused a value before the reader saw it.
 ///

@@ -1,5 +1,5 @@
 import Foundation
-import Tessera
+import TesseraCore
 
 /// A running chip read, as Swift values: an `AsyncStream` of updates and one awaitable ending.
 ///
@@ -229,12 +229,12 @@ final class ChipReadObserverBridge: NSObject, ChipReadObserver, Sendable {
 }
 
 /// Passes each Kotlin readiness change to a closure. The Kotlin side calls it on the main queue.
-private final class ReadinessListener: NSObject, Tessera.ChipReadReadinessListener, @unchecked Sendable {
+private final class ReadinessListener: NSObject, TesseraCore.ChipReadReadinessListener, @unchecked Sendable {
     // Immutable after init, and the closure is `@Sendable`.
     private let handler: @Sendable (ChipReadReadiness) -> Void
     init(_ handler: @escaping @Sendable (ChipReadReadiness) -> Void) { self.handler = handler }
 
-    func onReadinessChanged(readiness: Tessera.ChipReadReadiness) {
+    func onReadinessChanged(readiness: TesseraCore.ChipReadReadiness) {
         handler(ChipReadReadiness(readiness))
     }
 }
@@ -242,7 +242,7 @@ private final class ReadinessListener: NSObject, Tessera.ChipReadReadinessListen
 /// Holds the Kotlin registration so the stream can remove it from any thread; the Kotlin `remove()`
 /// is safe to call more than once and from any thread.
 private final class RegistrationBox: @unchecked Sendable {
-    private let registration: any Tessera.ChipReadReadinessRegistration
-    init(_ registration: any Tessera.ChipReadReadinessRegistration) { self.registration = registration }
+    private let registration: any TesseraCore.ChipReadReadinessRegistration
+    init(_ registration: any TesseraCore.ChipReadReadinessRegistration) { self.registration = registration }
     func remove() { registration.remove() }
 }

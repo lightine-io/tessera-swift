@@ -4,27 +4,32 @@ import Foundation
 
 // Tessera for iOS ships TWO products from this package:
 //
-//   • `Tessera`   — the headless SDK: MRZ parsing / validation / generation plus the AVFoundation +
-//                   Apple Vision live-camera scanner, vended as the `Tessera` XCFramework. Built from the
-//                   Kotlin Multiplatform codebase in lightine-io/tessera and attached to that project's
-//                   GitHub release. The url/checksum below come from the main project's release workflow;
-//                   `swift package compute-checksum Tessera.xcframework.zip` reproduces the checksum.
+//   • `Tessera`   — everything headless, behind one `import Tessera`: MRZ parsing / validation /
+//                   generation, the AVFoundation + Apple Vision live-camera scanner and chip reading.
+//                   A hand-written Swift target (Sources/Tessera: the `async` chip-reading layer) that
+//                   re-exports the `TesseraCore` binary target, so an app sees both through one import.
 //
 //   • `TesseraUI` — the default SwiftUI scanner UI (hand-written Swift/SwiftUI per ADR-026), layered over
-//                   the headless `Tessera` XCFramework. Its public surface freezes at the 0.5.0 tag under
-//                   ADR-007, lockstep-versioned with the main project.
+//                   `Tessera`. Its public surface freezes at the 0.5.0 tag under ADR-007, lockstep-versioned
+//                   with the main project.
+//
+// `TesseraCore` is the XCFramework built from the Kotlin Multiplatform codebase in lightine-io/tessera and
+// attached to that project's GitHub release (named `Tessera.xcframework.zip` up to 0.7.0). It is a target,
+// not a product: apps reach it through `Tessera`. The url/checksum below come from the main project's
+// release workflow; `swift package compute-checksum TesseraCore.xcframework.zip` reproduces the checksum.
+//
 // Dev-only escape hatch: when TESSERA_LOCAL_XCFRAMEWORK is set, consume a locally-built, unreleased
-// Tessera.xcframework (e.g. one carrying an additive K/N change not yet in a published release) from
+// TesseraCore.xcframework (e.g. one carrying an additive K/N change not yet in a published release) from
 // `.local-xcframework/` instead of the release asset. The committed DEFAULT always points at the release
-// URL so CI and consumers are unaffected. See TES-82: while the 0.5.0 live-preview seam is unreleased,
-// TesseraUI is developed with this set; the release URL/checksum below is bumped when the seam ships.
-let tesseraBinary: Target = {
+// URL so CI and consumers are unaffected. The url names the new asset ahead of the release that uploads it:
+// until then only the local framework builds (the release workflow rewrites the version and checksum).
+let tesseraCoreBinary: Target = {
     if ProcessInfo.processInfo.environment["TESSERA_LOCAL_XCFRAMEWORK"] != nil {
-        return .binaryTarget(name: "Tessera", path: ".local-xcframework/Tessera.xcframework")
+        return .binaryTarget(name: "TesseraCore", path: ".local-xcframework/TesseraCore.xcframework")
     }
     return .binaryTarget(
-        name: "Tessera",
-        url: "https://github.com/lightine-io/tessera/releases/download/v0.7.0/Tessera.xcframework.zip",
+        name: "TesseraCore",
+        url: "https://github.com/lightine-io/tessera/releases/download/v0.7.0/TesseraCore.xcframework.zip",
         checksum: "72892d28ec0ce05c4bb88742109808ba28486834e85e8f314a97b6739ece66a7"
     )
 }()
@@ -38,18 +43,15 @@ let package = Package(
     products: [
         .library(name: "Tessera", targets: ["Tessera"]),
         .library(name: "TesseraUI", targets: ["TesseraUI"]),
-        // The headless Swift layer: `async` chip reading over the Kotlin reader. Draws nothing and
-        // imports no UI framework, so an app can read a chip without linking the scanner screen.
-        .library(name: "TesseraKit", targets: ["TesseraKit"]),
     ],
     targets: [
-        tesseraBinary,
-        // TesseraKit (TES-346): hand-written Swift over the headless `Tessera` binary, no UI imports.
-        // TesseraUI may depend on it later, so the screen and the headless API share one adapter.
+        tesseraCoreBinary,
+        // Tessera (TES-346): hand-written Swift over the `TesseraCore` binary, no UI imports. One file
+        // (Exports.swift) re-exports TesseraCore; the rest is the `async` chip-reading layer.
         .target(
-            name: "TesseraKit",
-            dependencies: ["Tessera"],
-            path: "Sources/TesseraKit"
+            name: "Tessera",
+            dependencies: ["TesseraCore"],
+            path: "Sources/Tessera"
         ),
         .target(
             name: "TesseraUI",
@@ -93,13 +95,26 @@ let package = Package(
         // NEW, mirrors a documentation page that does not exist yet (TES-346).
         .target(
             name: "TesseraSamplesChipReading",
-            dependencies: ["Tessera", "TesseraKit"],
+            dependencies: ["Tessera"],
             path: "Samples/HowToChipReading"
         ),
+        // Compile-only guards for the import shape (TES-346): an app written for 0.7.0 (`import Tessera`
+        // plus `import TesseraUI`, core types unqualified, the scanner view) and an app that imports only
+        // `Tessera` and reads a chip. A name that turns ambiguous or drops out of `import Tessera` fails here.
+        .target(
+            name: "TesseraSamplesImports070",
+            dependencies: ["Tessera", "TesseraUI"],
+            path: "Tests/ImportShape/App070"
+        ),
+        .target(
+            name: "TesseraSamplesImportsOne",
+            dependencies: ["Tessera"],
+            path: "Tests/ImportShape/OneImport"
+        ),
         .testTarget(
-            name: "TesseraKitTests",
-            dependencies: ["TesseraKit", "TesseraSamplesChipReading"],
-            path: "Tests/TesseraKitTests"
+            name: "TesseraTests",
+            dependencies: ["Tessera", "TesseraSamplesChipReading", "TesseraSamplesImports070", "TesseraSamplesImportsOne"],
+            path: "Tests/TesseraTests"
         ),
         .testTarget(
             name: "TesseraUITests",

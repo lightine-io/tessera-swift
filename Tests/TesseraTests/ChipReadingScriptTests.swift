@@ -1,7 +1,6 @@
 import Foundation
 import Testing
-import Tessera
-@testable import TesseraKit
+@testable import Tessera
 
 /// The test aid `ChipReading.makeForTesting`, and with it the phase and outcome values that Swift
 /// cannot get from the Kotlin reader: readingFile, linkLost, waitingForDocument, and the endings Swift can
@@ -73,7 +72,7 @@ struct ChipReadingScriptTests {
             (.keyNotAccepted(denied), "keyNotAccepted"),
             (.keyRejected(mismatch), "keyRejected"),
             (.failed(NfcTagLost(), access: nil), "failed"),
-            (.endedBySystem(NfcTimeout(timeoutMillis: nil)), "endedBySystem"),
+            (.endedBySystem(NfcTimeout(timeoutMillis: nil, limit: .session)), "endedBySystem"),
             (.notStarted(.notSupported), "notStarted"),
             (.cancelled(byPerson: false), "cancelled"),
         ]

@@ -1,5 +1,5 @@
 import Foundation
-import Tessera
+import TesseraCore
 
 /// The words on the system NFC sheet, from Swift closures.
 ///

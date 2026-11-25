@@ -4,7 +4,6 @@
 
 // region TES-A-168 block 2
 import Tessera
-import TesseraKit
 // endregion
 
 // region TES-A-168 block 3

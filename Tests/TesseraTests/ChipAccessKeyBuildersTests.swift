@@ -1,6 +1,5 @@
 import Testing
-import Tessera
-@testable import TesseraKit
+@testable import Tessera
 
 /// The key helpers: Swift errors instead of raw `NSError`, and no value in an error message.
 /// The MRZ values are the published ICAO Doc 9303 specimen.

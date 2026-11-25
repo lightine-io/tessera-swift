@@ -1,7 +1,7 @@
 import Foundation
 import Testing
-import Tessera
-@testable import TesseraKit
+@testable import Tessera
+import TesseraCore
 
 /// The `enum` mirrors. Swift cannot build the Kotlin cases that carry values (`ReadingFile`,
 /// `LinkLost`, `WaitingForDocument`, `Complete` and the like), so the value conversions behind them are
@@ -55,10 +55,10 @@ struct ChipReadPhaseTests {
     }
 
     @Test func readinessMapsFromTheKotlinValues() {
-        #expect(TesseraKit.ChipReadReadiness(Tessera.ChipReadReadiness.Ready.shared) == .ready)
-        #expect(TesseraKit.ChipReadReadiness(Tessera.ChipReadReadiness.ReadInProgress.shared) == .readInProgress)
-        #expect(TesseraKit.ChipReadReadiness.notYet(remainingMillis: 1_500) == .notYet(remaining: 1.5))
-        #expect(TesseraKit.ChipReadReadiness.notYet(remainingMillis: 1) != .ready)
+        #expect(Tessera.ChipReadReadiness(TesseraCore.ChipReadReadiness.Ready.shared) == .ready)
+        #expect(Tessera.ChipReadReadiness(TesseraCore.ChipReadReadiness.ReadInProgress.shared) == .readInProgress)
+        #expect(Tessera.ChipReadReadiness.notYet(remainingMillis: 1_500) == .notYet(remaining: 1.5))
+        #expect(Tessera.ChipReadReadiness.notYet(remainingMillis: 1) != .ready)
     }
 
     @Test func readinessNowIsReadyOrExplainsWhy() {
@@ -70,7 +70,7 @@ struct ChipReadPhaseTests {
     }
 
     @Test func theReadinessStreamStartsWithTheValueNow() async {
-        var first: TesseraKit.ChipReadReadiness?
+        var first: Tessera.ChipReadReadiness?
         for await value in ChipReading.readinessUpdates {
             first = value
             break // ending the loop ends the stream, which removes the Kotlin listener

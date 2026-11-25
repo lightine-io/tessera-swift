@@ -1,5 +1,5 @@
 import Foundation
-import Tessera
+import TesseraCore
 
 /// The state machine behind ``ChipReading``: the update buffer, the one ending, the waiters and the
 /// cancel flag. It is generic over the update and ending types so the tests can drive it with plain

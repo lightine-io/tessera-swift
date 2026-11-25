@@ -1,7 +1,6 @@
 import Foundation
 import Testing
-import Tessera
-@testable import TesseraKit
+@testable import Tessera
 
 /// The builder conveniences, the root-certificate loading, the sheet texts and the check helpers.
 /// The certificate is a throwaway self-signed one made for this test: no private key is kept.

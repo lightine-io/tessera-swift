@@ -1,5 +1,5 @@
 import Foundation
-import Tessera
+import TesseraCore
 
 // TEST AID. Nothing here talks to NFC or to the Kotlin reader. The Kotlin update and ending types have
 // no public constructors, so an app (or this package's own tests) cannot build one to test its screen.

@@ -1,5 +1,5 @@
 import Foundation
-import Tessera
+import TesseraCore
 
 // Swift `Int` and `String` views of facts the Kotlin types give as boxed numbers or enums. The
 // names follow the existing ones (`statusWordInt`, `percentInt`): the Kotlin property keeps its name,

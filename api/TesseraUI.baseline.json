@@ -2189,13 +2189,13 @@
            {
             "kind": "TypeNominal",
             "name": "DocumentCategory",
-            "printedName": "Tessera.DocumentCategory",
+            "printedName": "TesseraCore.DocumentCategory",
             "usr": "c:objc(cs)TesseraDocumentCategory"
            }
           ],
           "kind": "TypeNominal",
           "name": "Set",
-          "printedName": "Swift.Set<Tessera.DocumentCategory>",
+          "printedName": "Swift.Set<TesseraCore.DocumentCategory>",
           "usr": "s:Sh"
          }
         ],
@@ -2221,13 +2221,13 @@
            {
             "kind": "TypeNominal",
             "name": "DocumentCategory",
-            "printedName": "Tessera.DocumentCategory",
+            "printedName": "TesseraCore.DocumentCategory",
             "usr": "c:objc(cs)TesseraDocumentCategory"
            }
           ],
           "kind": "TypeNominal",
           "name": "Set",
-          "printedName": "Swift.Set<Tessera.DocumentCategory>",
+          "printedName": "Swift.Set<TesseraCore.DocumentCategory>",
           "usr": "s:Sh"
          }
         ],
@@ -2247,13 +2247,13 @@
          {
           "kind": "TypeNominal",
           "name": "DocumentCategory",
-          "printedName": "Tessera.DocumentCategory",
+          "printedName": "TesseraCore.DocumentCategory",
           "usr": "c:objc(cs)TesseraDocumentCategory"
          }
         ],
         "kind": "TypeNominal",
         "name": "Set",
-        "printedName": "Swift.Set<Tessera.DocumentCategory>",
+        "printedName": "Swift.Set<TesseraCore.DocumentCategory>",
         "usr": "s:Sh"
        }
       ],
@@ -2424,14 +2424,14 @@
          {
           "kind": "TypeNominal",
           "name": "DocumentCategory",
-          "printedName": "Tessera.DocumentCategory",
+          "printedName": "TesseraCore.DocumentCategory",
           "usr": "c:objc(cs)TesseraDocumentCategory"
          }
         ],
         "hasDefaultArg": true,
         "kind": "TypeNominal",
         "name": "Set",
-        "printedName": "Swift.Set<Tessera.DocumentCategory>",
+        "printedName": "Swift.Set<TesseraCore.DocumentCategory>",
         "usr": "s:Sh"
        }
       ],
@@ -2584,14 +2584,14 @@
          {
           "kind": "TypeNominal",
           "name": "DocumentCategory",
-          "printedName": "Tessera.DocumentCategory",
+          "printedName": "TesseraCore.DocumentCategory",
           "usr": "c:objc(cs)TesseraDocumentCategory"
          }
         ],
         "hasDefaultArg": true,
         "kind": "TypeNominal",
         "name": "Set",
-        "printedName": "Swift.Set<Tessera.DocumentCategory>",
+        "printedName": "Swift.Set<TesseraCore.DocumentCategory>",
         "usr": "s:Sh"
        }
       ],
@@ -2733,14 +2733,14 @@
          {
           "kind": "TypeNominal",
           "name": "DocumentCategory",
-          "printedName": "Tessera.DocumentCategory",
+          "printedName": "TesseraCore.DocumentCategory",
           "usr": "c:objc(cs)TesseraDocumentCategory"
          }
         ],
         "hasDefaultArg": true,
         "kind": "TypeNominal",
         "name": "Set",
-        "printedName": "Swift.Set<Tessera.DocumentCategory>",
+        "printedName": "Swift.Set<TesseraCore.DocumentCategory>",
         "usr": "s:Sh"
        }
       ],
@@ -3282,13 +3282,13 @@
            {
             "kind": "TypeNominal",
             "name": "MrzScanResultDecoded",
-            "printedName": "Tessera.MrzScanResultDecoded",
+            "printedName": "TesseraCore.MrzScanResultDecoded",
             "usr": "c:objc(cs)TesseraMrzScanResultDecoded"
            }
           ],
           "kind": "TypeFunc",
           "name": "Function",
-          "printedName": "(Tessera.MrzScanResultDecoded) -> TesseraUI.TesseraUIResult"
+          "printedName": "(TesseraCore.MrzScanResultDecoded) -> TesseraUI.TesseraUIResult"
          },
          {
           "children": [
@@ -3306,7 +3306,7 @@
         ],
         "kind": "TypeFunc",
         "name": "Function",
-        "printedName": "(TesseraUI.TesseraUIResult.Type) -> (Tessera.MrzScanResultDecoded) -> TesseraUI.TesseraUIResult"
+        "printedName": "(TesseraUI.TesseraUIResult.Type) -> (TesseraCore.MrzScanResultDecoded) -> TesseraUI.TesseraUIResult"
        }
       ],
       "declKind": "EnumElement",
@@ -3390,18 +3390,18 @@
            {
             "kind": "TypeNominal",
             "name": "MrzScanResult",
-            "printedName": "any Tessera.MrzScanResult",
+            "printedName": "any TesseraCore.MrzScanResult",
             "usr": "c:objc(pl)TesseraMrzScanResult"
            }
           ],
           "kind": "TypeNominal",
           "name": "AsyncStream",
-          "printedName": "_Concurrency.AsyncStream<any Tessera.MrzScanResult>",
+          "printedName": "_Concurrency.AsyncStream<any TesseraCore.MrzScanResult>",
           "usr": "s:ScS"
          }
         ],
         "declKind": "Accessor",
-        "genericSig": "<Self where Self : Tessera.MrzCameraScanner>",
+        "genericSig": "<Self where Self : TesseraCore.MrzCameraScanner>",
         "isFromExtension": true,
         "kind": "Accessor",
         "mangledName": "$sSo23TesseraMrzCameraScannerP0A2UIE12resultStreamScSySo0aB10ScanResult_pGvg",
@@ -3417,13 +3417,13 @@
          {
           "kind": "TypeNominal",
           "name": "MrzScanResult",
-          "printedName": "any Tessera.MrzScanResult",
+          "printedName": "any TesseraCore.MrzScanResult",
           "usr": "c:objc(pl)TesseraMrzScanResult"
          }
         ],
         "kind": "TypeNominal",
         "name": "AsyncStream",
-        "printedName": "_Concurrency.AsyncStream<any Tessera.MrzScanResult>",
+        "printedName": "_Concurrency.AsyncStream<any TesseraCore.MrzScanResult>",
         "usr": "s:ScS"
        }
       ],
@@ -3446,7 +3446,7 @@
     "genericSig": "<Self : AnyObject>",
     "isExternal": true,
     "kind": "TypeDecl",
-    "moduleName": "Tessera",
+    "moduleName": "TesseraCore",
     "name": "MrzCameraScanner",
     "objc_name": "TesseraMrzCameraScanner",
     "printedName": "MrzCameraScanner",

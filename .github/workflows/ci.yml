@@ -30,7 +30,7 @@ jobs:
       # simulator runtime with iPhone 17; https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md).
       # The Kotlin Multiplatform compatibility table lists Xcode 26.4 for Kotlin 2.4.20-2.4.21
       # (https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html), and the
-      # main repository builds the Tessera XCFramework with the same Xcode. The swift-api-digester baseline
+      # main repository builds the TesseraCore XCFramework with the same Xcode. The swift-api-digester baseline
       # is also Xcode-version sensitive: bump XCODE_VERSION and regenerate api/TesseraUI.baseline.json together.
       XCODE_VERSION: "26.4.1"
       SIMULATOR: "iPhone 17"

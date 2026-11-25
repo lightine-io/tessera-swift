@@ -1,5 +1,5 @@
 import Foundation
-import Tessera
+import TesseraCore
 
 /// What a read does when the link to the chip is lost, usually because the document moved.
 /// Mirrors `LinkLossPolicy`.

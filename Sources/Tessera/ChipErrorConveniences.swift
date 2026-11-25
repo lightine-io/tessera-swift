@@ -1,5 +1,5 @@
 import Foundation
-import Tessera
+import TesseraCore
 
 extension ChipError {
     /// The chip's status word as an `Int`, or `nil` when the error has none. (The Kotlin

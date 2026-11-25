@@ -1,5 +1,5 @@
 import Foundation
-import Tessera
+import TesseraCore
 
 /// Where a chip read is, as a Swift `enum` you can `switch` over.
 ///
@@ -47,7 +47,7 @@ public enum ChipReadPhase: Sendable, Equatable {
     case starting
     /// The read is stopping.
     case stopping
-    /// A state this version of `TesseraKit` does not know. Read the raw update for the object.
+    /// A state this version of `Tessera` does not know. Read the raw update for the object.
     case unknown
 
     // The value conversions, apart from the type switch, so a test can run them without a Kotlin
@@ -212,7 +212,7 @@ public enum ChipReadOutcome {
     case endedBySystem(NfcError)
     /// The read could not start. The reason says why, for example that NFC is not available.
     case notStarted(NfcUnavailable.Reason)
-    /// An ending this version of `TesseraKit` does not know. Read ``ChipReadFinish/raw``.
+    /// An ending this version of `Tessera` does not know. Read ``ChipReadFinish/raw``.
     case unknown
 
     /// Maps a raw object. It takes `Any` so a test can pass something that is not an ending.
@@ -337,19 +337,19 @@ public enum ChipReadReadiness: @unchecked Sendable, Equatable {
     case readInProgress
     /// A read cannot start on this device, for this reason (the same as ``ChipReading/availability``).
     case unavailable(NfcUnavailable.Reason)
-    /// A value this version of `TesseraKit` does not know.
+    /// A value this version of `Tessera` does not know.
     case unknown
 
     static func notYet(remainingMillis: Int64) -> ChipReadReadiness {
         .notYet(remaining: TimeInterval(remainingMillis) / 1000)
     }
 
-    init(_ readiness: Tessera.ChipReadReadiness) {
+    init(_ readiness: TesseraCore.ChipReadReadiness) {
         switch readiness {
-        case is Tessera.ChipReadReadiness.Ready: self = .ready
-        case let value as Tessera.ChipReadReadiness.NotYet: self = .notYet(remainingMillis: value.remainingMillis)
-        case is Tessera.ChipReadReadiness.ReadInProgress: self = .readInProgress
-        case let value as Tessera.ChipReadReadiness.Unavailable: self = .unavailable(value.reason)
+        case is TesseraCore.ChipReadReadiness.Ready: self = .ready
+        case let value as TesseraCore.ChipReadReadiness.NotYet: self = .notYet(remainingMillis: value.remainingMillis)
+        case is TesseraCore.ChipReadReadiness.ReadInProgress: self = .readInProgress
+        case let value as TesseraCore.ChipReadReadiness.Unavailable: self = .unavailable(value.reason)
         default: self = .unknown
         }
     }

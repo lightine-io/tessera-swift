@@ -1,7 +1,6 @@
 import Foundation
 import Testing
-import Tessera
-@testable import TesseraKit
+@testable import Tessera
 
 /// The core behind `ChipReading`, driven directly with plain values (`Int` updates, `String` ending),
 /// because Swift code cannot build Kotlin update objects. No NFC needed.

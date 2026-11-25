@@ -1,6 +1,5 @@
 import Foundation
-import Tessera
-@testable import TesseraKit
+@testable import Tessera
 
 // The package supports iOS 15: thread-safe state uses an `NSLock`, not `Mutex` (iOS 18), and waits use
 // `Task.sleep(nanoseconds:)`, not `Duration` (iOS 16).
