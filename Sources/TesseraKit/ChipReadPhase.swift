@@ -39,6 +39,10 @@ public enum ChipReadPhase: Sendable, Equatable {
     /// restarts. `tries` is how many commands went unanswered so far. A good line for a person:
     /// "Move the document slowly", then "Stay there" once the read goes on.
     case noAnswerYet(tries: Int)
+    /// The read is closing its system session and opening a new one, because no document was
+    /// reported. The system sheet closes and opens again. `renewal` is the number of the new session,
+    /// from 1. A good line for a person: "Searching again".
+    case renewingSession(renewal: Int)
     /// The read is starting.
     case starting
     /// The read is stopping.
@@ -64,6 +68,8 @@ public enum ChipReadPhase: Sendable, Equatable {
 
     static func noAnswer(tries: Int32) -> ChipReadPhase { .noAnswerYet(tries: Int(tries)) }
 
+    static func renewing(renewal: Int32) -> ChipReadPhase { .renewingSession(renewal: Int(renewal)) }
+
     /// Maps a raw object. It takes `Any` so a test can pass something that is not a state.
     static func from(_ object: Any) -> ChipReadPhase {
         switch object {
@@ -76,6 +82,7 @@ public enum ChipReadPhase: Sendable, Equatable {
         case is ChipReadState.AuthenticatingChip: return .authenticatingChip
         case is ChipReadState.CheckingFiles: return .checkingFiles
         case let state as ChipReadState.NoAnswerYet: return noAnswer(tries: state.tries)
+        case let state as ChipReadState.RenewingSession: return renewing(renewal: state.renewal)
         case let state as ChipReadState.LinkLost: return lost(restartsLeft: state.restartsLeft)
         case is ChipReadState.Starting: return .starting
         case is ChipReadState.Stopping: return .stopping
@@ -305,4 +312,45 @@ extension ChipReadProgress {
     /// The progress as a whole percent, 0 to 100, as an `Int`. (The Kotlin `percent` is an `Int32`
     /// and `fraction`, from 0 to 1, is already a `Double`.)
     public var percentInt: Int { Int(percent) }
+}
+
+/// Whether a new chip read started now is expected to begin at once. Mirrors `ChipReadReadiness`.
+///
+/// It is the SDK's own bookkeeping, stated as facts, not a promise from the system: a start is
+/// always allowed. The Kotlin type may gain members in a later release, so `switch` needs a `default`
+/// or the `.unknown` case.
+///
+/// ```swift
+/// Button("Read the chip") { start() }
+///     .disabled(readiness != .ready)
+/// ```
+///
+/// - Since: 1.0.0
+public enum ChipReadReadiness: @unchecked Sendable, Equatable {
+    /// A read started now begins its system session at once.
+    case ready
+    /// No read is running, but a new one would wait first. `remaining` is the longest that wait is,
+    /// as the SDK counts it now: at least 0.001 seconds.
+    case notYet(remaining: TimeInterval)
+    /// A read is running in this app: a new start now ends at once with `.notStarted` and the reason
+    /// `READ_IN_PROGRESS`.
+    case readInProgress
+    /// A read cannot start on this device, for this reason (the same as ``ChipReading/availability``).
+    case unavailable(NfcUnavailable.Reason)
+    /// A value this version of `TesseraKit` does not know.
+    case unknown
+
+    static func notYet(remainingMillis: Int64) -> ChipReadReadiness {
+        .notYet(remaining: TimeInterval(remainingMillis) / 1000)
+    }
+
+    init(_ readiness: Tessera.ChipReadReadiness) {
+        switch readiness {
+        case is Tessera.ChipReadReadiness.Ready: self = .ready
+        case let value as Tessera.ChipReadReadiness.NotYet: self = .notYet(remainingMillis: value.remainingMillis)
+        case is Tessera.ChipReadReadiness.ReadInProgress: self = .readInProgress
+        case let value as Tessera.ChipReadReadiness.Unavailable: self = .unavailable(value.reason)
+        default: self = .unknown
+        }
+    }
 }

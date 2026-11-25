@@ -4393,6 +4393,63 @@
        {
         "children": [
          {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipReadPhase",
+            "printedName": "TesseraKit.ChipReadPhase",
+            "usr": "s:10TesseraKit13ChipReadPhaseO"
+           },
+           {
+            "children": [
+             {
+              "kind": "TypeNominal",
+              "name": "Int",
+              "printedName": "Swift.Int",
+              "usr": "s:Si"
+             }
+            ],
+            "kind": "TypeNominal",
+            "name": "Tuple",
+            "printedName": "(renewal: Swift.Int)"
+           }
+          ],
+          "kind": "TypeFunc",
+          "name": "Function",
+          "printedName": "(Swift.Int) -> TesseraKit.ChipReadPhase"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipReadPhase",
+            "printedName": "TesseraKit.ChipReadPhase",
+            "usr": "s:10TesseraKit13ChipReadPhaseO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.ChipReadPhase.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.ChipReadPhase.Type) -> (Swift.Int) -> TesseraKit.ChipReadPhase"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit13ChipReadPhaseO15renewingSessionyACSi_tcACmF",
+      "moduleName": "TesseraKit",
+      "name": "renewingSession",
+      "printedName": "renewingSession",
+      "usr": "s:10TesseraKit13ChipReadPhaseO15renewingSessionyACSi_tcACmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
           "kind": "TypeNominal",
           "name": "ChipReadPhase",
           "printedName": "TesseraKit.ChipReadPhase",
@@ -6308,6 +6365,301 @@
         "children": [
          {
           "kind": "TypeNominal",
+          "name": "ChipReadReadiness",
+          "printedName": "TesseraKit.ChipReadReadiness",
+          "usr": "s:10TesseraKit17ChipReadReadinessO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipReadReadiness",
+            "printedName": "TesseraKit.ChipReadReadiness",
+            "usr": "s:10TesseraKit17ChipReadReadinessO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.ChipReadReadiness.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.ChipReadReadiness.Type) -> TesseraKit.ChipReadReadiness"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit17ChipReadReadinessO5readyyA2CmF",
+      "moduleName": "TesseraKit",
+      "name": "ready",
+      "printedName": "ready",
+      "usr": "s:10TesseraKit17ChipReadReadinessO5readyyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipReadReadiness",
+            "printedName": "TesseraKit.ChipReadReadiness",
+            "usr": "s:10TesseraKit17ChipReadReadinessO"
+           },
+           {
+            "children": [
+             {
+              "children": [
+               {
+                "kind": "TypeNominal",
+                "name": "Double",
+                "printedName": "Swift.Double",
+                "usr": "s:Sd"
+               }
+              ],
+              "kind": "TypeNameAlias",
+              "name": "TimeInterval",
+              "printedName": "Foundation.TimeInterval"
+             }
+            ],
+            "kind": "TypeNominal",
+            "name": "Tuple",
+            "printedName": "(remaining: Foundation.TimeInterval)"
+           }
+          ],
+          "kind": "TypeFunc",
+          "name": "Function",
+          "printedName": "(Foundation.TimeInterval) -> TesseraKit.ChipReadReadiness"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipReadReadiness",
+            "printedName": "TesseraKit.ChipReadReadiness",
+            "usr": "s:10TesseraKit17ChipReadReadinessO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.ChipReadReadiness.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.ChipReadReadiness.Type) -> (Foundation.TimeInterval) -> TesseraKit.ChipReadReadiness"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit17ChipReadReadinessO6notYetyACSd_tcACmF",
+      "moduleName": "TesseraKit",
+      "name": "notYet",
+      "printedName": "notYet",
+      "usr": "s:10TesseraKit17ChipReadReadinessO6notYetyACSd_tcACmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipReadReadiness",
+          "printedName": "TesseraKit.ChipReadReadiness",
+          "usr": "s:10TesseraKit17ChipReadReadinessO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipReadReadiness",
+            "printedName": "TesseraKit.ChipReadReadiness",
+            "usr": "s:10TesseraKit17ChipReadReadinessO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.ChipReadReadiness.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.ChipReadReadiness.Type) -> TesseraKit.ChipReadReadiness"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit17ChipReadReadinessO14readInProgressyA2CmF",
+      "moduleName": "TesseraKit",
+      "name": "readInProgress",
+      "printedName": "readInProgress",
+      "usr": "s:10TesseraKit17ChipReadReadinessO14readInProgressyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipReadReadiness",
+            "printedName": "TesseraKit.ChipReadReadiness",
+            "usr": "s:10TesseraKit17ChipReadReadinessO"
+           },
+           {
+            "kind": "TypeNominal",
+            "name": "Reason",
+            "printedName": "Tessera.NfcUnavailable.Reason",
+            "usr": "c:objc(cs)TesseraNfcUnavailableReason"
+           }
+          ],
+          "kind": "TypeFunc",
+          "name": "Function",
+          "printedName": "(Tessera.NfcUnavailable.Reason) -> TesseraKit.ChipReadReadiness"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipReadReadiness",
+            "printedName": "TesseraKit.ChipReadReadiness",
+            "usr": "s:10TesseraKit17ChipReadReadinessO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.ChipReadReadiness.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.ChipReadReadiness.Type) -> (Tessera.NfcUnavailable.Reason) -> TesseraKit.ChipReadReadiness"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit17ChipReadReadinessO11unavailableyACSo0A20NfcUnavailableReasonCcACmF",
+      "moduleName": "TesseraKit",
+      "name": "unavailable",
+      "printedName": "unavailable",
+      "usr": "s:10TesseraKit17ChipReadReadinessO11unavailableyACSo0A20NfcUnavailableReasonCcACmF"
+     },
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipReadReadiness",
+          "printedName": "TesseraKit.ChipReadReadiness",
+          "usr": "s:10TesseraKit17ChipReadReadinessO"
+         },
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipReadReadiness",
+            "printedName": "TesseraKit.ChipReadReadiness",
+            "usr": "s:10TesseraKit17ChipReadReadinessO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Metatype",
+          "printedName": "TesseraKit.ChipReadReadiness.Type"
+         }
+        ],
+        "kind": "TypeFunc",
+        "name": "Function",
+        "printedName": "(TesseraKit.ChipReadReadiness.Type) -> TesseraKit.ChipReadReadiness"
+       }
+      ],
+      "declKind": "EnumElement",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit17ChipReadReadinessO7unknownyA2CmF",
+      "moduleName": "TesseraKit",
+      "name": "unknown",
+      "printedName": "unknown",
+      "usr": "s:10TesseraKit17ChipReadReadinessO7unknownyA2CmF"
+     },
+     {
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Bool",
+        "printedName": "Swift.Bool",
+        "usr": "s:Sb"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "ChipReadReadiness",
+        "printedName": "TesseraKit.ChipReadReadiness",
+        "usr": "s:10TesseraKit17ChipReadReadinessO"
+       },
+       {
+        "kind": "TypeNominal",
+        "name": "ChipReadReadiness",
+        "printedName": "TesseraKit.ChipReadReadiness",
+        "usr": "s:10TesseraKit17ChipReadReadinessO"
+       }
+      ],
+      "declAttributes": [
+       "Implements"
+      ],
+      "declKind": "Func",
+      "funcSelfKind": "NonMutating",
+      "implicit": true,
+      "kind": "Function",
+      "mangledName": "$s10TesseraKit17ChipReadReadinessO21__derived_enum_equalsySbAC_ACtFZ",
+      "moduleName": "TesseraKit",
+      "name": "__derived_enum_equals",
+      "printedName": "__derived_enum_equals(_:_:)",
+      "static": true,
+      "usr": "s:10TesseraKit17ChipReadReadinessO21__derived_enum_equalsySbAC_ACtFZ"
+     }
+    ],
+    "conformances": [
+     {
+      "kind": "Conformance",
+      "mangledName": "$sSQ",
+      "name": "Equatable",
+      "printedName": "Equatable",
+      "usr": "s:SQ"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss16SendableMetatypeP",
+      "name": "SendableMetatype",
+      "printedName": "SendableMetatype",
+      "usr": "s:s16SendableMetatypeP"
+     },
+     {
+      "kind": "Conformance",
+      "mangledName": "$ss8SendableP",
+      "name": "Sendable",
+      "printedName": "Sendable",
+      "usr": "s:s8SendableP"
+     }
+    ],
+    "declKind": "Enum",
+    "isEnumExhaustive": true,
+    "kind": "TypeDecl",
+    "mangledName": "$s10TesseraKit17ChipReadReadinessO",
+    "moduleName": "TesseraKit",
+    "name": "ChipReadReadiness",
+    "printedName": "ChipReadReadiness",
+    "usr": "s:10TesseraKit17ChipReadReadinessO"
+   },
+   {
+    "children": [
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
           "name": "LinkLoss",
           "printedName": "TesseraKit.LinkLoss",
           "usr": "s:10TesseraKit8LinkLossO"
@@ -7640,6 +7992,314 @@
         "accessorKind": "get",
         "children": [
          {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit16ChipReadSettingsV18maxSessionRenewalsSivg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit16ChipReadSettingsV18maxSessionRenewalsSivg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit16ChipReadSettingsV18maxSessionRenewalsSivs",
+        "moduleName": "TesseraKit",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:10TesseraKit16ChipReadSettingsV18maxSessionRenewalsSivs"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "Int",
+        "printedName": "Swift.Int",
+        "usr": "s:Si"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit16ChipReadSettingsV18maxSessionRenewalsSivp",
+      "moduleName": "TesseraKit",
+      "name": "maxSessionRenewals",
+      "printedName": "maxSessionRenewals",
+      "usr": "s:10TesseraKit16ChipReadSettingsV18maxSessionRenewalsSivp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "kind": "TypeNominal",
+              "name": "Double",
+              "printedName": "Swift.Double",
+              "usr": "s:Sd"
+             }
+            ],
+            "kind": "TypeNameAlias",
+            "name": "TimeInterval",
+            "printedName": "Foundation.TimeInterval"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Foundation.TimeInterval?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit16ChipReadSettingsV12sessionRenewSdSgvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit16ChipReadSettingsV12sessionRenewSdSgvg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "kind": "TypeNominal",
+              "name": "Double",
+              "printedName": "Swift.Double",
+              "usr": "s:Sd"
+             }
+            ],
+            "kind": "TypeNameAlias",
+            "name": "TimeInterval",
+            "printedName": "Foundation.TimeInterval"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Foundation.TimeInterval?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit16ChipReadSettingsV12sessionRenewSdSgvs",
+        "moduleName": "TesseraKit",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:10TesseraKit16ChipReadSettingsV12sessionRenewSdSgvs"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Double",
+            "printedName": "Swift.Double",
+            "usr": "s:Sd"
+           }
+          ],
+          "kind": "TypeNameAlias",
+          "name": "TimeInterval",
+          "printedName": "Foundation.TimeInterval"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Foundation.TimeInterval?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declAttributes": [
+       "HasInitialValue",
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit16ChipReadSettingsV12sessionRenewSdSgvp",
+      "moduleName": "TesseraKit",
+      "name": "sessionRenew",
+      "printedName": "sessionRenew",
+      "usr": "s:10TesseraKit16ChipReadSettingsV12sessionRenewSdSgvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "kind": "TypeNominal",
+              "name": "Double",
+              "printedName": "Swift.Double",
+              "usr": "s:Sd"
+             }
+            ],
+            "kind": "TypeNameAlias",
+            "name": "TimeInterval",
+            "printedName": "Foundation.TimeInterval"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Foundation.TimeInterval?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit16ChipReadSettingsV9busyRetrySdSgvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit16ChipReadSettingsV9busyRetrySdSgvg"
+       },
+       {
+        "accessorKind": "set",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Void",
+          "printedName": "()"
+         },
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "kind": "TypeNominal",
+              "name": "Double",
+              "printedName": "Swift.Double",
+              "usr": "s:Sd"
+             }
+            ],
+            "kind": "TypeNameAlias",
+            "name": "TimeInterval",
+            "printedName": "Foundation.TimeInterval"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Foundation.TimeInterval?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit16ChipReadSettingsV9busyRetrySdSgvs",
+        "moduleName": "TesseraKit",
+        "name": "Set",
+        "printedName": "Set()",
+        "usr": "s:10TesseraKit16ChipReadSettingsV9busyRetrySdSgvs"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Double",
+            "printedName": "Swift.Double",
+            "usr": "s:Sd"
+           }
+          ],
+          "kind": "TypeNameAlias",
+          "name": "TimeInterval",
+          "printedName": "Foundation.TimeInterval"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Foundation.TimeInterval?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declAttributes": [
+       "HasInitialValue",
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit16ChipReadSettingsV9busyRetrySdSgvp",
+      "moduleName": "TesseraKit",
+      "name": "busyRetry",
+      "printedName": "busyRetry",
+      "usr": "s:10TesseraKit16ChipReadSettingsV9busyRetrySdSgvp"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
           "children": [
            {
             "kind": "TypeNominal",
@@ -7931,16 +8591,67 @@
         "name": "ChipReadPolling",
         "printedName": "TesseraKit.ChipReadPolling",
         "usr": "s:10TesseraKit15ChipReadPollingO"
+       },
+       {
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Int",
+        "printedName": "Swift.Int",
+        "usr": "s:Si"
+       },
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Double",
+            "printedName": "Swift.Double",
+            "usr": "s:Sd"
+           }
+          ],
+          "kind": "TypeNameAlias",
+          "name": "TimeInterval",
+          "printedName": "Foundation.TimeInterval"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Foundation.TimeInterval?",
+        "usr": "s:Sq"
+       },
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Double",
+            "printedName": "Swift.Double",
+            "usr": "s:Sd"
+           }
+          ],
+          "kind": "TypeNameAlias",
+          "name": "TimeInterval",
+          "printedName": "Foundation.TimeInterval"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Foundation.TimeInterval?",
+        "usr": "s:Sq"
        }
       ],
       "declKind": "Constructor",
       "init_kind": "Designated",
       "kind": "Constructor",
-      "mangledName": "$s10TesseraKit16ChipReadSettingsV8linkLoss11settleDelay14commandTimeout0jK12BeforeAccess18waitAfterSystemEnd9telemetry04readK013searchRestart7pollingAcA04LinkG0O_S4dSo0A13TelemetrySink_pSgS2dSgAA0cD7PollingOtcfc",
+      "mangledName": "$s10TesseraKit16ChipReadSettingsV8linkLoss11settleDelay14commandTimeout0jK12BeforeAccess18waitAfterSystemEnd9telemetry04readK013searchRestart7polling18maxSessionRenewals12sessionRenew9busyRetryAcA04LinkG0O_S4dSo0A13TelemetrySink_pSgS2dSgAA0cD7PollingOSiA2Ttcfc",
       "moduleName": "TesseraKit",
       "name": "init",
-      "printedName": "init(linkLoss:settleDelay:commandTimeout:commandTimeoutBeforeAccess:waitAfterSystemEnd:telemetry:readTimeout:searchRestart:polling:)",
-      "usr": "s:10TesseraKit16ChipReadSettingsV8linkLoss11settleDelay14commandTimeout0jK12BeforeAccess18waitAfterSystemEnd9telemetry04readK013searchRestart7pollingAcA04LinkG0O_S4dSo0A13TelemetrySink_pSgS2dSgAA0cD7PollingOtcfc"
+      "printedName": "init(linkLoss:settleDelay:commandTimeout:commandTimeoutBeforeAccess:waitAfterSystemEnd:telemetry:readTimeout:searchRestart:polling:maxSessionRenewals:sessionRenew:busyRetry:)",
+      "usr": "s:10TesseraKit16ChipReadSettingsV8linkLoss11settleDelay14commandTimeout0jK12BeforeAccess18waitAfterSystemEnd9telemetry04readK013searchRestart7polling18maxSessionRenewals12sessionRenew9busyRetryAcA04LinkG0O_S4dSo0A13TelemetrySink_pSgS2dSgAA0cD7PollingOSiA2Ttcfc"
      },
      {
       "accessors": [
@@ -8791,6 +9502,68 @@
       "usr": "s:10TesseraKit17ChipReadStepEventV10systemCodeSiSgvp"
      },
      {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "Int",
+            "printedName": "Swift.Int",
+            "usr": "s:Si"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "Optional",
+          "printedName": "Swift.Int?",
+          "usr": "s:Sq"
+         }
+        ],
+        "declAttributes": [
+         "Transparent"
+        ],
+        "declKind": "Accessor",
+        "implicit": true,
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit17ChipReadStepEventV7renewalSiSgvg",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "usr": "s:10TesseraKit17ChipReadStepEventV7renewalSiSgvg"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Swift.Int?",
+        "usr": "s:Sq"
+       }
+      ],
+      "declAttributes": [
+       "HasStorage"
+      ],
+      "declKind": "Var",
+      "hasStorage": true,
+      "isLet": true,
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit17ChipReadStepEventV7renewalSiSgvp",
+      "moduleName": "TesseraKit",
+      "name": "renewal",
+      "printedName": "renewal",
+      "usr": "s:10TesseraKit17ChipReadStepEventV7renewalSiSgvp"
+     },
+     {
       "children": [
        {
         "kind": "TypeNominal",
@@ -8891,16 +9664,31 @@
         "name": "Optional",
         "printedName": "Swift.Int?",
         "usr": "s:Sq"
+       },
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "Int",
+          "printedName": "Swift.Int",
+          "usr": "s:Si"
+         }
+        ],
+        "hasDefaultArg": true,
+        "kind": "TypeNominal",
+        "name": "Optional",
+        "printedName": "Swift.Int?",
+        "usr": "s:Sq"
        }
       ],
       "declKind": "Constructor",
       "init_kind": "Designated",
       "kind": "Constructor",
-      "mangledName": "$s10TesseraKit17ChipReadStepEventV4step7outcome8protocol6fileId9byteCount10statusWord14durationMillis10systemCodeACSS_AA0cdE6ResultOSSSgSiSgA2Os5Int64VAOtcfc",
+      "mangledName": "$s10TesseraKit17ChipReadStepEventV4step7outcome8protocol6fileId9byteCount10statusWord14durationMillis10systemCode7renewalACSS_AA0cdE6ResultOSSSgSiSgA2Ps5Int64VA2Ptcfc",
       "moduleName": "TesseraKit",
       "name": "init",
-      "printedName": "init(step:outcome:protocol:fileId:byteCount:statusWord:durationMillis:systemCode:)",
-      "usr": "s:10TesseraKit17ChipReadStepEventV4step7outcome8protocol6fileId9byteCount10statusWord14durationMillis10systemCodeACSS_AA0cdE6ResultOSSSgSiSgA2Os5Int64VAOtcfc"
+      "printedName": "init(step:outcome:protocol:fileId:byteCount:statusWord:durationMillis:systemCode:renewal:)",
+      "usr": "s:10TesseraKit17ChipReadStepEventV4step7outcome8protocol6fileId9byteCount10statusWord14durationMillis10systemCode7renewalACSS_AA0cdE6ResultOSSSgSiSgA2Ps5Int64VA2Ptcfc"
      },
      {
       "children": [
@@ -9709,6 +10497,112 @@
       "printedName": "availability",
       "static": true,
       "usr": "s:10TesseraKit11ChipReadingC12availabilitySo0A20NfcUnavailableReasonCSgvpZ"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipReadReadiness",
+          "printedName": "TesseraKit.ChipReadReadiness",
+          "usr": "s:10TesseraKit17ChipReadReadinessO"
+         }
+        ],
+        "declAttributes": [
+         "Final"
+        ],
+        "declKind": "Accessor",
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit11ChipReadingC9readinessAA0C13ReadReadinessOvgZ",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "static": true,
+        "usr": "s:10TesseraKit11ChipReadingC9readinessAA0C13ReadReadinessOvgZ"
+       }
+      ],
+      "children": [
+       {
+        "kind": "TypeNominal",
+        "name": "ChipReadReadiness",
+        "printedName": "TesseraKit.ChipReadReadiness",
+        "usr": "s:10TesseraKit17ChipReadReadinessO"
+       }
+      ],
+      "declAttributes": [
+       "Final"
+      ],
+      "declKind": "Var",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit11ChipReadingC9readinessAA0C13ReadReadinessOvpZ",
+      "moduleName": "TesseraKit",
+      "name": "readiness",
+      "printedName": "readiness",
+      "static": true,
+      "usr": "s:10TesseraKit11ChipReadingC9readinessAA0C13ReadReadinessOvpZ"
+     },
+     {
+      "accessors": [
+       {
+        "accessorKind": "get",
+        "children": [
+         {
+          "children": [
+           {
+            "kind": "TypeNominal",
+            "name": "ChipReadReadiness",
+            "printedName": "TesseraKit.ChipReadReadiness",
+            "usr": "s:10TesseraKit17ChipReadReadinessO"
+           }
+          ],
+          "kind": "TypeNominal",
+          "name": "AsyncStream",
+          "printedName": "_Concurrency.AsyncStream<TesseraKit.ChipReadReadiness>",
+          "usr": "s:ScS"
+         }
+        ],
+        "declAttributes": [
+         "Final"
+        ],
+        "declKind": "Accessor",
+        "kind": "Accessor",
+        "mangledName": "$s10TesseraKit11ChipReadingC16readinessUpdatesScSyAA0C13ReadReadinessOGvgZ",
+        "moduleName": "TesseraKit",
+        "name": "Get",
+        "printedName": "Get()",
+        "static": true,
+        "usr": "s:10TesseraKit11ChipReadingC16readinessUpdatesScSyAA0C13ReadReadinessOGvgZ"
+       }
+      ],
+      "children": [
+       {
+        "children": [
+         {
+          "kind": "TypeNominal",
+          "name": "ChipReadReadiness",
+          "printedName": "TesseraKit.ChipReadReadiness",
+          "usr": "s:10TesseraKit17ChipReadReadinessO"
+         }
+        ],
+        "kind": "TypeNominal",
+        "name": "AsyncStream",
+        "printedName": "_Concurrency.AsyncStream<TesseraKit.ChipReadReadiness>",
+        "usr": "s:ScS"
+       }
+      ],
+      "declAttributes": [
+       "Final"
+      ],
+      "declKind": "Var",
+      "kind": "Var",
+      "mangledName": "$s10TesseraKit11ChipReadingC16readinessUpdatesScSyAA0C13ReadReadinessOGvpZ",
+      "moduleName": "TesseraKit",
+      "name": "readinessUpdates",
+      "printedName": "readinessUpdates",
+      "static": true,
+      "usr": "s:10TesseraKit11ChipReadingC16readinessUpdatesScSyAA0C13ReadReadinessOGvpZ"
      },
      {
       "children": [

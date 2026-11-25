@@ -96,6 +96,34 @@ public final class ChipReading: Sendable {
         CoreNfcChipRead.companion.availability()
     }
 
+    /// Whether a read started now is expected to begin at once, as a value: for a "read the chip"
+    /// button. On iPhone the system needs a short wait between sessions, and this says when it is over.
+    /// A start is always allowed, and one made while this is ``ChipReadReadiness/notYet(remaining:)``
+    /// waits for the same time, so nothing is lost by starting early. Use ``readinessUpdates`` to hear
+    /// when it changes.
+    public static var readiness: ChipReadReadiness {
+        ChipReadReadiness(CoreNfcChipRead.companion.readiness())
+    }
+
+    /// The readiness now, then each change, as a stream: bind a button to it.
+    ///
+    /// The first value is the current one; after that a value comes once per change of kind (for
+    /// example from ``ChipReadReadiness/readInProgress`` to ``ChipReadReadiness/notYet(remaining:)``
+    /// to ``ChipReadReadiness/ready``), never twice in a row with the same kind. When the stream ends
+    /// (its task is cancelled or the loop is left) the listener is removed.
+    ///
+    /// Each read of this property makes a new stream with its own listener.
+    public static var readinessUpdates: AsyncStream<ChipReadReadiness> {
+        AsyncStream(bufferingPolicy: .bufferingNewest(1)) { continuation in
+            let listener = ReadinessListener { continuation.yield($0) }
+            // Listen first, then ask for the value now, so no change falls between the two.
+            let registration = CoreNfcChipRead.companion.addReadinessListener(listener: listener)
+            continuation.yield(readiness)
+            let box = RegistrationBox(registration)
+            continuation.onTermination = { _ in box.remove() }
+        }
+    }
+
     /// Starts reading the chip. The system NFC sheet opens at once.
     ///
     /// The key inside `options` is cleared when the read ends: a new read needs a new key.
@@ -105,7 +133,7 @@ public final class ChipReading: Sendable {
     ///   - texts: The words on the system sheet. `nil` uses the built-in English texts.
     ///     Use ``ChipReadTexts`` for your own.
     ///   - settings: How the read behaves around the radio. The default is
-    ///     ``ChipReadSettings/init(linkLoss:settleDelay:commandTimeout:commandTimeoutBeforeAccess:waitAfterSystemEnd:telemetry:readTimeout:searchRestart:polling:)``
+    ///     ``ChipReadSettings/init(linkLoss:settleDelay:commandTimeout:commandTimeoutBeforeAccess:waitAfterSystemEnd:telemetry:readTimeout:searchRestart:polling:maxSessionRenewals:sessionRenew:busyRetry:)``
     ///     with no arguments.
     /// - Returns: The running read. A read that cannot start still returns: its ending says why.
     public static func start(
@@ -198,4 +226,23 @@ final class ChipReadObserverBridge: NSObject, ChipReadObserver, Sendable {
     func onEnding(ending: ChipReadEnding) {
         core.finish(ChipReadFinish(ending))
     }
+}
+
+/// Passes each Kotlin readiness change to a closure. The Kotlin side calls it on the main queue.
+private final class ReadinessListener: NSObject, Tessera.ChipReadReadinessListener, @unchecked Sendable {
+    // Immutable after init, and the closure is `@Sendable`.
+    private let handler: @Sendable (ChipReadReadiness) -> Void
+    init(_ handler: @escaping @Sendable (ChipReadReadiness) -> Void) { self.handler = handler }
+
+    func onReadinessChanged(readiness: Tessera.ChipReadReadiness) {
+        handler(ChipReadReadiness(readiness))
+    }
+}
+
+/// Holds the Kotlin registration so the stream can remove it from any thread; the Kotlin `remove()`
+/// is safe to call more than once and from any thread.
+private final class RegistrationBox: @unchecked Sendable {
+    private let registration: any Tessera.ChipReadReadinessRegistration
+    init(_ registration: any Tessera.ChipReadReadinessRegistration) { self.registration = registration }
+    func remove() { registration.remove() }
 }

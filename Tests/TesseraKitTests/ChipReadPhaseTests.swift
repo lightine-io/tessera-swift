@@ -49,6 +49,35 @@ struct ChipReadPhaseTests {
         #expect(ChipReadPhase.noAnswer(tries: 1) != .noAnswerYet(tries: 2))
     }
 
+    @Test func renewingSessionCarriesTheRenewal() {
+        #expect(ChipReadPhase.renewing(renewal: 2) == .renewingSession(renewal: 2))
+        #expect(ChipReadPhase.renewing(renewal: 1) != .renewingSession(renewal: 2))
+    }
+
+    @Test func readinessMapsFromTheKotlinValues() {
+        #expect(TesseraKit.ChipReadReadiness(Tessera.ChipReadReadiness.Ready.shared) == .ready)
+        #expect(TesseraKit.ChipReadReadiness(Tessera.ChipReadReadiness.ReadInProgress.shared) == .readInProgress)
+        #expect(TesseraKit.ChipReadReadiness.notYet(remainingMillis: 1_500) == .notYet(remaining: 1.5))
+        #expect(TesseraKit.ChipReadReadiness.notYet(remainingMillis: 1) != .ready)
+    }
+
+    @Test func readinessNowIsReadyOrExplainsWhy() {
+        // A simulator has no NFC: the same reason as `availability`.
+        switch ChipReading.readiness {
+        case .unavailable(let reason): #expect(ChipReading.availability === reason)
+        case .ready, .notYet, .readInProgress, .unknown: #expect(ChipReading.availability == nil)
+        }
+    }
+
+    @Test func theReadinessStreamStartsWithTheValueNow() async {
+        var first: TesseraKit.ChipReadReadiness?
+        for await value in ChipReading.readinessUpdates {
+            first = value
+            break // ending the loop ends the stream, which removes the Kotlin listener
+        }
+        #expect(first == ChipReading.readiness)
+    }
+
     @Test func theRealStatesOfARealReadMapToACaseTheEnumKnows() async throws {
         let real = try await RealReading.sample()
         for snapshot in real.updates {

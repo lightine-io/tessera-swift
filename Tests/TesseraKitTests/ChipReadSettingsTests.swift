@@ -166,6 +166,59 @@ struct ChipReadSettingsTests {
         }
     }
 
+    @Test func theRenewalAndBusyRetryDefaultsAreTheKotlinDefaults() {
+        let swift = ChipReadSettings()
+        #expect(swift.maxSessionRenewals == Int(CoreNfcReadSettings.companion.DEFAULT_MAX_SESSION_RENEWALS))
+        #expect(swift.maxSessionRenewals == 2)
+        #expect(swift.sessionRenew == 10)
+        #expect(swift.busyRetry == 6)
+        let kotlin = swift.kotlinSettings()
+        #expect(kotlin.maxSessionRenewals == 2)
+        #expect(kotlin.sessionRenewMillis == 10_000)
+        #expect(kotlin.busyRetryMillis == 6_000)
+        let back = ChipReadSettings(CoreNfcReadSettings())
+        #expect(back.maxSessionRenewals == 2)
+        #expect(back.sessionRenew == 10)
+        #expect(back.busyRetry == 6)
+    }
+
+    @Test func renewalsAndBusyRetryCanBeTurnedOff() throws {
+        let off = ChipReadSettings(maxSessionRenewals: 0, sessionRenew: nil, busyRetry: nil).kotlinSettings()
+        #expect(off.maxSessionRenewals == 0)
+        #expect(off.sessionRenewMillis == 0)
+        #expect(off.busyRetryMillis == 0)
+        #expect(ChipReadSettings(sessionRenew: 0).kotlinSettings().sessionRenewMillis == 0)
+        #expect(ChipReadSettings(busyRetry: 0).kotlinSettings().busyRetryMillis == 0)
+        #expect(ChipReadSettings(sessionRenew: 0).normalized.sessionRenew == nil)
+        #expect(ChipReadSettings(busyRetry: 0).normalized.busyRetry == nil)
+        let kotlin = try CoreNfcReadSettings.Builder().sessionRenewMillis(millis: 0).busyRetryMillis(millis: 0).build()
+        #expect(ChipReadSettings(kotlin).sessionRenew == nil)
+        #expect(ChipReadSettings(kotlin).busyRetry == nil)
+    }
+
+    @Test func renewalValuesAreClampedAndNeverTrap() {
+        #expect(ChipReadSettings(maxSessionRenewals: -4).kotlinSettings().maxSessionRenewals == 0)
+        #expect(ChipReadSettings(maxSessionRenewals: Int.max).kotlinSettings().maxSessionRenewals == Int32.max)
+        #expect(ChipReadSettings(maxSessionRenewals: 3).normalized.maxSessionRenewals == 3)
+        #expect(ChipReadSettings(sessionRenew: 1).kotlinSettings().sessionRenewMillis == 5_000)
+        #expect(ChipReadSettings(sessionRenew: -3).normalized.sessionRenew == 5)
+        #expect(ChipReadSettings(sessionRenew: .nan).kotlinSettings().sessionRenewMillis == 5_000)
+        #expect(ChipReadSettings(sessionRenew: 7.5).kotlinSettings().sessionRenewMillis == 7_500)
+        #expect(ChipReadSettings(sessionRenew: 1e12).normalized.sessionRenew == 86_400)
+        #expect(ChipReadSettings(busyRetry: -1).kotlinSettings().busyRetryMillis == 0)
+        #expect(ChipReadSettings(busyRetry: .nan).kotlinSettings().busyRetryMillis == 0)
+        #expect(ChipReadSettings(busyRetry: 0.0004).kotlinSettings().busyRetryMillis == 1)
+        #expect(ChipReadSettings(busyRetry: 2.5).kotlinSettings().busyRetryMillis == 2_500)
+        #expect(ChipReadSettings(busyRetry: 1e12).normalized.busyRetry == 86_400)
+    }
+
+    @Test func aStepEventCarriesTheRenewal() {
+        let event = ChipReadStepEvent(step: "SESSION_RENEW", outcome: .succeeded, systemCode: 202, renewal: 1)
+        #expect(event.renewal == 1)
+        #expect(event.systemCode == 202)
+        #expect(ChipReadStepEvent(step: "SESSION_END", outcome: .failed, systemCode: 201).renewal == nil)
+    }
+
     @Test func theSwiftLayerAsksTheReaderForItsOwnThread() {
         #expect(ChipReadSettings().kotlinSettings().observerOn === ObserverThread.caller)
         #expect(ChipReadSettings(linkLoss: .end).kotlinSettings().observerOn === ObserverThread.caller)

@@ -13,6 +13,7 @@ struct ChipReadingScriptTests {
         .waitingForDocument(waited: 1.5),
         .documentFound,
         .noAnswerYet(tries: 2),
+        .renewingSession(renewal: 1),
         .readingFile(dataGroup: 1, bytesRead: 10, bytesTotal: 100),
         .linkLost(restartsLeft: 1),
         .readingFile(dataGroup: nil, bytesRead: 0, bytesTotal: nil),

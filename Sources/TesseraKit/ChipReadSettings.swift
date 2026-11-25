@@ -94,7 +94,11 @@ public enum ChipReadPolling: Sendable, Equatable, CaseIterable {
 /// - `commandTimeout`, `readTimeout` and `commandTimeoutBeforeAccess` below one millisecond (or not a
 ///   number) become one millisecond, and one above a day becomes a day;
 /// - `searchRestart` of `nil` or 0 is off; any other value below 2 seconds (or not a number) becomes
-///   2 seconds, and one above a day becomes a day.
+///   2 seconds, and one above a day becomes a day;
+/// - `maxSessionRenewals` below 0 becomes 0 (off);
+/// - `sessionRenew` of `nil` or 0 is off; any other value below 5 seconds (or not a number) becomes
+///   5 seconds, and one above a day becomes a day;
+/// - `busyRetry` of `nil`, 0, below 0 or not a number is off; one above a day becomes a day.
 ///
 /// Read ``normalized`` to see the values that will be used. Times are in seconds and are rounded to
 /// whole milliseconds for the reader.
@@ -129,6 +133,19 @@ public struct ChipReadSettings {
     /// sheet still up. Default 4 seconds. `nil` (or 0) turns it off; any other value is at least
     /// 2 seconds.
     public var searchRestart: TimeInterval?
+    /// How many times one read may close its system session and open a new one while no document was
+    /// reported (see ``ChipReadPhase/renewingSession(renewal:)``): after the system's own end with
+    /// code 202, or after ``sessionRenew`` passed. The system sheet closes and opens again. Default 2.
+    /// 0 turns renewals off. A value below 0 becomes 0.
+    public var maxSessionRenewals: Int
+    /// How long a system session may go with no document reported before the read opens a new one,
+    /// while ``maxSessionRenewals`` allows. Default 10 seconds, well before the system's own end at
+    /// about 22 seconds. `nil` (or 0) turns it off; the renewal after the system's code 202 still
+    /// happens. Any other value is at least 5 seconds.
+    public var sessionRenew: TimeInterval?
+    /// How long the read keeps trying to begin a system session that the system refuses as busy.
+    /// Default 6 seconds. `nil` (or 0) turns the tries off.
+    public var busyRetry: TimeInterval?
     /// Where the read's step events go (see ``ChipReadStepSink``); `nil` uses the sink registered in
     /// `TelemetrySinkRegistry`, which drops everything when none is registered.
     public var telemetry: (any TelemetrySink)?
@@ -144,7 +161,10 @@ public struct ChipReadSettings {
         telemetry: (any TelemetrySink)? = nil,
         readTimeout: TimeInterval = 2,
         searchRestart: TimeInterval? = 4,
-        polling: ChipReadPolling = .automatic
+        polling: ChipReadPolling = .automatic,
+        maxSessionRenewals: Int = 2,
+        sessionRenew: TimeInterval? = 10,
+        busyRetry: TimeInterval? = 6
     ) {
         self.linkLoss = linkLoss
         self.settleDelay = settleDelay
@@ -155,6 +175,9 @@ public struct ChipReadSettings {
         self.readTimeout = readTimeout
         self.searchRestart = searchRestart
         self.polling = polling
+        self.maxSessionRenewals = maxSessionRenewals
+        self.sessionRenew = sessionRenew
+        self.busyRetry = busyRetry
     }
 
     /// The Kotlin `searchRestartMillis`: 0 for off, otherwise 2000 or more.
@@ -162,6 +185,22 @@ public struct ChipReadSettings {
         guard let seconds, seconds != 0 else { return 0 }
         return millis(seconds, minimum: 2_000)
     }
+
+    /// The Kotlin `sessionRenewMillis`: 0 for off, otherwise 5000 or more.
+    private static func sessionRenewMillis(_ seconds: TimeInterval?) -> Int64 {
+        guard let seconds, seconds != 0 else { return 0 }
+        return millis(seconds, minimum: 5_000)
+    }
+
+    /// The Kotlin `busyRetryMillis`: 0 for off (also for a negative or missing number), otherwise at
+    /// least 1.
+    private static func busyRetryMillis(_ seconds: TimeInterval?) -> Int64 {
+        guard let seconds, !seconds.isNaN, seconds > 0 else { return 0 }
+        return millis(seconds, minimum: 1)
+    }
+
+    /// The Kotlin `maxSessionRenewals`: 0 or more, and it fits an `Int32`.
+    private static func renewalCount(_ count: Int) -> Int32 { Int32(clamping: max(count, 0)) }
 
     private static let maxMillis: Int64 = 86_400_000
 
@@ -184,7 +223,10 @@ public struct ChipReadSettings {
             telemetry: telemetry,
             readTimeout: TimeInterval(Self.millis(readTimeout, minimum: 1)) / 1000,
             searchRestart: searchRestart.flatMap { $0 == 0 ? nil : TimeInterval(Self.searchRestartMillis($0)) / 1000 },
-            polling: polling
+            polling: polling,
+            maxSessionRenewals: Int(Self.renewalCount(maxSessionRenewals)),
+            sessionRenew: sessionRenew.flatMap { $0 == 0 ? nil : TimeInterval(Self.sessionRenewMillis($0)) / 1000 },
+            busyRetry: Self.busyRetryMillis(busyRetry) == 0 ? nil : TimeInterval(Self.busyRetryMillis(busyRetry)) / 1000
         )
     }
 
@@ -202,6 +244,9 @@ public struct ChipReadSettings {
             .waitAfterSystemEndMillis(millis: Self.millis(waitAfterSystemEnd, minimum: 0))
             .telemetry(sink: telemetry)
             .polling(choice: polling.kotlinPolling())
+            .maxSessionRenewals(count: Self.renewalCount(maxSessionRenewals))
+            .sessionRenewMillis(millis: Self.sessionRenewMillis(sessionRenew))
+            .busyRetryMillis(millis: Self.busyRetryMillis(busyRetry))
             // The Swift layer orders and buffers updates itself (see `ChipReadingCore`), so the
             // reader's own thread is enough: asking for the main queue would add one more hop.
             .observerOn(thread: .caller)
@@ -220,7 +265,10 @@ public struct ChipReadSettings {
             telemetry: settings.telemetry,
             readTimeout: TimeInterval(settings.readTimeoutMillis) / 1000,
             searchRestart: settings.searchRestartMillis == 0 ? nil : TimeInterval(settings.searchRestartMillis) / 1000,
-            polling: ChipReadPolling(kotlin: settings.polling)
+            polling: ChipReadPolling(kotlin: settings.polling),
+            maxSessionRenewals: Int(settings.maxSessionRenewals),
+            sessionRenew: settings.sessionRenewMillis == 0 ? nil : TimeInterval(settings.sessionRenewMillis) / 1000,
+            busyRetry: settings.busyRetryMillis == 0 ? nil : TimeInterval(settings.busyRetryMillis) / 1000
         )
     }
 }
@@ -249,13 +297,18 @@ public struct ChipReadStepEvent: Sendable, Equatable {
     /// The chip's status word, when it answered with one.
     public let statusWord: Int?
     public let durationMillis: Int64
-    /// The platform's own code, for a step that ended on one: today only the `SESSION_END` step, with
-    /// Core NFC's `NFCReaderError` code. `nil` for every other step.
+    /// The platform's own code, for a step that ended on one: the `SESSION_END` step, with Core NFC's
+    /// `NFCReaderError` code, and the `SESSION_RENEW` step, with 202 when the system's end led to the
+    /// renewal. `nil` for every other step, and for a renewal after the time passed.
     public let systemCode: Int?
+    /// The number of the new system session, from 1, for the `SESSION_RENEW` step; `nil` for every
+    /// other step.
+    public let renewal: Int?
 
     public init(
         step: String, outcome: ChipReadStepResult, protocol: String? = nil, fileId: Int? = nil,
-        byteCount: Int? = nil, statusWord: Int? = nil, durationMillis: Int64 = 0, systemCode: Int? = nil
+        byteCount: Int? = nil, statusWord: Int? = nil, durationMillis: Int64 = 0, systemCode: Int? = nil,
+        renewal: Int? = nil
     ) {
         self.step = step
         self.outcome = outcome
@@ -265,6 +318,7 @@ public struct ChipReadStepEvent: Sendable, Equatable {
         self.statusWord = statusWord
         self.durationMillis = durationMillis
         self.systemCode = systemCode
+        self.renewal = renewal
     }
 
     init(_ event: ChipReadEvent) {
@@ -281,6 +335,7 @@ public struct ChipReadStepEvent: Sendable, Equatable {
         statusWord = event.statusWord.map { Int($0.int32Value) }
         durationMillis = event.durationMillis
         systemCode = event.systemCode.map { Int($0.int32Value) }
+        renewal = event.renewal.map { Int($0.int32Value) }
     }
 }
 
