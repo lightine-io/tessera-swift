@@ -11,12 +11,15 @@ import Tessera
 final class AgreementGate {
     private let consensus = try! MrzDecodeConsensus(threshold: 2)   // a fixed, valid threshold
     private(set) var progress = ""
+    private var handedOver = false
 
     func offer(_ result: MrzScanResult) -> MrzScanResultDecoded? {
         guard let decoded = result as? MrzScanResultDecoded,
               !(decoded.parse is ParseResult.Failure) else { return nil }
         switch consensus.offer(decoded: decoded) {
         case let confirmed as ConsensusVerdictConfirmed:
+            if handedOver { return nil }   // it confirms again on every later frame; hand over once
+            handedOver = true
             return confirmed.decoded
         case let gathering as ConsensusVerdictGathering:
             progress = "\(gathering.agreement) of \(gathering.threshold)"
@@ -26,7 +29,10 @@ final class AgreementGate {
         }
     }
 
-    func reset() { consensus.reset() }
+    func reset() {
+        consensus.reset()
+        handedOver = false
+    }
 }
 // endregion
 

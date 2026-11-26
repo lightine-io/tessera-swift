@@ -17,7 +17,8 @@ final class ResultCollector: NSObject, Kotlinx_coroutines_coreFlowCollector {
 }
 
 @MainActor
-final class FirstReader {
+final class FirstReader: ObservableObject {
+    @Published private(set) var note = "Reading"
     private var scanner: AVCaptureMrzScanner?
     private var collectTask: Task<Void, Never>?
 
@@ -47,6 +48,11 @@ final class FirstReader {
     }
 
     private func handle(_ result: MrzScanResult) {
+        if let capture = result as? MrzScanResultCaptureError {
+            note = "Camera: \(capture.error.code)"   // for example, the permission was refused
+            return
+        }
+        // This accepts the first frame that parses. The how-to "Accept a read after N matching frames" shows agreement.
         guard let decoded = result as? MrzScanResultDecoded else { return }
         let document: MrzDocument
         if let success = decoded.parse as? ParseResult.Success {
@@ -57,9 +63,9 @@ final class FirstReader {
             return
         }
         let fields = document.commonFields
-        print("Name: \(fields.primaryIdentifier), \(fields.secondaryIdentifier)")
-        print("Document number: \(fields.documentNumber)")
-        print("Format: \(document.format.name)")
+        note = "Name: \(fields.primaryIdentifier), \(fields.secondaryIdentifier)\n" +
+            "Document number: \(fields.documentNumber)\n" +
+            "Format: \(document.format.name)"
         collectTask?.cancel()
         scanner?.stop()
         scanner?.close()
@@ -72,10 +78,10 @@ final class FirstReader {
 import SwiftUI
 
 struct ContentView: View {
-    @State private var reader = FirstReader()
+    @StateObject private var reader = FirstReader()
 
     var body: some View {
-        Text("Reading. Watch the Xcode console.")
+        Text(reader.note)
             .onAppear { reader.begin() }
     }
 }
