@@ -2,8 +2,9 @@ import Foundation
 import Tessera
 
 // A Swift `AsyncStream` over the Kotlin camera scanner's `results` flow (TES-31): a small hand-written
-// adapter instead of a code generator. It lives in TesseraUI because that is the Swift layer that ships;
-// the `Tessera` product is a binary XCFramework and cannot carry Swift code.
+// adapter instead of a code generator. It was written when `Tessera` was only a binary XCFramework and
+// could not carry Swift code, so it lives in TesseraUI. Since 1.0.0 `Tessera` is a Swift target
+// (Sources/Tessera) over the `TesseraCore` binary, and this adapter could move there.
 
 extension MrzCameraScanner {
     /// The scanner's results as a Swift `AsyncStream`, one element per analysed frame or capture error.
