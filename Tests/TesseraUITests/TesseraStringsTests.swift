@@ -35,7 +35,7 @@ struct TesseraStringsTests {
     }
 
     /// The built bundle's compiled strings table must resolve on every iOS the package supports: a miss
-    /// would show the raw key on the screen. The old-iOS simulator CI runs this on iOS 15, 16 and 17.
+    /// would show the raw key on the screen. The old-iOS simulator CI runs this on iOS 15, 16, 17 and 18.
     @Test func screenKeysResolveToText() {
         let keys = [
             "tessera_scanner_title",

@@ -16,7 +16,7 @@ private func rawClassGetName(_ cls: UnsafeRawPointer) -> UnsafePointer<CChar>
 /// classes) names a type missing on the running iOS, the walk dies here instead of in an app.
 ///
 /// The test only means something on an old simulator. On the iOS the package was built on, it passes
-/// and proves little. The workflow `.github/workflows/old-ios.yml` runs it on iOS 15, 16 and 17.
+/// and proves little. The workflow `.github/workflows/old-ios.yml` runs it on iOS 15, 16, 17 and 18.
 struct ClassWalkTests {
     /// What the walk saw, so a failure message can say what was found.
     private struct Walk {
