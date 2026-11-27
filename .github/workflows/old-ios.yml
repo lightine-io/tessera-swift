@@ -1,15 +1,24 @@
 name: old-ios
 
-# Runs the package's tests on real iOS 15, 16 and 17 simulators (TES-343: the minimum went from iOS 18
-# to iOS 15). No old simulator runs on the maintainer's Mac (Xcode 27), so this is the only place the
-# old-iOS code paths run. Not part of ci.yml: it downloads multi-GB runtimes and builds the framework.
+# Runs the package's tests on real iOS 15, 16, 17 and 18 simulators, plus a control leg on the image's own
+# iOS (TES-343: the minimum went from iOS 18 to iOS 15). No old simulator runs on the maintainer's Mac
+# (Xcode 27), so this is the only place the old-iOS code paths run. Not part of ci.yml: it downloads
+# multi-GB runtimes and builds the framework.
 #
-# The package consumes a binary TesseraCore.xcframework. The release URL in Package.swift is built for
-# iOS 18, so the `framework` job builds the one that matches the ref from lightine-io/tessera and the
-# `test` job takes it through TESSERA_LOCAL_XCFRAMEWORK=1 (.local-xcframework/). The ref must have the
-# TesseraCore name (TES-346); an older ref builds Tessera.xcframework and the framework job stops.
+# The package consumes a binary TesseraCore.xcframework. The `framework` job builds it from the chosen ref
+# of lightine-io/tessera and the `test` job takes it through TESSERA_LOCAL_XCFRAMEWORK=1
+# (.local-xcframework/), so a framework change is checked here before it is released. To check a released
+# framework, give its tag as the ref. The ref must have the TesseraCore name (TES-346); a ref from 0.7.0 or
+# earlier builds Tessera.xcframework and the framework job stops.
 #
-# Not a required check. Every action is pinned to a full commit SHA with a version comment.
+# What a leg proves (TES-372): the test bundle links the static framework as an app does, so a system
+# symbol the old iOS lacks stops the bundle from loading (FrameworkLoadSmokeTests and the log summary show
+# it); the saved-image reader runs Apple Vision on a drawn specimen (SavedImageVisionReadTests); the class
+# walk sets up every class (ClassWalkTests). Chip reads with fake chips are not covered here: the fakes are
+# Kotlin test code that the framework does not ship.
+#
+# Runs by hand and once a week (the main branch of lightine-io/tessera). Not a required check.
+# Every action is pinned to a full commit SHA with a version comment.
 
 on:
   workflow_dispatch:
@@ -26,13 +35,9 @@ on:
         options:
           - full
           - permission
-  # TEMPORARY: lets the workflow run from this branch before it exists on the default branch
-  # (workflow_dispatch only lists workflows that are on the default branch). Remove the push trigger
-  # when TES-343 is merged. A pushed branch whose name ends in `-perm-trace` runs the `permission` focus.
-  push:
-    branches:
-      - "feature/tes-343-*"
-      - "feature/tes-346-*"
+  schedule:
+    # Mondays 04:17 UTC. A scheduled run has no inputs, so it builds `main` with the `full` focus.
+    - cron: "17 4 * * 1"
 
 permissions:
   contents: read
@@ -44,14 +49,14 @@ concurrency:
 env:
   # The framework is built with the Xcode the main repository pins (Kotlin 2.4.20-2.4.21 lists Xcode 26.4).
   FRAMEWORK_XCODE_VERSION: "26.4.1"
-  # On push runs the matching framework branch; on manual runs the input.
-  TESSERA_REF: ${{ github.event_name == 'push' && (startsWith(github.ref_name, 'feature/tes-346-') && 'feature/tes-346-chip-read-lifecycle' || 'feature/tes-343-ios-15-minimum') || inputs.tessera_ref }}
+  # The input on manual runs; `main` on scheduled runs, which have no inputs.
+  TESSERA_REF: ${{ inputs.tessera_ref || 'main' }}
   # `permission`: only the permission-watcher suite on iOS 16.4 (TES-343 diagnosis). `full`: everything.
-  FOCUS: ${{ (inputs.focus == 'permission' || (github.event_name == 'push' && endsWith(github.ref_name, '-perm-trace'))) && 'permission' || 'full' }}
+  FOCUS: ${{ inputs.focus == 'permission' && 'permission' || 'full' }}
 
 jobs:
   framework:
-    name: XCFramework (${{ github.event_name == 'push' && (startsWith(github.ref_name, 'feature/tes-346-') && 'feature/tes-346-chip-read-lifecycle' || 'feature/tes-343-ios-15-minimum') || inputs.tessera_ref }})
+    name: XCFramework (${{ inputs.tessera_ref || 'main' }})
     runs-on: macos-26
     timeout-minutes: 60
     steps:
@@ -94,7 +99,7 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
         with:
-          # This workflow never writes the Gradle cache (it runs on feature branches and by hand).
+          # This workflow never writes the Gradle cache (it runs by hand and on a schedule).
           cache-read-only: true
 
       - name: Build the XCFramework
@@ -128,7 +133,7 @@ jobs:
       # leg ends with a warning and runs no test, so the run stays green; if one installs, its tests count.
       # The `permission` focus keeps only the iOS 16.4 leg. (`env` is not readable here, hence the repeat.)
       matrix:
-        include: ${{ fromJSON((inputs.focus == 'permission' || (github.event_name == 'push' && endsWith(github.ref_name, '-perm-trace'))) && '[{"label":"iOS 16.4","ios":"16.4","device":"iPhone 14","xcode":"26.6","install":true,"optional":false}]' || '[{"label":"iOS 15","ios":"15.5 15.4 15.2 15.0","device":"iPhone 13","xcode":"26.6","install":true,"optional":true},{"label":"iOS 16.4","ios":"16.4","device":"iPhone 14","xcode":"26.6","install":true,"optional":false},{"label":"iOS 17.5","ios":"17.5","device":"iPhone 15","xcode":"26.6","install":true,"optional":false},{"label":"iOS 26.4.1 (control, on the image)","ios":"26.4.1","device":"iPhone 17","xcode":"26.4.1","install":false,"optional":false}]') }}
+        include: ${{ fromJSON(inputs.focus == 'permission' && '[{"label":"iOS 16.4","ios":"16.4","device":"iPhone 14","xcode":"26.6","install":true,"optional":false}]' || '[{"label":"iOS 15","ios":"15.5 15.4 15.2 15.0","device":"iPhone 13","xcode":"26.6","install":true,"optional":true},{"label":"iOS 16.4","ios":"16.4","device":"iPhone 14","xcode":"26.6","install":true,"optional":false},{"label":"iOS 17.5","ios":"17.5","device":"iPhone 15","xcode":"26.6","install":true,"optional":false},{"label":"iOS 18","ios":"18.6 18.5 18.4","device":"iPhone 16","xcode":"26.6","install":true,"optional":false},{"label":"iOS 26.4.1 (control, on the image)","ios":"26.4.1","device":"iPhone 17","xcode":"26.4.1","install":false,"optional":false}]') }}
         # Xcode 26.4.1 crashes XCTest's start-up on iOS 15 simulators (Apple forum thread 822916,
         # "Tests fail to run on iOS 15 simulators", fixed in Xcode 26.5), so the old legs use the
         # newest Xcode on the image. The control leg uses the Xcode and runtime ci.yml uses.
@@ -168,6 +173,8 @@ jobs:
       # "not available for download" (run 45470048797); Apple DTS says Xcode 26.2 offers iOS 15.0 and later
       # (forum thread 814284), so `ios` lists candidates, newest first, and the first one that installs is used.
       # Every answer is printed. If none installs, the step fails with all the answers.
+      # iOS 18 (TES-372) lists the last 18.x releases, newest first, the same way: no run has yet shown
+      # which of them Xcode 26.6 offers, so the first run's answers settle it.
       - name: Install an iOS ${{ matrix.ios }} simulator runtime
         id: rt
         if: matrix.install
@@ -261,6 +268,8 @@ jobs:
           TEST_RUNNER_TESSERA_PERMISSION_TRACE: "1"
         run: |
           set -o pipefail
+          # Crash reports newer than this mark belong to this run (see the summary step).
+          touch "$RUNNER_TEMP/test-start"
           ONLY=()
           if [ "$FOCUS" = permission ]; then
             ONLY=(-only-testing:TesseraUITests/ScannerModelPermissionTests)
@@ -280,13 +289,82 @@ jobs:
           [ -f "$LOG" ] || { echo "No test log."; exit 0; }
           grep -E 'permission-trace|ScannerModelPermissionTests|Test run with' "$LOG" || echo "No permission-trace lines."
 
-      - name: Upload the log and result bundle
-        if: failure()
+      # TES-372: the reason for a failure goes to the job log, so it can be read even when an upload fails.
+      # Prints the result line, the test counts, each failing test with its message, and every line that
+      # says the test process could not load or crashed. Always ends green: the Test step carries the result.
+      - name: Failure summary (iOS ${{ steps.ver.outputs.version }})
+        if: always() && steps.rt.outputs.skip != 'true'
+        env:
+          LOG: ${{ runner.temp }}/test-${{ matrix.label }}.log
+          BUNDLE: ${{ runner.temp }}/result-${{ matrix.label }}.xcresult
+        run: |
+          set +e
+          LOAD='dyld\[|dyld:|Symbol not found|Library not loaded|unexpected exit|crashed|Terminating app|couldn.t be loaded|failed to load|exited before'
+          # Prints the matching lines of stdin, or "None." when there are none.
+          lines() { OUT=$(grep -iE "$1" | head -n "$2"); if [ -n "$OUT" ]; then echo "$OUT"; else echo "None."; fi; }
+          echo "::group::Result and counts (console log)"
+          if [ -f "$LOG" ]; then
+            grep -E '\*\* TEST (SUCCEEDED|FAILED) \*\*|Testing failed:|Executed [0-9]+ tests?|Test run with [0-9]+ tests?|Test Suite .* (passed|failed) at' "$LOG" | tail -n 40
+          else
+            echo "No test log."
+          fi
+          echo "::endgroup::"
+          if [ -f "$LOG" ]; then
+            echo "Failing tests and their messages (console log):"
+            # Swift Testing marks a failed test or issue with "✘"; XCTest writes "error: -[Suite test] : message";
+            # xcodebuild lists "Failing tests:" at the end.
+            grep -E '✘|: error: |error: -\[|^Failing tests:|^\s+[A-Za-z0-9_]+\.[A-Za-z0-9_]+\(\)$|^\s+-\[' "$LOG" | head -n 200
+            echo "Load and crash lines (console log):"
+            lines "$LOAD" 60 < "$LOG"
+          fi
+          if [ -d "$BUNDLE" ]; then
+            echo "Failing tests and their messages (result bundle):"
+            xcrun xcresulttool get test-results summary --path "$BUNDLE" --compact > "$RUNNER_TEMP/summary.json" 2> "$RUNNER_TEMP/summary.err"
+            python3 -I - "$RUNNER_TEMP/summary.json" <<'PY'
+          import json, sys
+          try:
+              s = json.load(open(sys.argv[1]))
+          except Exception as e:
+              print("No readable summary: %s" % e)
+              sys.exit(0)
+          print("result=%s total=%s passed=%s failed=%s skipped=%s" % (
+              s.get("result"), s.get("totalTestCount"), s.get("passedTests"), s.get("failedTests"), s.get("skippedTests")))
+          for f in s.get("testFailures", [])[:50]:
+              print("FAILED %s / %s: %s" % (f.get("targetName", "?"), f.get("testIdentifierString") or f.get("testName"), (f.get("failureText") or "").strip()[:600]))
+          PY
+            cat "$RUNNER_TEMP/summary.err"
+            echo "Load and crash lines (result bundle log):"
+            xcrun xcresulttool get log --path "$BUNDLE" --type action 2>&1 | lines "$LOAD" 60
+          fi
+          echo "Crash reports written during the test:"
+          if [ -f "$RUNNER_TEMP/test-start" ]; then
+            find "$HOME/Library/Logs/DiagnosticReports" -type f -newer "$RUNNER_TEMP/test-start" 2>/dev/null | while read -r f; do
+              echo "--- $(basename "$f")"
+              grep -iE 'Symbol not found|Library not loaded|"termination"|exception|dyld|"procName"|"osVersion"' "$f" | head -n 20
+            done
+          fi
+          exit 0
+
+      # Two uploads: the console log is small and goes first; the result bundle is large and once timed out.
+      # Neither may change the job's result, which is the Test step's.
+      - name: Upload the log
+        if: failure() && steps.rt.outputs.skip != 'true'
+        continue-on-error: true
+        timeout-minutes: 10
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: old-ios-${{ matrix.label }}-logs
-          path: |
-            ${{ runner.temp }}/test-${{ matrix.label }}.log
-            ${{ runner.temp }}/result-${{ matrix.label }}.xcresult
+          name: old-ios-${{ matrix.label }}-log
+          path: ${{ runner.temp }}/test-${{ matrix.label }}.log
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload the result bundle
+        if: failure() && steps.rt.outputs.skip != 'true'
+        continue-on-error: true
+        timeout-minutes: 20
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: old-ios-${{ matrix.label }}-result
+          path: ${{ runner.temp }}/result-${{ matrix.label }}.xcresult
           if-no-files-found: ignore
           retention-days: 7
