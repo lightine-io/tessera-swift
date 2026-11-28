@@ -2,7 +2,7 @@
 import PackageDescription
 import Foundation
 
-// Tessera for iOS ships TWO products from this package:
+// Tessera for iOS ships THREE products from this package:
 //
 //   • `Tessera`   — everything headless, behind one `import Tessera`: MRZ parsing / validation /
 //                   generation, the AVFoundation + Apple Vision live-camera scanner and chip reading.
@@ -12,6 +12,9 @@ import Foundation
 //   • `TesseraUI` — the default SwiftUI scanner UI (hand-written Swift/SwiftUI per ADR-026), layered over
 //                   `Tessera`. Its public surface freezes at the 0.5.0 tag under ADR-007, lockstep-versioned
 //                   with the main project.
+//
+//   • `TesseraLogging` — opt-in, for debugging: one sink that prints each SDK diagnostic event to Apple's
+//                   unified log (TES-367). `Tessera` and `TesseraUI` contain no log-writing code.
 //
 // `TesseraCore` is the XCFramework built from the Kotlin Multiplatform codebase in lightine-io/tessera and
 // attached to that project's GitHub release (named `Tessera.xcframework.zip` up to 0.7.0). It is a target,
@@ -43,6 +46,7 @@ let package = Package(
     products: [
         .library(name: "Tessera", targets: ["Tessera"]),
         .library(name: "TesseraUI", targets: ["TesseraUI"]),
+        .library(name: "TesseraLogging", targets: ["TesseraLogging"]),
     ],
     targets: [
         tesseraCoreBinary,
@@ -60,6 +64,12 @@ let package = Package(
             // The compatibility layer's notes for maintainers: not a resource, not shipped.
             exclude: ["Compat/README.md"],
             resources: [.process("Resources")]
+        ),
+        // TesseraLogging (TES-367): opt-in sink that logs telemetry events to the unified log.
+        .target(
+            name: "TesseraLogging",
+            dependencies: ["Tessera"],
+            path: "Sources/TesseraLogging"
         ),
         // Compiled samples (TES-230): every Swift code block of the public iOS how-to pages and
         // tutorials, one file per page under Samples/. How-tos build in the package's Swift 6
@@ -115,6 +125,11 @@ let package = Package(
             name: "TesseraTests",
             dependencies: ["Tessera", "TesseraSamplesChipReading", "TesseraSamplesImports070", "TesseraSamplesImportsOne"],
             path: "Tests/TesseraTests"
+        ),
+        .testTarget(
+            name: "TesseraLoggingTests",
+            dependencies: ["Tessera", "TesseraLogging"],
+            path: "Tests/TesseraLoggingTests"
         ),
         .testTarget(
             name: "TesseraUITests",

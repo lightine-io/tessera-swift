@@ -1,6 +1,6 @@
 # tessera-swift
 
-This repository is the Swift package for Tessera, the open-source SDK that reads, validates, and generates MRZ data. An MRZ (machine-readable zone) is the block of text lines printed at the bottom of a passport or ID card page. The package vends two products: `Tessera`, everything headless (the Kotlin core with the headless readers, and the Swift layer for reading a chip), and `TesseraUI`, the SwiftUI scanner screen. The current release is 1.1.0. The Kotlin source and the releases live in the [main repository](https://github.com/lightine-io/tessera). The SDK reports what it read, and your app decides what to do with it.
+This repository is the Swift package for Tessera, the open-source SDK that reads, validates, and generates MRZ data. An MRZ (machine-readable zone) is the block of text lines printed at the bottom of a passport or ID card page. The package vends two products: `Tessera`, everything headless (the Kotlin core with the headless readers, and the Swift layer for reading a chip), and `TesseraUI`, the SwiftUI scanner screen. A third, `TesseraLogging`, is an opt-in log helper for debugging. The current release is 1.1.0. The Kotlin source and the releases live in the [main repository](https://github.com/lightine-io/tessera). The SDK reports what it read, and your app decides what to do with it.
 
 ## Install
 
@@ -235,6 +235,7 @@ func readWhileVisible(options: ChipReadOptions) async -> ChipReadFinish {
 |---|---|
 | `Tessera` | Everything headless, with one `import Tessera`. The Kotlin core (the `TesseraCore` XCFramework, which `Tessera` re-exports): MRZ parsing, validation, and generation, plus the headless camera, saved-image, and manual-entry readers. Also headless chip reading in Swift: `ChipReading`, the `ChipAccessKey` builders, `ChipReadOptions.Builder` helpers, `TrustAnchors.shared.load(contentsOf:)`, and the `ChipReadOutcome` enum. It draws nothing and imports no UI framework. |
 | `TesseraUI` | The SwiftUI scanner screen: `MrzScannerView`, `MrzScannerConfig`, and the result it returns. |
+| `TesseraLogging` | Opt-in, for debugging. `LoggingTelemetrySink` prints each SDK diagnostic event to Apple's unified log. Add the product on purpose and register it with `TelemetrySinkRegistry.shared.register(sink: LoggingTelemetrySink())`. `Tessera` and `TesseraUI` never write to the log. |
 
 Compatibility within 0.x:
 
