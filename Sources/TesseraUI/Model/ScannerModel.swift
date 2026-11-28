@@ -75,7 +75,7 @@ final class ScannerModel: ObservableObject {
     /// ``previewSession``'s bound video device - the same seam ``setTorch(_:)`` already reads. `false` while
     /// no session is live (nothing to check yet).
     var hasTorch: Bool {
-        currentCaptureDevice()?.hasTorch ?? false
+        currentTorchDevice()?.hasTorch ?? false
     }
 
     /// The configuration this presentation runs with, fixed when the model is created (TES-155).
@@ -126,8 +126,8 @@ final class ScannerModel: ObservableObject {
     /// Android `lastNotAcceptedAtMs`.
     private var lastNotAcceptedAt: Date?
 
-    /// The clock behind ``lastNotAcceptedAt`` and its linger check. A seam so a host test can step past the
-    /// linger without waiting 3 seconds; the screen always uses the wall clock.
+    /// The model's clock: behind ``lastNotAcceptedAt`` and ``lastGatheringAt`` and their linger checks. A seam
+    /// so a host test can step past a linger without waiting; the screen always uses the wall clock.
     var notAcceptedClock: () -> Date = { Date() }
 
     /// The kinds of document this presentation accepts (TES-103). Never empty: the config refuses an empty set.
@@ -833,8 +833,14 @@ final class ScannerModel: ObservableObject {
 
     /// Main-actor delivery of the latest published `AVCaptureSession` (or `nil`), for the preview view.
     private func deliverPreviewSession(_ session: UnsafeTransfer<AVCaptureSession?>) {
-        previewSession = session.value
-        guard session.value != nil else { return }
+        applyPreviewSession(session.value)
+    }
+
+    /// The body of ``deliverPreviewSession(_:)``, internal so a host test can publish a session (the simulator
+    /// has no camera, so no real one ever arrives).
+    func applyPreviewSession(_ session: AVCaptureSession?) {
+        previewSession = session
+        guard session != nil else { return }
         // Honour torchOnByDefault the first time the camera opens (the device is now reachable via the session).
         if config.torchOnByDefault, !torchDefaultApplied {
             torchDefaultApplied = true
@@ -860,7 +866,7 @@ final class ScannerModel: ObservableObject {
     /// isn't open yet or has no torch. Kotlin/Native doesn't bind the AVFoundation torch category, so this
     /// lives in Swift; it's safe because torch is a device-level property orthogonal to the session config.
     private func setTorch(_ on: Bool) {
-        guard let device = currentCaptureDevice(), device.hasTorch, device.isTorchAvailable else { return }
+        guard let device = currentTorchDevice(), device.hasTorch, device.isTorchAvailable else { return }
         do {
             try device.lockForConfiguration()
             device.torchMode = on ? .on : .off
@@ -869,6 +875,15 @@ final class ScannerModel: ObservableObject {
         } catch {
             // Torch config can fail transiently (device busy); leave the state unchanged.
         }
+    }
+
+    /// Test seam: supplies a stand-in torch device in place of the one reached through the session. `nil` in
+    /// production, so the real device is always used.
+    var torchDeviceOverride: (() -> (any TorchDevice)?)?
+
+    private func currentTorchDevice() -> (any TorchDevice)? {
+        if let torchDeviceOverride { return torchDeviceOverride() }
+        return currentCaptureDevice()
     }
 
     /// The active video capture device, reached from the running session the scanner publishes.
@@ -917,7 +932,7 @@ final class ScannerModel: ObservableObject {
                 confirmedReadHaptic += 1
                 routeThroughDecode(decoded, source: .camera)
             case .gathering:
-                lastGatheringAt = Date()
+                lastGatheringAt = notAcceptedClock()
                 // A new reading gathering also replaces a not-accepted notice (TES-103).
                 if case let .scanning(struggling, gathering, notAccepted) = state, !gathering || notAccepted != nil {
                     state = .scanning(struggling: struggling, gathering: true, notAccepted: nil)
@@ -953,7 +968,7 @@ final class ScannerModel: ObservableObject {
             // Clear the "hold steady" cue only after the linger window with no decode, so a single miss
             // between two decodes (normal even on a steady card) does not strobe it.
             if newGathering, let lastGathering = lastGatheringAt,
-               Date().timeIntervalSince(lastGathering) > gatheringCueLinger {
+               notAcceptedClock().timeIntervalSince(lastGathering) > gatheringCueLinger {
                 newGathering = false
             }
             // TES-151: the struggle timeout already elapsed while scanning was not showing — this frame, on
@@ -1054,4 +1069,20 @@ private final class FlowCollector: NSObject, Kotlinx_coroutines_coreFlowCollecto
     func emit(value: Any?) async throws {
         await onValue(value)
     }
+}
+
+/// The part of a camera device the torch switch uses. `AVCaptureDevice` conforms; a host test supplies a fake.
+protocol TorchDevice: AnyObject {
+    var hasTorch: Bool { get }
+    var isTorchAvailable: Bool { get }
+    var torchMode: AVCaptureDevice.TorchMode { get set }
+    func lockForConfiguration() throws
+    func unlockForConfiguration()
+}
+
+extension AVCaptureDevice: TorchDevice {}
+
+/// The torch button's symbol: the filled bolt while the torch is on, the slashed bolt while it is off.
+func torchIconName(on: Bool) -> String {
+    on ? "bolt.fill" : "bolt.slash.fill"
 }
