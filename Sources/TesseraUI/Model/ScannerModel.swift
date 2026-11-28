@@ -883,7 +883,7 @@ final class ScannerModel: ObservableObject {
 
     private func currentTorchDevice() -> (any TorchDevice)? {
         if let torchDeviceOverride { return torchDeviceOverride() }
-        return currentCaptureDevice()
+        return currentCaptureDevice().map(CaptureTorchDevice.init)
     }
 
     /// The active video capture device, reached from the running session the scanner publishes.
@@ -1080,7 +1080,23 @@ protocol TorchDevice: AnyObject {
     func unlockForConfiguration()
 }
 
-extension AVCaptureDevice: TorchDevice {}
+/// The real camera device behind ``TorchDevice``. A wrapper, not a conformance on `AVCaptureDevice`: an
+/// extension of a system type would show in this module's public API.
+final class CaptureTorchDevice: TorchDevice {
+    private let device: AVCaptureDevice
+
+    init(_ device: AVCaptureDevice) { self.device = device }
+
+    var hasTorch: Bool { device.hasTorch }
+    var isTorchAvailable: Bool { device.isTorchAvailable }
+    var torchMode: AVCaptureDevice.TorchMode {
+        get { device.torchMode }
+        set { device.torchMode = newValue }
+    }
+
+    func lockForConfiguration() throws { try device.lockForConfiguration() }
+    func unlockForConfiguration() { device.unlockForConfiguration() }
+}
 
 /// The torch button's symbol: the filled bolt while the torch is on, the slashed bolt while it is off.
 func torchIconName(on: Bool) -> String {
