@@ -80,7 +80,7 @@ let package = Package(
         // TesseraUITests depends on the samples targets: that is what makes CI compile them.
         .target(
             name: "TesseraSamples",
-            dependencies: ["Tessera", "TesseraUI"],
+            dependencies: ["Tessera", "TesseraUI", "TesseraLogging"],
             path: "Samples/HowTo"
         ),
         .target(
